@@ -64,7 +64,7 @@ void buildup_process_tree() {
         for (ListNode *now = processes_list_tail; now; now = now->prev) {
             for (ListNode *p1 = now->item->son_list_tail; p1; p1 = p1->prev) {
                 ListNode *p2 = p1;
-                while (p2->prev && (p2->item->pid) < (p2->prev->item->pid)) {
+                while (p2->prev && (p2->item->pid) < ((p2->prev->item)->pid)) {
                     Process *t = p2->item;
                     p2->item = p2->prev->item;
                     p2->prev->item = t;
