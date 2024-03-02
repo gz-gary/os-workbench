@@ -15,6 +15,7 @@ void fetch_one_process(const char *pid_str) {
     strcat(proc_filename, pid_str);
     strcat(proc_filename, "/stat");
 
+    printf("%s\n", proc_filename);
     FILE *fp = fopen(proc_filename, "r");
     if (!fp) goto release_fp;
 
@@ -38,7 +39,6 @@ void fetch_all_processes() {
         // if entry represents a process
         if (is_pure_digits(entry->d_name)) {
             fetch_one_process(entry->d_name);
-
         }
     }
 
