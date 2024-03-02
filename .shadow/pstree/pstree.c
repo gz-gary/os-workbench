@@ -65,7 +65,7 @@ void traverse_process_tree(Process *now, int depth) {
     int is_leaf_node = (now->son_list_tail == NULL);
     if (is_leaf_node) printf("{%s}", now->name);
     else printf("%s", now->name);
-    printf("(%d)", now->pid);
+    if (flag_n) printf("(%d)", now->pid);
     printf("\n");
 
     for (ListNode *son = now->son_list_tail; son; son = son->prev) {
@@ -88,7 +88,6 @@ int main(int argc, char *argv[]) {
     parse_args(argc, argv);
 
     if (flag_V) {
-        // const char *version_info = "pstree (a toy version)";
         fprintf(stderr, "pstree (a toy version)");
         return 0;
     }
