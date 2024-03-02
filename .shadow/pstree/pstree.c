@@ -18,9 +18,9 @@ void fetch_one_process(const char *pid_str) {
     FILE *fp = fopen(proc_filename, "r");
     if (!fp) goto release_fp;
 
-    Process *proc = malloc(sizeof(Process));
-    fscanf(fp, "%d (%s) %*c %d", &proc->pid, proc->name, &proc->ppid);
-    processes_list_tail = insert_item(processes_list_tail, proc);
+    //Process *proc = malloc(sizeof(Process));
+    //fscanf(fp, "%d (%s) %*c %d", &proc->pid, proc->name, &proc->ppid);
+    //processes_list_tail = insert_item(processes_list_tail, proc);
 
 release_fp:
     if (fp) fclose(fp);
