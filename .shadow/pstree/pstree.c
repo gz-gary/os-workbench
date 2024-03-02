@@ -20,7 +20,8 @@ void fetch_one_process(const char *pid_str) {
     if (!fp) goto release_fp;
 
     Process *proc = malloc(sizeof(Process));
-    fscanf(fp, "%d (%s) %*c %d", &proc->pid, proc->name, &proc->ppid);
+    fscanf(fp, "%d %s %*c %d", &proc->pid, proc->name, &proc->ppid);
+    remove_parentheses(proc->name);
     printf("%d %s %d\n", proc->pid, proc->name, proc->ppid);
     //processes_list_tail = insert_item(processes_list_tail, proc);
 
