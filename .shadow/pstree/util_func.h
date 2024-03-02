@@ -13,4 +13,5 @@ void remove_parentheses(char *str) {
         str[i] = str[i + 1];
     }
     str[len - 2] = '\0';
+    str[len - 1] = '\0';
 }
