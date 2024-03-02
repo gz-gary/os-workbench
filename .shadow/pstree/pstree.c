@@ -52,7 +52,7 @@ void buildup_process_tree() {
 
 void show_all_processes() {
     for (ListNode *now = processes_list_tail; now; now = now->prev) {
-        printf("%s\n", now->item->name);
+        printf("%d %s\n", now->item->pid, now->item->name);
     }
 }
 
