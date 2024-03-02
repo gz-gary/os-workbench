@@ -19,9 +19,8 @@ struct Process {
     pid_t pid;
     pid_t ppid;
 
-    char *name;
+    char name[128];
 
     Process *parent;
-
-    ListNode *sons_list_tail;
+    ListNode *son_list_tail;
 };
