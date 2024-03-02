@@ -58,6 +58,10 @@ void buildup_process_tree() {
         if (!now->item->ppid)
             root_of_process_tree = now->item;
     }
+
+    if (flag_n) {
+    }
+
 }
 
 void traverse_process_tree(Process *now, int depth) {
@@ -65,7 +69,7 @@ void traverse_process_tree(Process *now, int depth) {
     int is_leaf_node = (now->son_list_tail == NULL);
     if (is_leaf_node) printf("{%s}", now->name);
     else printf("%s", now->name);
-    if (flag_n) printf("(%d)", now->pid);
+    if (flag_p) printf("(%d)", now->pid);
     printf("\n");
 
     for (ListNode *son = now->son_list_tail; son; son = son->prev) {
