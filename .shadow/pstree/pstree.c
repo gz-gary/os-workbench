@@ -9,6 +9,7 @@
 #include "util_func.h"
 
 ListNode *processes_list_tail;
+Process *root_of_process_tree;
 
 void fetch_one_process(const char *pid_str) {
     char proc_filename[128] = "/proc/";
@@ -47,6 +48,28 @@ release_dir:
 }
 
 void buildup_process_tree() {
+    for (ListNode *now = processes_list_tail; now; now = now->prev) {
+        for (ListNode *parent = processes_list_tail; parent; parent = parent->prev)
+            if (parent->item->pid == now->item->ppid) {
+                parent->item->son_list_tail = insert_item(parent->item->son_list_tail, now->item);
+                break;
+            }
+        if (!now->item->ppid)
+            root_of_process_tree = now->item;
+    }
+}
+
+void traverse_process_tree(Process *now, int depth) {
+    for (int i = 0; i < 2 * depth; ++i) printf(" ");
+    int is_leaf_node = (now->son_list_tail == NULL);
+    if (is_leaf_node) printf("{%s}", now->name);
+    else printf("%s", now->name);
+    printf("(%d)", now->pid);
+    printf("\n");
+
+    for (ListNode *son = now->son_list_tail; son; son = son->prev) {
+        traverse_process_tree(son->item, depth + 1);
+    }
 }
 
 void show_all_processes() {
@@ -63,7 +86,9 @@ int main(int argc, char *argv[]) {
     assert(!argv[argc]);
 
     fetch_all_processes();
-    show_all_processes();
+    buildup_process_tree();
+    traverse_process_tree(root_of_process_tree, 0);
+    // show_all_processes();
   
     return 0;
 }

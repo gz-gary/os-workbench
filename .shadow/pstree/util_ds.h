@@ -21,6 +21,6 @@ struct Process {
 
     char name[128];
 
-    Process *parent;
+    // Process *parent;
     ListNode *son_list_tail;
 };
