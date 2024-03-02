@@ -7,6 +7,7 @@
 #include <sys/procfs.h>
 #include "util_ds.h"
 #include "util_func.h"
+#include "parse_args.h"
 
 ListNode *processes_list_tail;
 Process *root_of_process_tree;
@@ -79,11 +80,18 @@ void show_all_processes() {
 }
 
 int main(int argc, char *argv[]) {
-    for (int i = 0; i < argc; i++) {
+    /*for (int i = 0; i < argc; i++) {
         assert(argv[i]);
         printf("argv[%d] = %s\n", i, argv[i]);
     }
-    assert(!argv[argc]);
+    assert(!argv[argc]);*/
+    parse_args(argc, argv);
+
+    if (flag_V) {
+        // const char *version_info = "pstree (a toy version)";
+        fprintf(stderr, "pstree (a toy version)");
+        return 0;
+    }
 
     fetch_all_processes();
     buildup_process_tree();
