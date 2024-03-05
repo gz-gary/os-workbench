@@ -77,9 +77,9 @@ void buildup_process_tree() {
 }
 
 void traverse_process_tree(Process *now, int depth) {
-    int is_leaf_node = (now->son_list_tail == NULL);
+    // int is_leaf_node = (now->son_list_tail == NULL);
     // we dont need to deal with threads (leaf node)
-    if (is_leaf_node) return;
+    // if (is_leaf_node) return;
     
     for (int i = 0; i < 2 * depth; ++i) printf(" ");
     // if (is_leaf_node) return;
