@@ -79,10 +79,10 @@ void buildup_process_tree() {
 void traverse_process_tree(Process *now, int depth) {
     for (int i = 0; i < 2 * depth; ++i) printf(" ");
     int is_leaf_node = (now->son_list_tail == NULL);
-    if (is_leaf_node) return;
-    printf("%s", now->name);
-    // if (is_leaf_node) printf("{%s}", now->name);
-    // else printf("%s", now->name);
+    // if (is_leaf_node) return;
+    // printf("%s", now->name);
+    if (is_leaf_node) printf("{%s}", now->name);
+    else printf("%s", now->name);
     if (flag_p) printf("(%d)", now->pid);
     printf("\n");
 
