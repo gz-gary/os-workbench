@@ -33,15 +33,9 @@ void fetch_all_processes() {
     if (!dir) goto release_dir;
 
     struct dirent *entry;
-
-    char proc_filename[128];
-
-    while ((entry = readdir(dir)) != NULL) {
-        // if entry represents a process
-        if (is_pure_digits(entry->d_name)) {
+    while ((entry = readdir(dir)) != NULL)
+        if (is_pure_digits(entry->d_name)) // if entry represents a process
             fetch_one_process(entry->d_name);
-        }
-    }
 
 release_dir:
     if (dir) closedir(dir);
