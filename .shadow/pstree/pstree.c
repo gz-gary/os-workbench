@@ -13,9 +13,8 @@ ListNode *processes_list_tail;
 Process *root_of_process_tree;
 
 void fetch_one_process(const char *pid_str) {
-    char proc_filename[128] = "/proc/";
-    strcat(proc_filename, pid_str);
-    strcat(proc_filename, "/stat");
+    char proc_filename[128];
+    sprintf(proc_filename, "/proc/%s/stat", pid_str);
 
     FILE *fp = fopen(proc_filename, "r");
     if (!fp) goto release_fp;
@@ -77,15 +76,7 @@ void buildup_process_tree() {
 }
 
 void traverse_process_tree(Process *now, int depth) {
-    // int is_leaf_node = (now->son_list_tail == NULL);
-    // we dont need to deal with threads (leaf node)
-    // if (is_leaf_node) return;
-    
     for (int i = 0; i < 2 * depth; ++i) printf(" ");
-    // if (is_leaf_node) return;
-    // printf("%s", now->name);
-    //if (is_leaf_node) printf("{%s}", now->name);
-    //else printf("%s", now->name);
     printf("%s", now->name);
     if (flag_p) printf("(%d)", now->pid);
     printf("\n");
