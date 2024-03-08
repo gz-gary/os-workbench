@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
 
     fetch_all_processes();
     buildup_process_tree();
-    // traverse_process_tree(root_of_process_tree, 0);
+    traverse_process_tree(root_of_process_tree, 0);
     // show_all_processes();
   
     return 0;
