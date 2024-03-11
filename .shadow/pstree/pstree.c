@@ -10,7 +10,7 @@
 #include "parse_args.h"
 
 #define for_in_list(list_tail, node) for (ListNode *node = (list_tail); (node); node = ((node)->prev))
-#define for_in_list_prev(list_tail, node, prev_node) for (ListNode *node = (list_tail), *prev_node = ((node)->prev); (node); node = (prev_node), prev_node = ((prev_node) ? ((prev_node)->prev) : NULL))
+#define for_in_list_prev(list_tail, node, prev_node) for (ListNode *node = (list_tail), *prev_node = ((list_tail) ? ((list_tail)->prev) : NULL); (node); node = (prev_node), prev_node = ((prev_node) ? ((prev_node)->prev) : NULL))
 #define insert_in_list(list_tail, node) list_tail = insert_item((list_tail), (node))
 #define swap(type, a, b) { type t = (a); a = (b); b = t; }
 
