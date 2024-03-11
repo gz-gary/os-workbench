@@ -59,7 +59,7 @@ void buildup_process_tree() {
     }
 
     // using bubble sort for LinkList here
-    if (flag_n) {
+    /*if (flag_n) {
         for_in_list(processes_list_tail, proc) {
             for_in_list(proc->item->son_list_tail, _) {
                 for_in_list_prev(proc->item->son_list_tail, now, prev) {
@@ -69,7 +69,7 @@ void buildup_process_tree() {
                 }
             }
         }
-    }
+    }*/
 
 }
 
