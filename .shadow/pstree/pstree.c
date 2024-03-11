@@ -9,10 +9,10 @@
 #include "util_func.h"
 #include "parse_args.h"
 
-#define for_in_list(list_tail, node) for (ListNode *node = list_tail; node; node = node->prev)
-#define for_in_list_prev(list_tail, node, prev_node) for (ListNode *node = list_tail, *prev_node = node->prev; node; node = prev_node, prev_node = (node ? node->prev : NULL))
-#define insert_in_list(list_tail, node) list_tail = insert_item(list_tail, node)
-#define swap(type, a, b) { type t = a; a = b; b = t; }
+#define for_in_list(list_tail, node) for (ListNode *node = (list_tail); (node); node = ((node)->prev))
+#define for_in_list_prev(list_tail, node, prev_node) for (ListNode *node = (list_tail), *prev_node = ((node)->prev); (node); node = (prev_node), prev_node = ((node) ? ((node)->prev) : NULL))
+#define insert_in_list(list_tail, node) list_tail = insert_item((list_tail), (node))
+#define swap(type, a, b) { type t = (a); a = (b); b = t; }
 
 ListNode *processes_list_tail;
 Process *root_of_process_tree;
@@ -92,12 +92,12 @@ void cleanup() {
     for_in_list_prev(processes_list_tail, now, _) {
 
         Process *proc = now->item;
-        for (ListNode *son = proc->son_list_tail; son; son = son->prev) {
-            ++cnt;
-        }
-        //for_in_list_prev(proc->son_list_tail, son, __) {
-            //free(son);
+        //for (ListNode *son = proc->son_list_tail; son; son = son->prev) {
         //}
+        for_in_list_prev(proc->son_list_tail, son, __) {
+            ++cnt;
+            //free(son);
+        }
 
         //free(now->item);
         //free(now);
