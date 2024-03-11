@@ -4,10 +4,85 @@
 #include <string.h>
 #include <assert.h>
 #include <dirent.h>
+#include <unistd.h>
+#include <getopt.h>
 #include <sys/procfs.h>
-#include "util_ds.h"
-#include "util_func.h"
-#include "parse_args.h"
+
+/* --- Data structures --- */
+
+typedef struct ListNode ListNode;
+typedef struct Process Process;
+
+struct ListNode {
+    ListNode *prev;
+    Process *item;
+};
+
+ListNode * insert_item(ListNode *list_tail, Process *new_item) {
+    ListNode *new_node = (ListNode*)malloc(sizeof(ListNode));
+    new_node->item = new_item;
+    new_node->prev = list_tail;
+    return new_node;
+}
+
+struct Process {
+    pid_t pid;
+    pid_t ppid;
+
+    char name[128];
+
+    // Process *parent;
+    ListNode *son_list_tail;
+};
+
+/* --- String functions --- */
+
+int is_pure_digits(const char *str) {
+    int len = strlen(str);
+    for (int i = 0; i < len; ++i)
+        if (str[i] < '0' || str[i] > '9') return 0;
+    return 1;
+}
+
+void remove_parentheses(char *str) {
+    int len = strlen(str);
+    for (int i = 0; i < len - 2; ++i) {
+        str[i] = str[i + 1];
+    }
+    str[len - 2] = '\0';
+    str[len - 1] = '\0';
+}
+
+/* --- Arguments resolution --- */
+
+int flag_p, flag_n, flag_V;
+
+void parse_args(int argc, char *argv[]) {
+    int opt;
+    int option_index = 0;
+    char short_options[] = "pnV";
+    struct option long_options[] = {
+        {"show-pids", no_argument, NULL, 'p'},
+        {"numeric-sort", no_argument, NULL, 'n'},
+        {"version", no_argument, NULL, 'V'},
+        {NULL, 0, NULL, 0}
+    };
+
+    while ((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1) {
+        switch (opt) {
+            case 'p':
+                flag_p = 1;
+                break;
+            case 'n':
+                flag_n = 1;
+                break;
+            case 'V':
+                flag_V = 1;
+                break;
+        }
+    }
+
+}
 
 #define for_in_list(list_tail, node) for (ListNode *node = (list_tail); (node); node = ((node)->prev))
 #define for_in_list_prev(list_tail, node, prev_node) for (ListNode *node = (list_tail), *prev_node = ((list_tail) ? ((list_tail)->prev) : NULL); (node); node = (prev_node), prev_node = ((prev_node) ? ((prev_node)->prev) : NULL))
@@ -78,15 +153,10 @@ void traverse_process_tree(Process *now, int depth) {
         traverse_process_tree(son->item, depth + 1);
 }
 
-void show_all_processes() {
-    for (ListNode *now = processes_list_tail; now; now = now->prev) {
-        printf("%d %s\n", now->item->pid, now->item->name);
-    }
-}
-
 void cleanup() {
     for_in_list_prev(processes_list_tail, now, _) {
-        for_in_list_prev(now->item->son_list_tail, son, __) free(son);
+        for_in_list_prev(now->item->son_list_tail, son, __)
+            free(son);
         free(now->item);
         free(now);
     }
@@ -103,7 +173,6 @@ int main(int argc, char *argv[]) {
     fetch_all_processes();
     buildup_process_tree();
     traverse_process_tree(root_of_process_tree, 0);
-    //show_all_processes();
     cleanup();
   
     return 0;
