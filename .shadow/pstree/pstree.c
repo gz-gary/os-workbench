@@ -85,14 +85,14 @@ void show_all_processes() {
 }
 
 void cleanup() {
-    for_in_list_prev(processes_list_tail, proc, _) {
+    for_in_list_prev(processes_list_tail, now, _) {
 
-        for_in_list_prev(proc->item->son_list_tail, son, _) {
-            free(son);
-        }
+        //for_in_list_prev(proc->item->son_list_tail, son, _) {
+            //free(son);
+        //}
 
-        free(proc->item);
-        free(proc);
+        free(now->item);
+        free(now);
     }
 }
 
