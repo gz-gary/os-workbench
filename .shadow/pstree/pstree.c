@@ -92,10 +92,12 @@ void cleanup() {
     for_in_list_prev(processes_list_tail, now, _) {
 
         Process *proc = now->item;
-        for_in_list_prev(proc->son_list_tail, son, __) {
-            ++cnt;
-            //free(son);
+        for (ListNode *son = proc->son_list_tail; son; son = son->prev) {
         }
+        //for_in_list_prev(proc->son_list_tail, son, __) {
+            //++cnt;
+            //free(son);
+        //}
 
         //free(now->item);
         //free(now);
