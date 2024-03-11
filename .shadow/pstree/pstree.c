@@ -93,9 +93,9 @@ void cleanup() {
 
         Process *proc = now->item;
         for (ListNode *son = proc->son_list_tail; son; son = son->prev) {
+            ++cnt;
         }
         //for_in_list_prev(proc->son_list_tail, son, __) {
-            //++cnt;
             //free(son);
         //}
 
