@@ -79,42 +79,20 @@ void traverse_process_tree(Process *now, int depth) {
 }
 
 void show_all_processes() {
-    int cnt = 0;
     for (ListNode *now = processes_list_tail; now; now = now->prev) {
-        ++cnt;
-        //printf("%d %s\n", now->item->pid, now->item->name);
+        printf("%d %s\n", now->item->pid, now->item->name);
     }
-    printf("%d\n", cnt);
 }
 
 void cleanup() {
-    int cnt = 0;
     for_in_list_prev(processes_list_tail, now, _) {
-
-        Process *proc = now->item;
-        printf("standard: ---\n");
-        for (ListNode *son = proc->son_list_tail; son; son = son->prev) {
-            printf("pp: %p\n", son);
-        }
-        printf("macro: ---\n");
-        for_in_list_prev(proc->son_list_tail, son, __) {
-            printf("pp: %p\n", son);
-            //++cnt;
-            //free(son);
-        }
-
-        //free(now->item);
-        //free(now);
+        for_in_list_prev(now->item->son_list_tail, son, __) free(son);
+        free(now->item);
+        free(now);
     }
-    printf("%d\n", cnt);
 }
 
 int main(int argc, char *argv[]) {
-    /*for (int i = 0; i < argc; i++) {
-        assert(argv[i]);
-        printf("argv[%d] = %s\n", i, argv[i]);
-    }
-    assert(!argv[argc]);*/
     parse_args(argc, argv);
 
     if (flag_V) {
