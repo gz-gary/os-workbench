@@ -95,7 +95,7 @@ void cleanup() {
         for (ListNode *son = proc->son_list_tail; son; son = son->prev) {
             printf("pp: %p\n", son);
         }
-        for_in_list_prev(proc->son_list_tail, son, __) {
+        for_in_list(proc->son_list_tail, son) {
             printf("pp: %p\n", son);
             //++cnt;
             //free(son);
