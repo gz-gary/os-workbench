@@ -87,12 +87,12 @@ void show_all_processes() {
 void cleanup() {
     for_in_list_prev(processes_list_tail, now, _) {
 
-        //for_in_list_prev(proc->item->son_list_tail, son, _) {
-            //free(son);
-        //}
+        for_in_list_prev(now->item->son_list_tail, son, _) {
+            free(son);
+        }
 
-        free(now->item);
-        free(now);
+        //free(now->item);
+        //free(now);
     }
 }
 
