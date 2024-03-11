@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
     parse_args(argc, argv);
 
     if (flag_V) {
-        fprintf(stderr, "pstree (a toy version)");
+        fprintf(stderr, "pstree (a toy version)\n");
         return 0;
     }
 
