@@ -79,21 +79,27 @@ void traverse_process_tree(Process *now, int depth) {
 }
 
 void show_all_processes() {
+    int cnt = 0;
     for (ListNode *now = processes_list_tail; now; now = now->prev) {
-        printf("%d %s\n", now->item->pid, now->item->name);
+        ++cnt;
+        //printf("%d %s\n", now->item->pid, now->item->name);
     }
+    printf("%d\n", cnt);
 }
 
 void cleanup() {
+    int cnt = 0;
     for_in_list_prev(processes_list_tail, now, _) {
 
         for_in_list_prev(now->item->son_list_tail, son, __) {
-            free(son);
+            ++cnt;
+            //free(son);
         }
 
         //free(now->item);
         //free(now);
     }
+    printf("%d\n", cnt);
 }
 
 int main(int argc, char *argv[]) {
@@ -112,6 +118,7 @@ int main(int argc, char *argv[]) {
     fetch_all_processes();
     buildup_process_tree();
     traverse_process_tree(root_of_process_tree, 0);
+    show_all_processes();
     cleanup();
   
     return 0;
