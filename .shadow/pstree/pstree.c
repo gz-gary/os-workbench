@@ -62,11 +62,11 @@ void buildup_process_tree() {
     if (flag_n) {
         for_in_list(processes_list_tail, proc) {
             for_in_list(proc->item->son_list_tail, _) {
-                for_in_list_prev(proc->item->son_list_tail, now, prev) {
-                    if (prev && ((now->item)->pid) < ((prev->item)->pid)) {
-                        swap(Process*, now->item, prev->item);
-                    }
-                }
+                //for_in_list_prev(proc->item->son_list_tail, now, prev) {
+                    //if (prev && ((now->item)->pid) < ((prev->item)->pid)) {
+                        //swap(Process*, now->item, prev->item);
+                    //}
+                //}
             }
         }
     }
