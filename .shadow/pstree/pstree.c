@@ -92,10 +92,11 @@ void cleanup() {
     for_in_list_prev(processes_list_tail, now, _) {
 
         Process *proc = now->item;
+        printf("standard: ---\n");
         for (ListNode *son = proc->son_list_tail; son; son = son->prev) {
             printf("pp: %p\n", son);
         }
-        printf("---\n");
+        printf("macro: ---\n");
         for_in_list(proc->son_list_tail, son) {
             printf("pp: %p\n", son);
             //++cnt;
