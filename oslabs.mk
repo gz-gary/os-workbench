@@ -1,4 +1,5 @@
-export TOKEN := ???
+# export TOKEN := ???
+export TOKEN := ZHOO1rq9
 
 # ----- DO NOT MODIFY -----
 
