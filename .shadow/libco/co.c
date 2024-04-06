@@ -20,7 +20,7 @@ struct co {
     void *arg;
 
     enum co_status status;
-    //struct co *    waiter;           // unused
+    struct co *    who_wake_me_up;
     jmp_buf        context;
     #if __x86_64__
     __attribute__((aligned(16)))       // x86_64 stack pointer alignment
@@ -172,16 +172,20 @@ void co_yield() {
         assert(RUNNING(current));
         current->status = CO_WAITING;
         // - 2. randomly choose a new coroutine to go on
+        struct co* waker = current;
         current = co_available();
 
         assert(current);
         // - 3. wake it up or continue
         if (NEW(current)) {
+            ((volatile struct co *)current)->who_wake_me_up = waker;
             // wake it up and decide which to run after its death
             ((volatile struct co *)current)->status = CO_RUNNING;
             void *ptr = (current->stack + STACK_SIZE);
             stack_switch_call(current->stack + STACK_SIZE, current->func, (uintptr_t)current->arg);
-            stack_restore(ptr);
+            if (!DEAD(current->who_wake_me_up)) {
+                stack_restore(ptr);
+            }
             // - we can't write the code below because of strange behavior of gcc
             // stack_restore(current->stack + STACK_SIZE);
 
