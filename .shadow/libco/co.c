@@ -5,7 +5,7 @@
 #include <string.h>
 #include <assert.h>
 #include <time.h>
-#define STACK_SIZE (64 * 1024) // - 64 KiB per coroutine
+#define STACK_SIZE (128 * 1024) // - 64 KiB per coroutine
 
 enum co_status {
     CO_NEW = 1,     // - created but not awake
