@@ -52,14 +52,14 @@ static void insert_front(struct co *item) {
 }
 #define for_in_list(iter) for (list_node *iter = ls_front; iter; iter = (iter)->next)
 
-static void remove_item(const struct co *item) {
+/*static void remove_item(const struct co *item) {
     for_in_list(ln) if (ln->item == item) {
         if (ln == ls_front) ls_front = ls_front->next;
         else ln->prev->next = ln->next;
         free(ln);
         break;
     }
-}
+}*/
 
 static struct co *current;
 
