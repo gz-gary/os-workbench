@@ -178,8 +178,7 @@ void co_yield() {
         // - 3. wake it up or continue
         if (NEW(current)) {
             // wake it up and decide which to run after its death
-            volatile struct co * t_co = current;
-            t_co->status = CO_RUNNING;
+            ((volatile struct co *)current)->status = CO_RUNNING;
             void *ptr = (current->stack + STACK_SIZE);
             stack_switch_call(current->stack + STACK_SIZE, current->func, (uintptr_t)current->arg);
             stack_restore(ptr);
@@ -187,7 +186,7 @@ void co_yield() {
             // stack_restore(current->stack + STACK_SIZE);
 
             // - when a coroutine died, it returns to co_yield() of the one who wakes it up
-            t_co->status = CO_DEAD;
+            ((volatile struct co *)current)->status = CO_DEAD;
             // - after its death, we choose another waiting coroutine to continue
             for_in_list(ln) if (WAITING(ln->item)) {
                 current = ln->item;
