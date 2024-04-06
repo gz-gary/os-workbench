@@ -1,4 +1,5 @@
 #include "co.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <setjmp.h>
 #include <stdint.h>
