@@ -157,9 +157,9 @@ void co_wait(struct co *co) {
         co_yield();
     }
     // - recycle its resources (with assurement that co is only waited once)
-    remove_item(co);
-    free(co->name);
-    free(co);
+    //remove_item(co);
+    //free(co->name);
+    //free(co);
 }
 
 void co_yield() {
