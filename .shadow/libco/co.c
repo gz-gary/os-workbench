@@ -167,6 +167,7 @@ void co_wait(struct co *co) {
 uint8_t waker_stack[STACK_SIZE];
 void global_waker() {
     stack_switch_call(current->stack + STACK_SIZE, current->func, (uintptr_t)current->arg);
+    asm volatile("" ::: "rcx", "ecx");
     stack_restore(current->stack + STACK_SIZE);
     ((volatile struct co *)current)->status = CO_DEAD;
     for_in_list(ln) if (WAITING(ln->item)) {
