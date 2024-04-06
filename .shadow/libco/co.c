@@ -157,6 +157,7 @@ void co_wait(struct co *co) {
         co_yield();
     }
     // - recycle its resources (with assurement that co is only waited once)
+    printf("%s is done!\n", co->name);
     remove_item(co);
     free(co->name);
     free(co);
