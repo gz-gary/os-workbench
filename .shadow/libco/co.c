@@ -27,8 +27,6 @@ struct co {
     #endif
     uint8_t        stack[STACK_SIZE];
 };
-int free_len;
-void *free_ptr_lis[100];
 
 #define NEW(co)       (((co)->status) == CO_NEW)
 #define RUNNING(co)   (((co)->status) == CO_RUNNING)
@@ -162,7 +160,6 @@ void co_wait(struct co *co) {
     remove_item(co);
     free(co->name);
     free(co);
-    free_ptr_lis[++free_len] = co;
 }
 
 void co_yield() {
@@ -189,9 +186,6 @@ void co_yield() {
             // stack_restore(current->stack + STACK_SIZE);
 
             // - when a coroutine died, it returns to co_yield() of the one who wakes it up
-            for (int i = 1; i <= free_len; ++i) if (current == free_ptr_lis[i]) {
-                assert(0);
-            }
             ((volatile struct co *)current)->status = CO_DEAD;
             // - after its death, we choose another waiting coroutine to continue
             for_in_list(ln) if (WAITING(ln->item)) {
