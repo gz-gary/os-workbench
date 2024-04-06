@@ -1,4 +1,5 @@
 #include "co.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <setjmp.h>
 #include <stdint.h>
@@ -20,7 +21,6 @@ struct co {
     void *arg;
 
     enum co_status status;
-    //struct co *    waiter;           // unused
     jmp_buf        context;
     #if __x86_64__
     __attribute__((aligned(16)))       // x86_64 stack pointer alignment
@@ -162,6 +162,20 @@ void co_wait(struct co *co) {
     free(co);
 }
 
+uint8_t waker_stack[STACK_SIZE];
+void global_waker() {
+    stack_switch_call(current->stack + STACK_SIZE, current->func, (uintptr_t)current->arg);
+    asm volatile("" ::: "rcx", "ecx");
+    stack_restore(current->stack + STACK_SIZE);
+    ((volatile struct co *)current)->status = CO_DEAD;
+    for_in_list(ln) if (WAITING(ln->item)) {
+        current = ln->item;
+        ((volatile struct co *)current)->status = CO_RUNNING;
+        // - switch to its context and run it (go back its co_yield())
+        longjmp(current->context, 0);
+    }
+}
+
 void co_yield() {
     int val = setjmp(current->context);
     if (val == 0) {
@@ -179,21 +193,7 @@ void co_yield() {
         if (NEW(current)) {
             // wake it up and decide which to run after its death
             ((volatile struct co *)current)->status = CO_RUNNING;
-            void *ptr = (current->stack + STACK_SIZE);
-            stack_switch_call(current->stack + STACK_SIZE, current->func, (uintptr_t)current->arg);
-            stack_restore(ptr);
-            // - we can't write the code below because of strange behavior of gcc
-            // stack_restore(current->stack + STACK_SIZE);
-
-            // - when a coroutine died, it returns to co_yield() of the one who wakes it up
-            ((volatile struct co *)current)->status = CO_DEAD;
-            // - after its death, we choose another waiting coroutine to continue
-            for_in_list(ln) if (WAITING(ln->item)) {
-                current = ln->item;
-                ((volatile struct co *)current)->status = CO_RUNNING;
-                // - switch to its context and run it (go back its co_yield())
-                longjmp(current->context, 0);
-            }
+            stack_switch_call(waker_stack + STACK_SIZE, global_waker, (uintptr_t)NULL);
         } else if (WAITING(current)) {
             ((volatile struct co *)current)->status = CO_RUNNING;
             // - switch to its context and run it (go back its co_yield())
