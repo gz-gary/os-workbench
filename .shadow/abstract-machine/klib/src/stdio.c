@@ -8,8 +8,8 @@
 
 static void put_int(int x) {
   if (x < 0) { putch('-'); x = -x; }
-  putch('0' + x % 10);
   if (x > 0) put_int(x / 10);
+  putch('0' + x % 10);
 }
 
 int printf(const char *fmt, ...) {
