@@ -7,11 +7,11 @@
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
 static void recursive_put_int(unsigned int x) {
-  //assert(x == 0 || x == 2 || x == 24 || x == 243 || x == 2430);
-  int prefix_digits = x / 10;
-  if (prefix_digits) recursive_put_int(prefix_digits);
-  putch('0' + x % 10);
+  int pre_dig = x / 10;
+  if (pre_dig) recursive_put_int(pre_dig);
+  putch(x % 10 + '0');
 }
+
 static void put_int(int x) {
   if (x == 0) putch('0');
   else if (x < 0) {
@@ -21,17 +21,12 @@ static void put_int(int x) {
 }
 
 int printf(const char *fmt, ...) {
-  put_int(0);
-  putch('\n');
-  put_int(-2430);
-  putch('\n');
   put_int(2147483647);
-  putch('\n');
+  put_int(-2147483647);
   put_int(-2147483648);
-  putch('\n');
   put_int(6657);
-  putch('\n');
-  // TODO: make return value meaningful
+  put_int(0);
+  //panic("Not implemented");
   return 0;
 }
 
