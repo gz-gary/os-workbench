@@ -17,6 +17,7 @@ void memset_test() {
 }
 
 int main() {
+    memset_test();
     //os->init();
     //mpe_init(os->run);
     return 1;
