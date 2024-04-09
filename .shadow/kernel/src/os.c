@@ -22,12 +22,13 @@ static void os_run() {
         if (shared_counter < 300) {
             ++shared_counter;
             printf("cpu%d add counter to -> %d\n", cpu_current(), shared_counter);
+            spinlock_unlock(&big_kernel_lock);
+            continue;
         } else {
             spinlock_unlock(&big_kernel_lock);
             break;
         }
 
-        spinlock_unlock(&big_kernel_lock);
     }
     while (1) ;
 }
