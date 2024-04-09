@@ -3,8 +3,13 @@
 #include <kernel.h>
 #include <klib.h>
 
+static void klib_printf_test() {
+    printf("nothing");
+}
+
 int main() {
-    os->init();
-    mpe_init(os->run);
+    klib_printf_test();
+    //os->init();
+    //mpe_init(os->run);
     return 1;
 }
