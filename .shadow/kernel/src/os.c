@@ -14,11 +14,19 @@ static void os_run() {
     //for (const char *s = "Hello World from CPU #*\n"; *s; s++) {
         //putch(*s == '*' ? '0' + cpu_current() : *s);
     //}
-    while (shared_counter <= 300) {
+    while (1) {
         spinlock_lock(&big_kernel_lock);
+
         assert(big_kernel_lock.owner == cpu_current());
-        ++shared_counter;
-        printf("cpu%d add counter to -> %d\n", cpu_current(), shared_counter);
+
+        if (shared_counter < 300) {
+            ++shared_counter;
+            printf("cpu%d add counter to -> %d\n", cpu_current(), shared_counter);
+        } else {
+            spinlock_unlock(&big_kernel_lock);
+            break;
+        }
+
         spinlock_unlock(&big_kernel_lock);
     }
     while (1) ;
