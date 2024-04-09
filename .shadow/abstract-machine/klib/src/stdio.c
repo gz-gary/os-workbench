@@ -24,8 +24,8 @@ int printf(const char *fmt, ...) {
   putch('\n');
   put_int(-2430);
   putch('\n');
-  //put_int(2147483647);
-  //putch('\n');
+  put_int(2147483647);
+  putch('\n');
   //put_int(-2147483648);
   //putch('\n');
   //put_int(6657);
