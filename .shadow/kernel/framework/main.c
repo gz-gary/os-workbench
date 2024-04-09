@@ -11,5 +11,5 @@ int main() {
     klib_printf_test();
     //os->init();
     //mpe_init(os->run);
-    return 0;
+    return 1;
 }
