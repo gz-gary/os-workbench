@@ -1,4 +1,5 @@
 //#include <assert.h>
+#include "am.h"
 #include <spinlock.h>
 #include <common.h>
 
@@ -17,6 +18,9 @@ static void os_run() {
     spinlock_init(&big_kernel_lock);
     while (shared_counter <= 300) {
         spinlock_lock(&big_kernel_lock);
+        if (big_kernel_lock.owner != cpu_current()) {
+            printf("no\n");
+        }
         assert(big_kernel_lock.owner == cpu_current());
         //++shared_counter;
         //printf("cpu%d add counter to -> %d\n", cpu_current(), shared_counter);
