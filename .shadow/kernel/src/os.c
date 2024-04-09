@@ -6,6 +6,7 @@ spinlock_t big_kernel_lock;
 
 static void os_init() {
     pmm->init();
+    spinlock_init(&big_kernel_lock);
 }
 
 static void os_run() {
@@ -13,7 +14,6 @@ static void os_run() {
         //putch(*s == '*' ? '0' + cpu_current() : *s);
     //}
     shared_counter = 0;
-    spinlock_init(&big_kernel_lock);
     while (shared_counter <= 300) {
         spinlock_lock(&big_kernel_lock);
         if (big_kernel_lock.owner != cpu_current()) {
