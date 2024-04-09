@@ -4,7 +4,7 @@
 #include <klib.h>
 
 static void klib_printf_test() {
-    printf("nothing");
+    printf("%");
 }
 
 int main() {
