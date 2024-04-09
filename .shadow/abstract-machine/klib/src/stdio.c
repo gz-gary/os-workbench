@@ -67,7 +67,6 @@ int printf(const char *fmt, ...) {
   } arg;
   va_list ap;
   va_start(ap, fmt);
-  arg.s = va_arg(ap, const char *);
   while (*fmt) {
     int type_id = -1;
     const char *end = NULL;
