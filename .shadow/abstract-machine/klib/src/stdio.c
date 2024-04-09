@@ -36,7 +36,10 @@ static void recursive_put_hex(uintptr_t x) {
 
 static void put_ptr(void *ptr) {
   if (ptr == NULL) put_str("(nil)");
-  else recursive_put_hex((uintptr_t)ptr);
+  else {
+    put_str("0x");
+    recursive_put_hex((uintptr_t)ptr);
+  }
 }
 
 struct arg_type {
