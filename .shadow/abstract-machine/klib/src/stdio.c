@@ -14,10 +14,10 @@ static void put_int(int x) {
 
 int printf(const char *fmt, ...) {
   put_int(0);
-  put_int(-2430);
-  put_int(2147483647);
-  put_int(-2147483648);
-  put_int(6657);
+  //put_int(-2430);
+  //put_int(2147483647);
+  //put_int(-2147483648);
+  //put_int(6657);
   //panic("Not implemented");
   return 0;
 }
