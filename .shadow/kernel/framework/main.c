@@ -9,11 +9,10 @@ void memset_test() {
         printf("%d ", x[i]);
     }
     printf("\n");
-    memset(x, 1, sizeof(x));
-    for (int i = 0; i < 20; ++i) {
-        printf("%d ", x[i]);
-    }
-    printf("\n");
+    char s[20];
+    s[19] = '\0';
+    memset(s, 'a', sizeof(s));
+    printf("%s\n", s);
 }
 
 int main() {
