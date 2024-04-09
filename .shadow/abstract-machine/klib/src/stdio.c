@@ -93,6 +93,7 @@ int printf(const char *fmt, ...) {
         put_str(arg.s);
         break;
       }
+      fmt = end;
     } else putch(*(fmt++));
   }
   va_end(ap);
