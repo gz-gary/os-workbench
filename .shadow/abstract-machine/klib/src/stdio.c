@@ -6,17 +6,17 @@
 
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
-static void recursive_put_int(int x) {
+static void recursive_put_int(unsigned int x) {
   //assert(x == 0 || x == 2 || x == 24 || x == 243 || x == 2430);
-  int prefix = x / 10;
-  if (prefix) recursive_put_int(prefix);
+  int prefix_digits = x / 10;
+  if (prefix_digits) recursive_put_int(prefix_digits);
   putch('0' + x % 10);
 }
 static void put_int(int x) {
   if (x == 0) putch('0');
   else if (x < 0) {
     putch('-');
-    recursive_put_int(x);
+    recursive_put_int(-x);
   } else recursive_put_int(x);
 }
 
@@ -29,8 +29,8 @@ int printf(const char *fmt, ...) {
   putch('\n');
   put_int(-2147483648);
   putch('\n');
-  //put_int(6657);
-  //putch('\n');
+  put_int(6657);
+  putch('\n');
   // TODO: make return value meaningful
   return 0;
 }
