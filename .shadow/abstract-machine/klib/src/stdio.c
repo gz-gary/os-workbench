@@ -12,7 +12,8 @@ static void recursive_put_int(unsigned int x) {
   putch(x % 10 + '0');
 }
 
-static void put_int(int x) {
+static void put_int(void *arg) {
+  int x = *(int *)arg;
   if (x == 0) putch('0');
   else if (x < 0) {
     putch('-');
@@ -20,12 +21,36 @@ static void put_int(int x) {
   } else recursive_put_int(x);
 }
 
+static void put_str(void *arg) {
+  for (const char *str = arg; *str != '\0'; ++str) putch(*str);
+}
+
+struct resolver {
+  const char *match_pattern;
+  void (*resolve_func)(void *);
+} resolvers[] = {
+  {"%d", put_int},
+  {"%p", put_int},
+  {"%s", put_str},
+};
+
+const char * prefix_match(const char *str, const char *prefix) {
+  const char *tmp = str;
+  for (; *str != '\0' && *str == *prefix; ++str, ++prefix);
+  return *prefix == '\0' ? str : tmp;
+}
+
 int printf(const char *fmt, ...) {
-  put_int(2147483647);
-  put_int(-2147483647);
-  put_int(-2147483648);
-  put_int(6657);
-  put_int(0);
+  if (prefix_match(fmt, "%d") != fmt) {
+    put_str("success\n");
+  } else {
+    put_str("failed\n");
+  }
+  //regmatch_t pos;
+  //va_list ap;
+  //va_start(ap, fmt);
+  //while (fmt) {
+  //}
   //panic("Not implemented");
   return 0;
 }
