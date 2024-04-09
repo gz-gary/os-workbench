@@ -4,7 +4,7 @@
 #include <klib.h>
 
 static void klib_printf_test() {
-    printf("%d haha\n");
+    printf("%d ha%dha %d %d %d\n", 6657, -2147483648, 2147483647, -553, 0);
 }
 
 int main() {
