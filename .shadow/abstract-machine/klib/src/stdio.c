@@ -15,7 +15,8 @@ static void recursive_put_int(int x) {
 static void put_int(int x) {
   if (x == 0) putch('0');
   else if (x < 0) {
-    recursive_put_int(-x);
+    putch('-');
+    recursive_put_int(x);
   } else recursive_put_int(x);
 }
 
