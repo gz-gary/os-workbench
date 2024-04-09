@@ -6,10 +6,16 @@
 
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
-static void put_int(int x) {
-  if (x < 0) { putch('-'); x = -x; }
-  if (x > 0) put_int(x / 10);
+static void recursive_put_int(int x) {
+  if (x > 0) recursive_put_int(x / 10);
   putch('0' + x % 10);
+}
+static void put_int(int x) {
+  if (x == 0) putch('0');
+  else if (x < 0) {
+    putch('-');
+    recursive_put_int(-x);
+  } else recursive_put_int(x);
 }
 
 int printf(const char *fmt, ...) {
@@ -23,7 +29,7 @@ int printf(const char *fmt, ...) {
   putch('\n');
   put_int(6657);
   putch('\n');
-  //panic("Not implemented");
+  // TODO: make return value meaningful
   return 0;
 }
 
