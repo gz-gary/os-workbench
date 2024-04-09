@@ -10,8 +10,8 @@ void memset_test() {
     }
     printf("\n");
     char s[20];
-    s[19] = '\0';
     memset(s, 'a', sizeof(s));
+    s[19] = '\0';
     printf("%s\n", s);
 }
 
