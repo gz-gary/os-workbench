@@ -3,8 +3,21 @@
 #include <kernel.h>
 #include <klib.h>
 
+void memset_test() {
+    int x[20];
+    for (int i = 0; i < 20; ++i) {
+        printf("%d ", x[i]);
+    }
+    printf("\n");
+    memset(x, 0, sizeof(x));
+    for (int i = 0; i < 20; ++i) {
+        printf("%d ", x[i]);
+    }
+    printf("\n");
+}
+
 int main() {
-    os->init();
+    //os->init();
     //mpe_init(os->run);
     return 1;
 }

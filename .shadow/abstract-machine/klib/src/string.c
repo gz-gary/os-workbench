@@ -40,7 +40,7 @@ int strncmp(const char *s1, const char *s2, size_t n) {
 }
 
 void *memset(void *s, int c, size_t n) {
-  // for (; n > 0; --n, ++s) *(int *)s = c;
+  for (; n > 0; --n, ++s) *(int *)s = c;
   panic("Not implemented");
 }
 
