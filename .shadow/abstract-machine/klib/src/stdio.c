@@ -8,13 +8,13 @@
 
 static void recursive_put_int(int x) {
   //assert(x == 0 || x == 2 || x == 24 || x == 243 || x == 2430);
-  if (x >= 10) recursive_put_int(x / 10);
+  int prefix = x / 10;
+  if (prefix) recursive_put_int(prefix);
   putch('0' + x % 10);
 }
 static void put_int(int x) {
   if (x == 0) putch('0');
   else if (x < 0) {
-    putch('-');
     recursive_put_int(-x);
   } else recursive_put_int(x);
 }
