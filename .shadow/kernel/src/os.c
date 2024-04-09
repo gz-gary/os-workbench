@@ -16,9 +16,9 @@ static void os_run() {
     shared_counter = 0;
     while (shared_counter <= 300) {
         spinlock_lock(&big_kernel_lock);
+        assert(big_kernel_lock.owner == cpu_current());
         ++shared_counter;
         printf("cpu%d add counter to -> %d\n", cpu_current(), shared_counter);
-        assert(big_kernel_lock.owner == cpu_current());
         spinlock_unlock(&big_kernel_lock);
     }
     while (1) ;
