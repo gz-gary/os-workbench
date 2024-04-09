@@ -2,38 +2,56 @@
 #include <klib.h>
 #include <klib-macros.h>
 #include <stdarg.h>
+#include <stdint.h>
+#include <sys/types.h>
 
 
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
-static void recursive_put_int(unsigned int x) {
+static const char HEX_DIGITS[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
+static void recursive_put_uint(unsigned int x) {
   int pre_dig = x / 10;
-  if (pre_dig) recursive_put_int(pre_dig);
+  if (pre_dig) recursive_put_uint(pre_dig);
   putch(x % 10 + '0');
 }
 
-static void put_int(void *arg) {
-  int x = *(int *)arg;
+static void put_int(int x) {
   if (x == 0) putch('0');
   else if (x < 0) {
     putch('-');
-    recursive_put_int(-x);
-  } else recursive_put_int(x);
+    recursive_put_uint(-x);
+  } else recursive_put_uint(x);
 }
 
-static void put_str(void *arg) {
-  for (const char *str = arg; *str != '\0'; ++str) putch(*str);
+static void put_str(const char *str) {
+  for (; *str != '\0'; ++str) putch(*str);
 }
 
-struct resolver {
+static void recursive_put_hex(uintptr_t x) {
+  uintptr_t pre_dig = (x / 16);
+  if (pre_dig) recursive_put_hex(pre_dig);
+  putch(HEX_DIGITS[x % 16]);
+}
+
+static void put_ptr(void *ptr) {
+  if (ptr == NULL) put_str("(nil)");
+  else recursive_put_hex((uintptr_t)ptr);
+}
+
+struct arg_type {
   const char *match_pattern;
-  void (*resolve_func)(void *);
-} resolvers[] = {
-  {"%d", put_int},
-  {"%p", put_int},
-  {"%s", put_str},
+  enum {
+    ARG_TYPE_INT = 1,
+    ARG_TYPE_PTR,
+    ARG_TYPE_STRING,
+  } type;
+} arg_types[] = {
+  {"%d", ARG_TYPE_INT},
+  {"%p", ARG_TYPE_PTR},
+  {"%s", ARG_TYPE_STRING},
 };
-#define NR_RESOLVER sizeof(resolvers) / sizeof(struct resolver)
+#define NR_ARG_TYPE sizeof(arg_types) / sizeof(struct arg_type)
 
 const char * prefix_match(const char *str, const char *prefix) {
   const char *tmp = str;
@@ -42,28 +60,43 @@ const char * prefix_match(const char *str, const char *prefix) {
 }
 
 int printf(const char *fmt, ...) {
+  union {
+    int d;
+    void *p;
+    const char *s;
+  } arg;
+  va_list ap;
+  va_start(ap, fmt);
+  arg.s = va_arg(ap, const char *);
   while (*fmt) {
-    int resolver_id = -1;
+    int type_id = -1;
     const char *end = NULL;
-    for (int i = 0; i < NR_RESOLVER; ++i) {
-      end = prefix_match(fmt, resolvers[i].match_pattern);
+    for (int i = 0; i < NR_ARG_TYPE; ++i) {
+      end = prefix_match(fmt, arg_types[i].match_pattern);
       if (end != fmt) {
-        resolver_id = i;
+        type_id = i;
         break;
       }
     }
-    int x = 1;
-    if (resolver_id != -1) {
-      resolvers[resolver_id].resolve_func(&x);
-      fmt = end;
+    if (type_id != -1) {
+      switch (arg_types[type_id].type) {
+      case ARG_TYPE_INT:
+        arg.d = va_arg(ap, int);
+        put_int(arg.d);
+        break;
+      case ARG_TYPE_PTR:
+        arg.p = va_arg(ap, void *);
+        put_ptr(arg.p);
+        break;
+      case ARG_TYPE_STRING:
+        arg.s = va_arg(ap, const char *);
+        put_str(arg.s);
+        break;
+      }
     } else putch(*(fmt++));
   }
-  //regmatch_t pos;
-  //va_list ap;
-  //va_start(ap, fmt);
-  //while (fmt) {
-  //}
-  //panic("Not implemented");
+  va_end(ap);
+  // TODO: finish correct return value
   return 0;
 }
 
