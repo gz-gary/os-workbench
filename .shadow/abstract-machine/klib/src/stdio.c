@@ -33,6 +33,7 @@ struct resolver {
   {"%p", put_int},
   {"%s", put_str},
 };
+#define NR_RESOLVER sizeof(resolvers) / sizeof(struct resolver)
 
 const char * prefix_match(const char *str, const char *prefix) {
   const char *tmp = str;
@@ -41,10 +42,21 @@ const char * prefix_match(const char *str, const char *prefix) {
 }
 
 int printf(const char *fmt, ...) {
-  if (prefix_match(fmt, "%d") != fmt) {
-    put_str("success\n");
-  } else {
-    put_str("failed\n");
+  while (*fmt) {
+    int resolver_id = -1;
+    const char *end = NULL;
+    for (int i = 0; i < NR_RESOLVER; ++i) {
+      end = prefix_match(fmt, resolvers[i].match_pattern);
+      if (end != fmt) {
+        resolver_id = i;
+        break;
+      }
+    }
+    int x = 1;
+    if (resolver_id != -1) {
+      resolvers[resolver_id].resolve_func(&x);
+      fmt = end;
+    } else putch(*(fmt++));
   }
   //regmatch_t pos;
   //va_list ap;
