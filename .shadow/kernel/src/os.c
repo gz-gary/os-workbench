@@ -1,7 +1,5 @@
-//#include <assert.h>
-#include "am.h"
-#include <spinlock.h>
 #include <common.h>
+#include <spinlock.h>
 
 int shared_counter;
 spinlock_t big_kernel_lock;
@@ -18,12 +16,12 @@ static void os_run() {
     spinlock_init(&big_kernel_lock);
     while (shared_counter <= 300) {
         spinlock_lock(&big_kernel_lock);
-        if (big_kernel_lock.owner != cpu_current()) {
-            printf("no\n");
-        }
-        assert(big_kernel_lock.owner == cpu_current());
-        //++shared_counter;
-        //printf("cpu%d add counter to -> %d\n", cpu_current(), shared_counter);
+        //if (big_kernel_lock.owner != cpu_current()) {
+            //printf("no\n");
+        //}
+        //assert(big_kernel_lock.owner == cpu_current());
+        ++shared_counter;
+        printf("cpu%d add counter to -> %d\n", cpu_current(), shared_counter);
         spinlock_unlock(&big_kernel_lock);
     }
     while (1) ;
