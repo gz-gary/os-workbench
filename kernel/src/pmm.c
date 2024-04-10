@@ -1,4 +1,7 @@
 #include <common.h>
+#include <spinlock.h>
+
+spinlock_t big_kernel_lock;
 
 static void *kalloc(size_t size) {
     // TODO
@@ -22,6 +25,8 @@ static void pmm_init() {
         "Got %d MiB heap: [%p, %p)\n",
         pmsize >> 20, heap.start, heap.end
     );
+
+    spinlock_init(&big_kernel_lock);
 }
 
 MODULE_DEF(pmm) = {
