@@ -24,6 +24,13 @@ static void *kalloc(size_t size) {
     return NULL;
 }
 
+static void *kalloc_buddy(size_t size) {
+    // TODO
+    // You can add more .c files to the repo.
+    return NULL;
+}
+
+
 static void *kalloc_stupid(size_t size) {
 
     spinlock_lock(&big_kernel_lock);
@@ -46,6 +53,7 @@ static void *kalloc_stupid(size_t size) {
 
     return NULL;
 }
+
 
 static void kfree(void *ptr) {
     // TODO
@@ -95,6 +103,7 @@ static void pmm_init() {
 MODULE_DEF(pmm) = {
     .init  = pmm_init,
     //.alloc = kalloc,
-    .alloc = kalloc_stupid,
+    //.alloc = kalloc_stupid,
+    .alloc = kalloc_buddy,
     .free  = kfree,
 };
