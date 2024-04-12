@@ -7,7 +7,7 @@ spinlock_t big_kernel_lock;
 #ifdef TEST
 
 struct heap_t {
-    uintptr_t start, end;
+    void *start, *end;
 } heap;
 
 #endif
