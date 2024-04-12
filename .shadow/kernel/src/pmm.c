@@ -11,19 +11,16 @@ struct heap_t {
 
 #endif
 
-int shared_counter = 0;
-
 static void *kalloc(size_t size) {
     // TODO
     // You can add more .c files to the repo.
-    spinlock_lock(&big_kernel_lock);
-    //printf("There are %d cpus now\n", cpu_count());
-    //printf("cpu[%d] wants a block of %ld bytes\n\n", cpu_current(), size);
-    ++shared_counter;
-    printf("cpu[%d] add shared_counter to %d\n", cpu_current(), shared_counter);
-    assert(big_kernel_lock.owner == cpu_current());
-    spinlock_unlock(&big_kernel_lock);
+    return NULL;
+}
 
+static void *kalloc_stupid(size_t size) {
+
+    spinlock_lock(&big_kernel_lock);
+    spinlock_unlock(&big_kernel_lock);
     return NULL;
 }
 
@@ -74,6 +71,7 @@ static void pmm_init() {
 
 MODULE_DEF(pmm) = {
     .init  = pmm_init,
-    .alloc = kalloc,
+    //.alloc = kalloc,
+    .alloc = kalloc_stupid,
     .free  = kfree,
 };
