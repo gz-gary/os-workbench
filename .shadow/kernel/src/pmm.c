@@ -37,7 +37,6 @@ static void pmm_init() {
 
 #else
 
-#include <stdlib.h>
 #define TEST_HEAP_SIZE 16 * 1024 * 1024 //16MiB
 
 static void pmm_init() {
