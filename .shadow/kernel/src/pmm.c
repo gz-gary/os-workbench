@@ -35,7 +35,8 @@ static void *kalloc_stupid(size_t size) {
     ECHO_VAR(bound, %ld);
     ECHO_VAR(next_available, %p);
     printf("\n");
-    //assert(((uintptr_t)next_available & (bound - 1)) == 0);
+    assert(((uintptr_t)next_available & (bound - 1)) == 0);
+    assert(((uintptr_t)next_available % bound) == 0);
 
     spinlock_unlock(&big_kernel_lock);
     return NULL;
