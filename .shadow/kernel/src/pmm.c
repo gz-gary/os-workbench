@@ -16,7 +16,7 @@ static void *kalloc(size_t size) {
     // You can add more .c files to the repo.
     spinlock_lock(&big_kernel_lock);
     printf("There are %d cpus now\n", cpu_count());
-    printf("cpu[%d] wants a block of %d bytes\n\n", cpu_current(), size);
+    printf("cpu[%d] wants a block of %ld bytes\n\n", cpu_current(), size);
     spinlock_unlock(&big_kernel_lock);
 
     return NULL;
@@ -58,7 +58,7 @@ static void pmm_init() {
     );
 
     printf(
-        "Got %d MiB heap: [%p, %p)\n",
+        "Got %ld MiB heap: [%p, %p)\n",
         pmsize >> 20, heap.start, heap.end
     );
 
