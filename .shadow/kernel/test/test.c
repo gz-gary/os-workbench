@@ -16,17 +16,6 @@ int cpu_count() {
     return n_;
 }
 
-inline void putch(char ch) {
-    putchar(ch);
-}
-
-inline int atomic_xchg(volatile int *addr, int newval) {
-    int result;
-    asm volatile ("lock xchg %0, %1":
-        "+m"(*addr), "=a"(result) : "1"(newval) : "memory");
-    return result;
-}
-
 static void entry(int id) {
     while (n_ < NR_CPUS); //wait until all threads were created
     pmm->alloc(128);
