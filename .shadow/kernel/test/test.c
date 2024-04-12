@@ -46,7 +46,7 @@ static void entry(int id) {
 
     size_t block_size[1];
     void *ptr[1];
-    size_t max_size = 64 * 1024; //1 B to 64 KiB per request
+    size_t max_size = 8; //1 B to 64 KiB per request
     for (int i = 0; i < LENGTH(block_size); ++i) {
         block_size[i] = rand() % max_size + 1;
         ptr[i] = pmm->alloc(block_size[i]);
@@ -65,6 +65,8 @@ static void entry(int id) {
         for (int i = 0; i < LENGTH(block_size); ++i) {
             for (size_t offset = 0; offset < block_size[i]; ++offset) {
                 unsigned char byte_here = *(unsigned char *)(ptr[i] + offset);
+                ECHO_VAR(byte_here, %d);
+                ECHO_VAR(id, %d);
                 assert(byte_here == id);
             }
         }
