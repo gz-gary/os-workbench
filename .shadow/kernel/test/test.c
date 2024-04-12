@@ -51,8 +51,9 @@ static void entry(int id) {
     for (int i = 0; i < LENGTH(random_size); ++i) {
         random_size[i] = rand() % max_size + 1;
         ptr[i] = pmm->alloc(random_size[i]);
-        //assert(ptr[i]);
-        //assert(((uintptr_t)ptr[i] & (power_bound(random_size[i]) - 1)) == 0);
+        assert(ptr[i]);
+        assert(((uintptr_t)ptr[i] & (power_bound(random_size[i]) - 1)) == 0);
+        assert(((uintptr_t)ptr[i] % power_bound(random_size[i])) == 0);
     }
 }
 
