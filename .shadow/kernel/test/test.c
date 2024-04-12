@@ -18,7 +18,7 @@ int cpu_count() {
 
 static void entry(int id) {
     while (n_ < NR_CPUS); //wait until all threads were created
-    pmm->kalloc(128);
+    pmm->alloc(128);
 }
 
 int main() {
