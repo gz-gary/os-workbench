@@ -39,8 +39,7 @@ static void *kalloc_stupid(size_t size) {
     }
     else {
         heap.start = next_available + size;
-        printf("cpu[%d] wants %ld bytes\n", cpu_current(), size);
-        printf("allocator gives out [%p, %p)\n\n", next_available, next_available + size);
+        LOG_RANGE(size, next_available);
         spinlock_unlock(&big_kernel_lock);
         return next_available;
     }
