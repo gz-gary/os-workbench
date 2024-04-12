@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdint.h>
 
-struct heap_t;
+struct heap_t {
+    void *start, *end;
+};
 extern struct heap_t heap;
 
 extern void putch(char ch);

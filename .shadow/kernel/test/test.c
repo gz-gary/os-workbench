@@ -3,9 +3,7 @@
 
 #define NR_CPUS 4
 
-struct heap_t {
-    void *start, *end;
-} heap;
+struct heap_t heap;
 
 int cpu_current() {
     pthread_t pid = pthread_self();
