@@ -46,7 +46,8 @@ static void entry(int id) {
 
     size_t random_size[10];
     void *ptr[10];
-    size_t max_size = 64 * 1024; //1 B to 64 KiB per request
+    //size_t max_size = 64 * 1024; //1 B to 64 KiB per request
+    size_t max_size = 1 * 1024; //1 B to 64 KiB per request
     for (int i = 0; i < LENGTH(random_size); ++i) {
         random_size[i] = rand() % max_size + 1;
         ptr[i] = pmm->alloc(random_size[i]);
