@@ -3,6 +3,14 @@
 
 spinlock_t big_kernel_lock;
 
+#ifdef TEST
+
+struct heap_t {
+    void *start, *end;
+} heap;
+
+#endif
+
 static void *kalloc(size_t size) {
     // TODO
     // You can add more .c files to the repo.
@@ -36,8 +44,6 @@ static void pmm_init() {
 }
 
 #else
-
-extern struct heap_t heap;
 
 #define TEST_HEAP_SIZE 16 * 1024 * 1024 //16MiB
 
