@@ -44,16 +44,33 @@ static inline size_t power_bound(size_t x) {
 static void entry(int id) {
     while (n_ < NR_CPUS); //wait until all threads were created
 
-    size_t random_size[1];
+    size_t block_size[1];
     void *ptr[1];
-    //size_t max_size = 64 * 1024; //1 B to 64 KiB per request
-    size_t max_size = 1 * 1024; //1 B to 64 KiB per request
-    for (int i = 0; i < LENGTH(random_size); ++i) {
-        random_size[i] = rand() % max_size + 1;
-        ptr[i] = pmm->alloc(random_size[i]);
+    size_t max_size = 64 * 1024; //1 B to 64 KiB per request
+    for (int i = 0; i < LENGTH(block_size); ++i) {
+        block_size[i] = rand() % max_size + 1;
+        ptr[i] = pmm->alloc(block_size[i]);
+        // check if we get an available addr
         assert(ptr[i]);
-        assert(((uintptr_t)ptr[i] & (power_bound(random_size[i]) - 1)) == 0);
-        assert(((uintptr_t)ptr[i] % power_bound(random_size[i])) == 0);
+        // check if we get a legal addr
+        assert(((uintptr_t)ptr[i] & (power_bound(block_size[i]) - 1)) == 0);
+    }
+    unsigned char my_identifier = id;
+    for (int i = 0; i < LENGTH(block_size); ++i) {
+        // brush my range with my id
+        memset(ptr[i], my_identifier, block_size[i]);
+    }
+    // check if anyone invades my range for k times
+    for (int k = 0; k < 10; ++k) {
+        for (int i = 0; i < LENGTH(block_size); ++i) {
+            for (size_t offset = 0; offset < block_size[i]; ++offset) {
+                unsigned char byte_here = *(unsigned char *)(ptr[i] + offset);
+                assert(byte_here == id);
+            }
+        }
+    }
+    for (int i = 0; i < LENGTH(block_size); ++i) {
+        pmm->free(ptr[i]);
     }
 }
 

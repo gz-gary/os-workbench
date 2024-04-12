@@ -33,15 +33,14 @@ static void *kalloc_stupid(size_t size) {
         (((uintptr_t)heap.start - 1) & (~(bound - 1)))
         + bound);
     assert(((uintptr_t)next_available & (bound - 1)) == 0);
-    assert(((uintptr_t)next_available % bound) == 0);
     if (next_available >= heap.end) {
         spinlock_unlock(&big_kernel_lock);
         return NULL;
     }
     else {
         heap.start = next_available + size;
-        printf("cpu[%d] wants %ld bytes\n", cpu_current(), size);
-        printf("allocator gives out [%p, %p)\n\n", next_available, next_available + size);
+        //printf("cpu[%d] wants %ld bytes\n", cpu_current(), size);
+        //printf("allocator gives out [%p, %p)\n\n", next_available, next_available + size);
         spinlock_unlock(&big_kernel_lock);
         return next_available;
     }
