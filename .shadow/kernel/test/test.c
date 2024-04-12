@@ -46,7 +46,7 @@ static void entry(int id) {
 
     size_t block_size[1];
     void *ptr[1];
-    size_t max_size = 8; //1 B to 64 KiB per request
+    size_t max_size = 64 * 1024; //1 B to 64 KiB per request
 
     for (int i = 0; i < LENGTH(block_size); ++i) {
         block_size[i] = rand() % max_size + 1;
