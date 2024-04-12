@@ -1,16 +1,7 @@
 #include <common.h>
 #include <spinlock.h>
-#define TEST
 
 spinlock_t big_kernel_lock;
-
-#ifdef TEST
-
-struct heap_t {
-    void *start, *end;
-} heap;
-
-#endif
 
 static void *kalloc(size_t size) {
     // TODO
@@ -28,15 +19,9 @@ static void kfree(void *ptr) {
     // You can add more .c files to the repo.
 }
 
-#ifdef TEST
-
-#define TEST_HEAP_SIZE 16 * 1024 * 1024 //16MiB
+#ifndef TEST
 
 static void pmm_init() {
-    char *ptr = malloc(TEST_HEAP_SIZE);
-    heap.start = ptr;
-    heap.end = ptr + TEST_HEAP_SIZE;
-    
     uintptr_t pmsize = (
         (uintptr_t)heap.end
         - (uintptr_t)heap.start
@@ -52,7 +37,13 @@ static void pmm_init() {
 
 #else
 
+#define TEST_HEAP_SIZE 16 * 1024 * 1024 //16MiB
+
 static void pmm_init() {
+    char *ptr = malloc(TEST_HEAP_SIZE);
+    heap.start = ptr;
+    heap.end = ptr + TEST_HEAP_SIZE;
+    
     uintptr_t pmsize = (
         (uintptr_t)heap.end
         - (uintptr_t)heap.start
