@@ -37,6 +37,8 @@ static void pmm_init() {
 
 #else
 
+extern struct heap_t heap;
+
 #define TEST_HEAP_SIZE 16 * 1024 * 1024 //16MiB
 
 static void pmm_init() {

@@ -4,7 +4,6 @@
 struct heap_t {
     void *start, *end;
 };
-extern struct heap_t heap;
 
 extern void putch(char ch);
 
