@@ -4,6 +4,8 @@
 #include <thread.h>
 #include <kernel.h>
 #define ASSERT_EQUAL(a, b) assert((a) == (b))
+#define ASSERT_LEQ(a, b) assert((a) <= (b))
+#define ASSERT_GEQ(a, b) assert((a) >= (b))
 #define ECHO_VAR(var, type) printf(#var " = " #type "\n", var)
 #define ECHO_ARR(arr, index, type) printf(#arr "[%d] = " #type "\n", index, arr[index])
 
@@ -37,7 +39,7 @@ inline int atomic_xchg(volatile int *addr, int newval) {
 
 /* --------------------------------------------- */
 
-inline size_t power_bound(size_t x) {
+static inline size_t power_bound(size_t x) {
     size_t ret = 1;
     while (ret < x) ret <<= 1;
     return ret;
@@ -52,15 +54,12 @@ static void entry(int id) {
     for (int i = 0; i < LENGTH(random_size); ++i) {
         random_size[i] = rand() % max_size + 1;
         ptr[i] = pmm->alloc(random_size[i]);
-        ECHO_VAR(ptr[i], %p);
-        ECHO_ARR(ptr, i, %p);
-        ASSERT_EQUAL(ptr[i], NULL);
-        //COND((uintptr_t)ptr[i] & (power_bound(random_size[i]) - 1), == 0);
+        assert(ptr[i]);
         //assert(((uintptr_t)ptr[i] & (power_bound(random_size[i]) - 1)) == 0);
     }
 }
 
-void alloc_test() {
+static void alloc_test() {
     for (int i = 0; i < NR_CPUS; ++i) {
         create(entry);
     }
