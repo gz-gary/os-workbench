@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <stdint.h>
 
-struct head_t {
+struct heap_t {
     uintptr_t start, end;
-} heap;
+};
 
 inline void putch(char ch) {
     putchar(ch);
