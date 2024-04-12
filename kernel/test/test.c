@@ -29,12 +29,18 @@ inline int atomic_xchg(volatile int *addr, int newval) {
 
 static void entry(int id) {
     while (n_ < NR_CPUS); //wait until all threads were created
-    pmm->alloc(128);
+
+    for (int i = 0; i < 100; ++i)
+        pmm->alloc(0);
+}
+
+void mutex_test() {
+    for (int i = 0; i < NR_CPUS; ++i) {
+        create(entry);
+    }
 }
 
 int main() {
     pmm->init();
-    for (int i = 0; i < 4; ++i) {
-        create(entry);
-    }
+    mutex_test();
 }
