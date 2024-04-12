@@ -10,3 +10,10 @@ endif
 include $(AM_HOME)/Makefile
 include ../oslabs.mk
 image: git
+
+test: git
+	@gcc $(shell find src/ -name "*.c") \
+		 $(shell find test/ -name "*.c") \
+		 -Iinclude -Iframework -Itest -DTEST -lpthread \
+		 -o build/test
+	@build/test
