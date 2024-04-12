@@ -103,7 +103,7 @@ static void pmm_init() {
 MODULE_DEF(pmm) = {
     .init  = pmm_init,
     //.alloc = kalloc,
-    //.alloc = kalloc_stupid,
-    .alloc = kalloc_buddy,
+    .alloc = kalloc_stupid,
+    //.alloc = kalloc_buddy,
     .free  = kfree,
 };
