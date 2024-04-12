@@ -1,13 +1,7 @@
 #include <common.h>
-#include <spinlock.h>
-
-int shared_counter;
-spinlock_t big_kernel_lock;
 
 static void os_init() {
     pmm->init();
-    spinlock_init(&big_kernel_lock);
-    shared_counter = 0;
 }
 
 static void os_run() {
