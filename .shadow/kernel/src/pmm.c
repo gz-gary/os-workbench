@@ -11,12 +11,16 @@ struct heap_t {
 
 #endif
 
+int shared_counter = 0;
+
 static void *kalloc(size_t size) {
     // TODO
     // You can add more .c files to the repo.
     spinlock_lock(&big_kernel_lock);
-    printf("There are %d cpus now\n", cpu_count());
-    printf("cpu[%d] wants a block of %ld bytes\n\n", cpu_current(), size);
+    //printf("There are %d cpus now\n", cpu_count());
+    //printf("cpu[%d] wants a block of %ld bytes\n\n", cpu_current(), size);
+    ++shared_counter;
+    printf("cpu[%d] add shared_counter to %d\n", cpu_current(), shared_counter);
     spinlock_unlock(&big_kernel_lock);
 
     return NULL;
