@@ -31,10 +31,6 @@ static void *kalloc_stupid(size_t size) {
     void *next_available = (void*)(
         (((uintptr_t)heap.start - 1) & (~(bound - 1)))
         + bound);
-    ECHO_VAR(size, %ld);
-    ECHO_VAR(bound, %ld);
-    ECHO_VAR(next_available, %p);
-    printf("\n");
     assert(((uintptr_t)next_available & (bound - 1)) == 0);
     assert(((uintptr_t)next_available % bound) == 0);
 
