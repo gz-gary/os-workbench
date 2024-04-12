@@ -29,7 +29,7 @@ static void *kalloc_stupid(size_t size) {
     spinlock_lock(&big_kernel_lock);
     size_t bound = power_bound(size);
     void *next_available = (void*)(
-        (((uintptr_t)heap.start - 1) & (bound - 1))
+        (((uintptr_t)heap.start - 1) & (~(bound - 1)))
         + bound);
     ECHO_VAR(size, %ld);
     ECHO_VAR(bound, %ld);
