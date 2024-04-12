@@ -19,8 +19,8 @@ static void *kalloc(size_t size) {
 
 static void *kalloc_stupid(size_t size) {
 
-    spinlock_lock(&big_kernel_lock);
-    spinlock_unlock(&big_kernel_lock);
+    //spinlock_lock(&big_kernel_lock);
+    //spinlock_unlock(&big_kernel_lock);
     return NULL;
 }
 
