@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <thread.h>
 #include <kernel.h>
-#define COND(value, cond) value##cond
+#define COND(value, cond) assert(value##cond)
 #define ECHO_VAR(var, type) printf(#var " = " #type "\n", var)
 #define ECHO_ARR(arr, index, type) printf(#arr "[%d] = " #type "\n", index, arr[index])
 
@@ -54,7 +54,7 @@ static void entry(int id) {
         ptr[i] = pmm->alloc(random_size[i]);
         ECHO_VAR(ptr[i], %p);
         ECHO_ARR(ptr, i, %p);
-        assert(COND(1, == 0));
+        COND(1, == 0);
         //COND((uintptr_t)ptr[i] & (power_bound(random_size[i]) - 1), == 0);
         //assert(((uintptr_t)ptr[i] & (power_bound(random_size[i]) - 1)) == 0);
     }
