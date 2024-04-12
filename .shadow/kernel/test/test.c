@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <thread.h>
 #include <kernel.h>
-#define COND(value, cond) ((value)##cond)
+#define COND(value, cond) ((value) " " ##cond)
 #define ECHO_VAR(var, type) printf(#var " = " #type "\n", var)
 #define ECHO_ARR(arr, index, type) printf(#arr "[%d] = " #type "\n", index, arr[index])
 
