@@ -21,6 +21,7 @@ static void *kalloc(size_t size) {
     //printf("cpu[%d] wants a block of %ld bytes\n\n", cpu_current(), size);
     ++shared_counter;
     printf("cpu[%d] add shared_counter to %d\n", cpu_current(), shared_counter);
+    assert(big_kernel_lock.owner == cpu_current());
     spinlock_unlock(&big_kernel_lock);
 
     return NULL;
