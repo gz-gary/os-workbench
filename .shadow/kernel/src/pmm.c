@@ -55,8 +55,10 @@ static void *kalloc_buddy(size_t size) {
     size_t chunk_id = get_chunk_id(chunk);
     chunk_remove(chunk_id);
     chunk->status = CHUNK_USING;
+
+    LOG_RANGE(chunks[chunk_id].size * PAGE_SIZE, mem + (chunk_id * PAGE_SIZE));
+
     spinlock_unlock(&big_kernel_lock);
-    LOG_RANGE(size * PAGE_SIZE, mem + (chunk_id * PAGE_SIZE));
     return mem + (chunk_id * PAGE_SIZE);
 }
 
