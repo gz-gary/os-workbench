@@ -14,6 +14,29 @@ struct heap_t {
 
 #endif
 
+static void *kalloc_stupid(size_t size) {
+
+    spinlock_lock(&big_kernel_lock);
+
+    size_t bound = power_bound(size);
+    void *next_available = (void*)(
+        (((uintptr_t)heap.start - 1) & (~(bound - 1)))
+        + bound);
+    assert(((uintptr_t)next_available & (bound - 1)) == 0);
+    if (next_available >= heap.end) {
+        spinlock_unlock(&big_kernel_lock);
+        return NULL;
+    }
+    else {
+        heap.start = next_available + size;
+        LOG_RANGE(size, next_available);
+        spinlock_unlock(&big_kernel_lock);
+        return next_available;
+    }
+
+    return NULL;
+}
+
 static void *kalloc(size_t size) {
     if (size > REJECT_THRESHOLD) return NULL;
 
