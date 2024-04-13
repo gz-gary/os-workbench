@@ -44,8 +44,8 @@ static inline size_t power_bound(size_t x) {
 static void entry(int id) {
     while (n_ < NR_CPUS); //wait until all threads were created
 
-    size_t block_size[64];
-    void *ptr[64];
+    size_t block_size[80];
+    void *ptr[80];
     size_t max_size = 64 * 1024; //1 B to 64 KiB per request
 
     for (int i = 0; i < LENGTH(block_size); ++i) {
