@@ -35,6 +35,7 @@ static void *kalloc_buddy(size_t size) {
             spinlock_unlock(&big_kernel_lock);
             return NULL;
         }
+        assert(chunklist[level].head);
         chunk_t *bigger_chunk = chunklist[level].head;
         size_t bigger_id = get_chunk_id(bigger_chunk);
         chunk_remove(bigger_id);
