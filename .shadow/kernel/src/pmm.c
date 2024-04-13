@@ -20,14 +20,12 @@ static void *kalloc(size_t size) {
 }
 
 static void *kalloc_buddy(size_t size) {
+    if (size > REJECT_THRESHOLD) return NULL;
+
     size = (size - 1) / PAGE_SIZE + 1;
     spinlock_lock(&big_kernel_lock);
 
     int expected_level = level_bound(size);
-    if (size > REJECT_THRESHOLD) {
-        spinlock_unlock(&big_kernel_lock);
-        return NULL;
-    }
     if (!chunklist[expected_level].head) {
         int level = expected_level;
         ++level;
