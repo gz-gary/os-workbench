@@ -37,10 +37,8 @@ static void *kalloc_buddy(size_t size) {
         }
         chunk_t *bigger_chunk = chunklist[level].head;
         size_t bigger_id = get_chunk_id(bigger_chunk);
+        chunk_remove(bigger_id);
         while (level > expected_level) {
-            
-            chunk_remove(bigger_id);
-
             size_t bigger_size = bigger_chunk->size;
             size_t r_id = bigger_id + (bigger_size / 2);
             chunks[r_id].size = bigger_size / 2;
