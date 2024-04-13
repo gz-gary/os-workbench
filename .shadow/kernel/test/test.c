@@ -5,7 +5,7 @@
 #include <kernel.h>
 #include <debug-macros.h>
 
-#define NR_CPUS 1
+#define NR_CPUS 2
 
 /* ---------------- fake klib and am ---------------- */
 
