@@ -82,26 +82,14 @@ static void alloc_test() {
     }
 }
 
-static void simple_entry(int id) {
-    while (n_ < NR_CPUS); //wait until all threads were created
-
-    void *ptr1 = pmm->alloc((rand() % 30 + 1) * 4096);
-    void *ptr2 = pmm->alloc((rand() % 30 + 1) * 4096);
-    void *ptr3 = pmm->alloc((rand() % 30 + 1) * 4096);
-    pmm->free(ptr1);
-    pmm->free(ptr2);
-    pmm->free(ptr3);
-}
-
 static void simple_test() {
-    for (int i = 0; i < NR_CPUS; ++i) {
-        create(simple_entry);
-    }
+    n_ = 1;
+    entry(1);
 }
 
 int main() {
     srand(time(0));
     pmm->init();
-    alloc_test();
-    // simple_test();
+    // alloc_test();
+    simple_test();
 }
