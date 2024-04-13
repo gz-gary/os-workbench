@@ -97,7 +97,7 @@ static void pmm_init() {
     heap.start = align_to_bound(heap.start, bound);
     heap.end = heap.start + bound;
 
-    ECHO_VAR(bound, %ld);
+    ECHO_VAR(bound, %lx);
     ECHO_VAR(heap.start, %p);
     ECHO_VAR(heap.end, %p);
     ASSERT_EQUAL(heap.end - heap.start, bound);
