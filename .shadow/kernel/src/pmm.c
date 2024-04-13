@@ -64,12 +64,12 @@ static void setup_heap_structure() {
         if (bound + nr_page * PAGE_SIZE < heap.end) {
             ++log_nr_page;
             nr_page <<= 1;
-        } else break;
+        } else {
+            --log_nr_page;
+            nr_page >>= 1;
+            break;
+        }
     }
-    prefix = 
-    (nr_page) * sizeof(chunk_t) +
-    (log_nr_page + 1) * sizeof(chunklist_t);
-    bound = align_to_bound(heap.start + prefix, nr_page << LOG_PAGE_SIZE);
     // TODO: make more use of heap
 
     printf("we make heap to this structure:\n\n");
