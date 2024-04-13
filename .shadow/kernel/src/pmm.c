@@ -1,5 +1,6 @@
 #include <common.h>
 #include <spinlock.h>
+#include <chunklist.h>
 #include <debug-macros.h>
 
 spinlock_t big_kernel_lock;
