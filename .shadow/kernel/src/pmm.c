@@ -95,6 +95,7 @@ static void pmm_init() {
     ECHO_VAR(bound, %ld);
     ECHO_VAR(heap.start, %p);
     ECHO_VAR(heap.end, %p);
+    ASSERT_EQUAL(heap.end - heap.start, bound);
 }
 
 #endif
