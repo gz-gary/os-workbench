@@ -46,8 +46,8 @@ static void *kalloc_stupid(size_t size) {
         return NULL;
     }
     else {
-        heap.start = next_available + size;
-        LOG_RANGE(size, next_available);
+        // heap.start = next_available + size;
+        // LOG_RANGE(size, next_available);
         spinlock_unlock(&big_kernel_lock);
         return next_available;
     }
