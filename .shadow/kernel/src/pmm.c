@@ -56,6 +56,7 @@ static void *kalloc_buddy(size_t size) {
     chunk_remove(chunk_id);
     chunk->status = CHUNK_USING;
     spinlock_unlock(&big_kernel_lock);
+    LOG_RANGE(size * PAGE_SIZE, mem + (chunk_id * PAGE_SIZE));
     return mem + (chunk_id * PAGE_SIZE);
 }
 
@@ -72,7 +73,6 @@ static void *kalloc_stupid(size_t size) {
     }
     else {
         heap.start = next_available + size;
-        // LOG_RANGE(size, next_available);
         spinlock_unlock(&big_kernel_lock);
         return next_available;
     }
@@ -139,11 +139,11 @@ static void setup_heap_structure() {
     mem = align_to_bound(chunklist + (log_nr_page + 1) * sizeof(chunklist_t),
                          nr_page << LOG_PAGE_SIZE);
 
-    /*printf("\nwe make heap to this structure:\n\n");
+    printf("\nwe make heap to this structure:\n\n");
     printf("Manage %ld pages\n", nr_page);
     printf("[%p, %p) to store chunks\n", chunks, chunks + nr_page);
     printf("[%p, %p) to store chunklist\n", chunklist, chunklist + (log_nr_page + 1));
-    printf("[%p, %p) to allocate\n", mem, mem + nr_page * PAGE_SIZE);*/
+    printf("[%p, %p) to allocate\n", mem, mem + nr_page * PAGE_SIZE);
 }
 
 #ifndef TEST
