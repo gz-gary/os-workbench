@@ -92,6 +92,11 @@ static void pmm_init() {
 
     size_t bound = power_bound(pmsize);
     while (align_to_bound(heap.start, bound) >= heap.end) bound >>= 1;
+    for (void *x = align_to_bound(heap.start, bound); x + bound >= heap.end; bound >>= 1);
+    // TODO: make more use of heap
+    heap.start = align_to_bound(heap.start, bound);
+    heap.end = heap.start + bound;
+
     ECHO_VAR(bound, %ld);
     ECHO_VAR(heap.start, %p);
     ECHO_VAR(heap.end, %p);
