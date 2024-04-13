@@ -71,6 +71,7 @@ static void setup_heap_structure() {
     nr_page >>= 1;
 
     chunks = heap.start;
+    assert(chunks == heap.start);
     chunklist = heap.start + nr_page * sizeof(chunk_t);
     mem = align_to_bound(chunklist + (log_nr_page + 1) * sizeof(chunklist_t),
                          nr_page << LOG_PAGE_SIZE);
