@@ -3,8 +3,6 @@
 #include <util-funcs.h>
 
 #define NULL 0
-#define USING 0
-#define FREE 1
 
 chunk_t *chunks;
 chunklist_t *chunklist;
@@ -36,7 +34,7 @@ void chunk_remove(size_t chunk_id) {
 void chunk_init() {
     for (size_t i = 0; i < nr_page; ++i)
         chunks[i] = (chunk_t){
-            .status = FREE,
+            .status = CHUNK_FREE,
             .size = 0, //undefined except chunk[0]
             .next = NULL,
             .prev = NULL

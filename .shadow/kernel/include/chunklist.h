@@ -1,5 +1,7 @@
 #include <sys/types.h>
 
+#define CHUNK_USING 0
+#define CHUNK_FREE 1
 #define PAGE_SIZE (4 * 1024)
 #define LOG_PAGE_SIZE (12)
 #define REJECT_THRESHOLD (16 * 1024 * 1024)

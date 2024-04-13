@@ -53,6 +53,7 @@ static void *kalloc_buddy(size_t size) {
     chunk_t *chunk = chunklist[expected_level].head;
     size_t chunk_id = get_chunk_id(chunk);
     chunk_remove(chunk_id);
+    chunk->status = CHUNK_USING;
     spinlock_unlock(&big_kernel_lock);
     return mem + (chunk_id * PAGE_SIZE);
 }
@@ -85,6 +86,8 @@ static void kfree(void *ptr) {
 }
 
 static void kfree_buddy(void *ptr) {
+    size_t chunk_id = (ptr - mem) / PAGE_SIZE;
+    chunks[chunk_id].status = CHUNK_FREE;
 }
 
 static void setup_heap_structure() {
