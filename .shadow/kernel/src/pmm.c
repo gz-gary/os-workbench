@@ -91,6 +91,10 @@ static void pmm_init() {
     spinlock_init(&big_kernel_lock);
 
     size_t bound = power_bound(pmsize);
+    while (align_to_bound(heap.start, bound) >= heap.end) bound >>= 1;
+    ECHO_VAR(bound, %ld);
+    ECHO_VAR(heap.start, %p);
+    ECHO_VAR(heap.end, %p);
 }
 
 #endif
