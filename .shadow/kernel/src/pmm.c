@@ -20,8 +20,6 @@ static void *kalloc(size_t size) {
 }
 
 static void *kalloc_buddy(size_t size) {
-    // TODO
-    // You can add more .c files to the repo.
     return NULL;
 }
 
@@ -51,6 +49,33 @@ static void *kalloc_stupid(size_t size) {
 static void kfree(void *ptr) {
     // TODO
     // You can add more .c files to the repo.
+}
+
+static void setup_heap_structure() {
+    size_t prefix;
+    void *bound;
+    log_nr_page = 0;
+    nr_page = 1;
+    while (1) {
+        prefix = 
+        (nr_page) * sizeof(chunk_t) +
+        (log_nr_page + 1) * sizeof(chunklist_t);
+        bound = align_to_bound(heap.start + prefix, nr_page << LOG_PAGE_SIZE);
+        if (bound + nr_page * PAGE_SIZE < heap.end) {
+            ++log_nr_page;
+            nr_page <<= 1;
+        } else break;
+    }
+    prefix = 
+    (nr_page) * sizeof(chunk_t) +
+    (log_nr_page + 1) * sizeof(chunklist_t);
+    bound = align_to_bound(heap.start + prefix, nr_page << LOG_PAGE_SIZE);
+    // TODO: make more use of heap
+
+    printf("we make heap to this structure:\n\n");
+    printf("Manage %ld pages\n", nr_page);
+    printf("[%p, %p) to store ds\n", heap.start, heap.start + prefix);
+    printf("[%p, %p) to allocate\n", bound, bound + nr_page * PAGE_SIZE);
 }
 
 #ifndef TEST
@@ -90,17 +115,9 @@ static void pmm_init() {
 
     spinlock_init(&big_kernel_lock);
 
-    size_t bound = power_bound(pmsize);
-    while (align_to_bound(heap.start, bound) >= heap.end) bound >>= 1;
-    for (void *x = align_to_bound(heap.start, bound); x + bound >= heap.end; bound >>= 1);
-    // TODO: make more use of heap
-    heap.start = align_to_bound(heap.start, bound);
-    heap.end = heap.start + bound;
+    /* ---------- */
 
-    ECHO_VAR(bound, %lx);
-    ECHO_VAR(heap.start, %p);
-    ECHO_VAR(heap.end, %p);
-    ASSERT_EQUAL(heap.end - heap.start, bound);
+    setup_heap_structure();
 }
 
 #endif
