@@ -20,9 +20,44 @@ static void *kalloc(size_t size) {
 }
 
 static void *kalloc_buddy(size_t size) {
-    return NULL;
-}
+    spinlock_lock(&big_kernel_lock);
 
+    int expected_level= level_bound(size);
+    if (size > REJECT_THRESHOLD) {
+        spinlock_unlock(&big_kernel_lock);
+        return NULL;
+    }
+    if (!chunklist[expected_level].head) {
+        int level = expected_level;
+        ++level;
+        while (level <= log_nr_page && !chunklist[level].head) ++level;
+        if (level > log_nr_page) {
+            //no more chunk to split
+            spinlock_unlock(&big_kernel_lock);
+            return NULL;
+        }
+        chunk_t *bigger_chunk = chunklist[level].head;
+        size_t bigger_id = get_chunk_id(bigger_chunk);
+        while (level > expected_level) {
+            
+            chunk_remove(bigger_id);
+
+            size_t bigger_size = bigger_chunk->size;
+            size_t r_id = bigger_id + (bigger_size / 2);
+            chunks[r_id].size = bigger_size / 2;
+
+            chunk_insert(level - 1, r_id);
+            
+            --level;
+        }
+        chunk_insert(level, bigger_id);
+    }
+    chunk_t *chunk = chunklist[expected_level].head;
+    size_t chunk_id = get_chunk_id(chunk);
+    chunk_remove(chunk_id);
+    spinlock_unlock(&big_kernel_lock);
+    return mem + (chunk_id * PAGE_SIZE);
+}
 
 static void *kalloc_stupid(size_t size) {
 
@@ -51,7 +86,11 @@ static void kfree(void *ptr) {
     // You can add more .c files to the repo.
 }
 
+static void kfree_buddy(void *ptr) {
+}
+
 static void setup_heap_structure() {
+    // TODO: make more use of heap
     size_t prefix;
     void *bound;
 
@@ -74,13 +113,12 @@ static void setup_heap_structure() {
     chunklist = heap.start + nr_page * sizeof(chunk_t);
     mem = align_to_bound(chunklist + (log_nr_page + 1) * sizeof(chunklist_t),
                          nr_page << LOG_PAGE_SIZE);
-    // TODO: make more use of heap
 
-    printf("\nwe make heap to this structure:\n\n");
+    /*printf("\nwe make heap to this structure:\n\n");
     printf("Manage %ld pages\n", nr_page);
     printf("[%p, %p) to store chunks\n", chunks, chunks + nr_page);
     printf("[%p, %p) to store chunklist\n", chunklist, chunklist + (log_nr_page + 1));
-    printf("[%p, %p) to allocate\n", mem, mem + nr_page * PAGE_SIZE);
+    printf("[%p, %p) to allocate\n", mem, mem + nr_page * PAGE_SIZE);*/
 }
 
 #ifndef TEST
@@ -123,6 +161,7 @@ static void pmm_init() {
     /* ---------- */
 
     setup_heap_structure();
+    chunk_init();
 }
 
 #endif
@@ -130,7 +169,8 @@ static void pmm_init() {
 MODULE_DEF(pmm) = {
     .init  = pmm_init,
     //.alloc = kalloc,
-    .alloc = kalloc_stupid,
-    //.alloc = kalloc_buddy,
-    .free  = kfree,
+    //.alloc = kalloc_stupid,
+    .alloc = kalloc_buddy,
+    //.free  = kfree,
+    .free  = kfree_buddy,
 };

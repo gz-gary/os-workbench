@@ -5,7 +5,7 @@
 #include <kernel.h>
 #include <debug-macros.h>
 
-#define NR_CPUS 4
+#define NR_CPUS 1
 
 /* ---------------- fake klib and am ---------------- */
 
@@ -82,8 +82,26 @@ static void alloc_test() {
     }
 }
 
+static void simple_entry(int id) {
+    while (n_ < NR_CPUS); //wait until all threads were created
+
+    void *ptr1 = pmm->alloc((rand() % 30 + 1) * 4096);
+    void *ptr2 = pmm->alloc((rand() % 30 + 1) * 4096);
+    void *ptr3 = pmm->alloc((rand() % 30 + 1) * 4096);
+    pmm->free(ptr1);
+    pmm->free(ptr2);
+    pmm->free(ptr3);
+}
+
+static void simple_test() {
+    for (int i = 0; i < NR_CPUS; ++i) {
+        create(simple_entry);
+    }
+}
+
 int main() {
     srand(time(0));
     pmm->init();
     // alloc_test();
+    simple_test();
 }
