@@ -72,13 +72,15 @@ static void setup_heap_structure() {
 
     chunks = heap.start;
     chunklist = heap.start + (nr_page) * sizeof(chunk_t);
-    assert(chunklist == heap.start + prefix);
+    mem = align_to_bound(chunklist + (log_nr_page + 1) * sizeof(chunklist_t),
+                         nr_page << LOG_PAGE_SIZE);
     // TODO: make more use of heap
 
     printf("we make heap to this structure:\n\n");
     printf("Manage %ld pages\n", nr_page);
-    printf("[%p, %p) to store ds\n", heap.start, heap.start + prefix);
-    printf("[%p, %p) to allocate\n", bound, bound + nr_page * PAGE_SIZE);
+    printf("[%p, %p) to store chunks\n", chunks, chunks + nr_page * sizeof(chunk_t));
+    printf("[%p, %p) to store chunklist\n", chunklist, chunklist + (log_nr_page + 1) * sizeof(chunklist_t));
+    printf("[%p, %p) to allocate\n", mem, mem + nr_page * PAGE_SIZE);
 }
 
 #ifndef TEST
