@@ -44,5 +44,5 @@ void chunk_init() {
     chunks[0].size = nr_page;
     for (int i = 0; i <= log_nr_page; ++i)
         chunklist[i].head = NULL;
-    insert(log_nr_page, 0);
+    chunk_insert(log_nr_page, 0);
 }
