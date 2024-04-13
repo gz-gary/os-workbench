@@ -54,6 +54,7 @@ static void kfree(void *ptr) {
 static void setup_heap_structure() {
     size_t prefix;
     void *bound;
+
     log_nr_page = 0;
     nr_page = 1;
     while (1) {
@@ -64,12 +65,14 @@ static void setup_heap_structure() {
         if (bound + nr_page * PAGE_SIZE < heap.end) {
             ++log_nr_page;
             nr_page <<= 1;
-        } else {
-            --log_nr_page;
-            nr_page >>= 1;
-            break;
-        }
+        } else break;
     }
+    --log_nr_page;
+    nr_page >>= 1;
+
+    chunks = heap.start;
+    chunklist = heap.start + (nr_page) * sizeof(chunk_t);
+    assert(chunklist == heap.start + prefix);
     // TODO: make more use of heap
 
     printf("we make heap to this structure:\n\n");
