@@ -20,9 +20,10 @@ static void *kalloc(size_t size) {
 }
 
 static void *kalloc_buddy(size_t size) {
+    size = (size - 1) / PAGE_SIZE + 1;
     spinlock_lock(&big_kernel_lock);
 
-    int expected_level= level_bound(size);
+    int expected_level = level_bound(size);
     if (size > REJECT_THRESHOLD) {
         spinlock_unlock(&big_kernel_lock);
         return NULL;
