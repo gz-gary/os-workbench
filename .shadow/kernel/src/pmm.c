@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <common.h>
 #include <spinlock.h>
 #include <chunklist.h>
@@ -14,12 +15,6 @@ struct heap_t {
 #endif
 
 static void *kalloc(size_t size) {
-    // TODO
-    // You can add more .c files to the repo.
-    return NULL;
-}
-
-static void *kalloc_buddy(size_t size) {
     if (size > REJECT_THRESHOLD) return NULL;
 
     size = (size - 1) / PAGE_SIZE + 1;
@@ -27,68 +22,46 @@ static void *kalloc_buddy(size_t size) {
 
     int expected_level = level_bound(size);
     if (!chunklist[expected_level].head) {
-        int level = expected_level;
-        ++level;
+        int level = expected_level + 1;
         while (level <= log_nr_page && !chunklist[level].head) ++level;
-        if (level > log_nr_page) {
-            //no more chunk to split
+        if (level > log_nr_page) { //no more chunk to split
             spinlock_unlock(&big_kernel_lock);
             return NULL;
         }
+
         assert(chunklist[level].head);
         chunk_t *bigger_chunk = chunklist[level].head;
         size_t bigger_id = get_chunk_id(bigger_chunk);
         chunk_remove(bigger_id);
+
         while (level > expected_level) {
             size_t bigger_size = bigger_chunk->size;
             size_t r_id = bigger_id + (bigger_size / 2);
+
             chunks[r_id].size = bigger_size / 2;
             bigger_chunk->size = bigger_size / 2;
+            assert(get_buddy_id(r_id) == bigger_id);
+            assert(get_buddy_id(bigger_id) == r_id);
 
             chunk_insert(level - 1, r_id);
-            
             --level;
         }
         chunk_insert(level, bigger_id);
     }
+    assert(chunklist[expected_level].head);
     chunk_t *chunk = chunklist[expected_level].head;
     size_t chunk_id = get_chunk_id(chunk);
     chunk_remove(chunk_id);
+
     chunk->status = CHUNK_USING;
 
-    LOG_RANGE(chunks[chunk_id].size * PAGE_SIZE, mem + (chunk_id * PAGE_SIZE));
+    // LOG_RANGE(chunks[chunk_id].size * PAGE_SIZE, mem + (chunk_id * PAGE_SIZE));
 
     spinlock_unlock(&big_kernel_lock);
     return mem + (chunk_id * PAGE_SIZE);
 }
 
-static void *kalloc_stupid(size_t size) {
-
-    spinlock_lock(&big_kernel_lock);
-
-    size_t bound = power_bound(size);
-    void *next_available = align_to_bound(heap.start, bound);
-    assert(((uintptr_t)next_available & (bound - 1)) == 0);
-    if (next_available >= heap.end) {
-        spinlock_unlock(&big_kernel_lock);
-        return NULL;
-    }
-    else {
-        heap.start = next_available + size;
-        spinlock_unlock(&big_kernel_lock);
-        return next_available;
-    }
-
-    return NULL;
-}
-
-
 static void kfree(void *ptr) {
-    // TODO
-    // You can add more .c files to the repo.
-}
-
-static void kfree_buddy(void *ptr) {
     spinlock_lock(&big_kernel_lock);
 
     size_t chunk_id = (ptr - mem) / PAGE_SIZE;
@@ -109,6 +82,7 @@ static void kfree_buddy(void *ptr) {
 
         chunks[chunk_id].size *= 2;
         chunk_insert(level + 1, chunk_id);
+
         buddy_id = get_buddy_id(chunk_id);
         ++level;
     }
@@ -195,9 +169,6 @@ static void pmm_init() {
 
 MODULE_DEF(pmm) = {
     .init  = pmm_init,
-    //.alloc = kalloc,
-    //.alloc = kalloc_stupid,
-    .alloc = kalloc_buddy,
-    //.free  = kfree,
-    .free  = kfree_buddy,
+    .alloc = kalloc,
+    .free  = kfree,
 };
