@@ -58,7 +58,7 @@ static void entry(int id) {
         assert(((uintptr_t)ptr[i] & (power_bound(block_size[i]) - 1)) == 0);
     }
 
-    /*unsigned char my_identifier = id;
+    unsigned char my_identifier = id;
     for (int i = 0; i < LENGTH(block_size); ++i) {
         // brush my range with my id
         memset(ptr[i], my_identifier, block_size[i]);
@@ -71,7 +71,7 @@ static void entry(int id) {
                 unsigned char byte_here = *(unsigned char *)(ptr[i] + offset);
                 assert(byte_here == id);
             }
-        }*/
+        }
 
     for (int i = 0; i < LENGTH(block_size); ++i) pmm->free(ptr[i]);
 }
@@ -90,6 +90,6 @@ static void simple_test() {
 int main() {
     srand(time(0));
     pmm->init();
-    // alloc_test();
-    simple_test();
+    alloc_test();
+    //simple_test();
 }
