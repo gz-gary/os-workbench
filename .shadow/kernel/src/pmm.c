@@ -13,12 +13,6 @@ struct heap_t {
 
 #endif
 
-static inline size_t power_bound(size_t x) {
-    size_t ret = 1;
-    while (ret < x) ret <<= 1;
-    return ret;
-}
-
 static void *kalloc(size_t size) {
     // TODO
     // You can add more .c files to the repo.
@@ -37,16 +31,14 @@ static void *kalloc_stupid(size_t size) {
     spinlock_lock(&big_kernel_lock);
 
     size_t bound = power_bound(size);
-    void *next_available = (void*)(
-        (((uintptr_t)heap.start - 1) & (~(bound - 1)))
-        + bound);
+    void *next_available = align_to_bound(heap.start, bound);
     assert(((uintptr_t)next_available & (bound - 1)) == 0);
     if (next_available >= heap.end) {
         spinlock_unlock(&big_kernel_lock);
         return NULL;
     }
     else {
-        // heap.start = next_available + size;
+        heap.start = next_available + size;
         // LOG_RANGE(size, next_available);
         spinlock_unlock(&big_kernel_lock);
         return next_available;
@@ -97,6 +89,8 @@ static void pmm_init() {
     );
 
     spinlock_init(&big_kernel_lock);
+
+    size_t bound = power_bound(pmsize);
 }
 
 #endif
