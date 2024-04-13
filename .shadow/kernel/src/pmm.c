@@ -42,6 +42,7 @@ static void *kalloc_buddy(size_t size) {
             size_t bigger_size = bigger_chunk->size;
             size_t r_id = bigger_id + (bigger_size / 2);
             chunks[r_id].size = bigger_size / 2;
+            bigger_chunk->size = bigger_size / 2;
 
             chunk_insert(level - 1, r_id);
             
