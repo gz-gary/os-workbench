@@ -1,8 +1,8 @@
 #include <sys/types.h>
 
-#define PAGE_SIZE 4 * 1024
-#define LOG_PAGE_SIZE 12
-#define REJECT_THRESHOLD 16 * 1024 * 1024
+#define PAGE_SIZE (4 * 1024)
+#define LOG_PAGE_SIZE (12)
+#define REJECT_THRESHOLD (16 * 1024 * 1024)
 // #define MAX_NR_PAGE REJECT_THRESHOLD / PAGE_SIZE
 
 typedef struct chunk_t chunk_t;
