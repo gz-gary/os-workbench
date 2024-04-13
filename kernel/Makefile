@@ -11,9 +11,11 @@ include $(AM_HOME)/Makefile
 include ../oslabs.mk
 image: git
 
-test: git
+build-test: git
 	@gcc $(shell find src/ -name "*.c") \
 		 $(shell find test/ -name "*.c") \
 		 -Iinclude -Iframework -Itest -DTEST -lpthread \
-		 -o build/test
+		 -o build/test -ggdb
+
+test: build-test
 	@build/test

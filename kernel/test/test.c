@@ -82,8 +82,14 @@ static void alloc_test() {
     }
 }
 
+static void simple_test() {
+    n_ = 1;
+    entry(1);
+}
+
 int main() {
     srand(time(0));
     pmm->init();
     alloc_test();
+    //simple_test();
 }
