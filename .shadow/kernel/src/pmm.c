@@ -71,7 +71,6 @@ static void setup_heap_structure() {
     nr_page >>= 1;
 
     chunks = heap.start;
-    assert(chunks == heap.start);
     chunklist = heap.start + nr_page * sizeof(chunk_t);
     mem = align_to_bound(chunklist + (log_nr_page + 1) * sizeof(chunklist_t),
                          nr_page << LOG_PAGE_SIZE);
@@ -79,8 +78,8 @@ static void setup_heap_structure() {
 
     printf("\nwe make heap to this structure:\n\n");
     printf("Manage %ld pages\n", nr_page);
-    printf("[%p, %p) to store chunks\n", chunks, chunks + nr_page * sizeof(chunk_t));
-    printf("[%p, %p) to store chunklist\n", chunklist, chunklist + (log_nr_page + 1) * sizeof(chunklist_t));
+    printf("[%p, %p) to store chunks\n", chunks, chunks + nr_page);
+    printf("[%p, %p) to store chunklist\n", chunklist, chunklist + (log_nr_page + 1));
     printf("[%p, %p) to allocate\n", mem, mem + nr_page * PAGE_SIZE);
 }
 
