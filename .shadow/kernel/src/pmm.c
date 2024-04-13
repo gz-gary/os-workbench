@@ -86,6 +86,8 @@ static void kfree(void *ptr) {
 }
 
 static void kfree_buddy(void *ptr) {
+    spinlock_lock(&big_kernel_lock);
+
     size_t chunk_id = (ptr - mem) / PAGE_SIZE;
 
     chunks[chunk_id].status = CHUNK_FREE;
@@ -107,6 +109,8 @@ static void kfree_buddy(void *ptr) {
         buddy_id = get_buddy_id(chunk_id);
         ++level;
     }
+
+    spinlock_unlock(&big_kernel_lock);
 }
 
 static void setup_heap_structure() {
