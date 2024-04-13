@@ -87,7 +87,26 @@ static void kfree(void *ptr) {
 
 static void kfree_buddy(void *ptr) {
     size_t chunk_id = (ptr - mem) / PAGE_SIZE;
+
     chunks[chunk_id].status = CHUNK_FREE;
+    size_t buddy_id = get_buddy_id(chunk_id);
+    int level = level_bound(chunks[chunk_id].size);
+
+    while (level < log_nr_page &&
+           chunks[buddy_id].size == chunks[chunk_id].size &&
+           chunks[buddy_id].status == CHUNK_FREE) {
+           //not be splited and free
+
+        chunk_remove(buddy_id);
+        chunk_remove(chunk_id);
+
+        if (buddy_id < chunk_id) chunk_id = buddy_id;
+
+        chunks[chunk_id].size *= 2;
+        chunk_insert(level + 1, chunk_id);
+        buddy_id = get_buddy_id(chunk_id);
+        ++level;
+    }
 }
 
 static void setup_heap_structure() {
