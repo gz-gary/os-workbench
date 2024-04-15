@@ -52,7 +52,7 @@ static void kfree(void *ptr) {
     }
 }
 
-static void setup_heap_structure() {
+static void setup_heap_layout() {
     // TODO: make more use of heap
     size_t prefix;
     void *bound;
@@ -124,7 +124,7 @@ static void pmm_init() {
 
     /* ---------- */
 
-    setup_heap_structure();
+    setup_heap_layout();
     chunk_init();
     buddy_init();
 }
