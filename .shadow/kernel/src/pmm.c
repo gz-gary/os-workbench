@@ -106,7 +106,7 @@ static void setup_heap_layout() {
         if (temp_log < 0) break;
         else {
             
-            printf("ahead %d\n", temp_log);
+            printf("ahead %d %d\n", temp_log, 1 << temp_log);
             printf("chunks extend [%p, %p)\n", ((void*)chunks + nr_page * sizeof(chunk_t)),
                                                ((void*)chunks + (nr_page + (1 << temp_log)) * sizeof(chunk_t))                    );
             printf("mem extend [%p, %p)\n", (mem + nr_page * PAGE_SIZE),
