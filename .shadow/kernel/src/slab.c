@@ -66,8 +66,6 @@ void slab_free(void *ptr) {
 void slab_init() {
     int cpu_cnt = cpu_count();
     for (int i = 0; i < cpu_cnt; ++i)
-        for (int j = 0; j < SLAB_LEVEL; ++j) {
+        for (int j = 0; j < SLAB_LEVEL; ++j)
             locate_slab(i, j)->head = NULL;
-            printf("%d %d %p\n", i, j, locate_slab(i, j));
-        }
 }
