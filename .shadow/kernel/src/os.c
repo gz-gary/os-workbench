@@ -1,6 +1,8 @@
 #include <common.h>
 #include <spinlock.h>
 
+#ifndef TEST 
+
 #define NR_CPUS 8
 #define BUF 512
 #define TOTAL_ALLOC 120
@@ -78,6 +80,7 @@ static void producer() {
     //printf("sum_size: %d\n", sum_size);
 }
 
+#endif 
 spinlock_t stdout_log;
 
 static void os_init() {
