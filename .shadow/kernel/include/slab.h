@@ -24,7 +24,7 @@ struct slab_t {
 #define SLAB_LEVEL_MINIMAL (3)
 #define SLAB_LEVEL ((SLAB_LEVEL_MAXIMAL) - (SLAB_LEVEL_MINIMAL) + 1)
 #ifndef PAGE_SIZE
-#define PAGE_SIZE 4 * 1024
+#define PAGE_SIZE (4 * 1024)
 #endif
 
 extern slab_t **slabs;
