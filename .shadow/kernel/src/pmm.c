@@ -124,6 +124,7 @@ static void setup_heap_layout() {
             nr_page += (1 << temp_log);
         }
     }
+    printf("mem we use %d MiB\n", (nr_page * PAGE_SIZE) >> 20);
 }
 
 #ifndef TEST
