@@ -58,7 +58,7 @@ int cpu_current() {
     pthread_t pid = pthread_self();
     for (int i = 0; i < n_; ++i) {
         if (threads_[i].thread == pid) {
-            return threads_[i].id;
+            return threads_[i].id - 1;
         }
     }
     // return 0;
