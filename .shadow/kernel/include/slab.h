@@ -27,7 +27,7 @@ struct slab_t {
 #define PAGE_SIZE (4 * 1024)
 #endif
 
-extern slab_t **slabs;
+extern void *slabs;
 
 extern void slab_init();
 extern void *slab_allocate(size_t size);

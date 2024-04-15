@@ -3,7 +3,11 @@
 #include <slab.h>
 #include <buddy.h>
 
-slab_t *(*slabs);
+void *slabs;
+
+static inline slab_t *get_slab(int cpu, int level) {
+    return slabs + (cpu * SLAB_LEVEL + level) * sizeof(slab_t);
+}
 
 static inline void *get_page_start(void *ptr) {
     return (void *)(((uintptr_t)ptr) & (~(PAGE_SIZE - 1)));
@@ -30,7 +34,7 @@ void *slab_allocate(size_t size) {
 
     int level    = level_bound(size);
     int cpu      = cpu_current();
-    slab_t *slab = &slabs[cpu][level - SLAB_LEVEL_MINIMAL];
+    slab_t *slab = get_slab(cpu, level - SLAB_LEVEL_MINIMAL);
 
     if (!slab->head)
         fetch_slab(slab, size);
@@ -51,7 +55,7 @@ void slab_free(void *ptr) {
     size_t     size   = hdr->size;
     int        level  = level_bound(size);
     int        cpu    = cpu_current();
-    slab_t     *slab  = &slabs[cpu][level - SLAB_LEVEL_MINIMAL];
+    slab_t     *slab  = get_slab(cpu, level - SLAB_LEVEL_MINIMAL);
     piece_t    *piece = (void *)hdr + sizeof(slab_hdr_t);
     int        idx    = (ptr - hdr->mem) / size;
 
@@ -62,8 +66,6 @@ void slab_free(void *ptr) {
 void slab_init() {
     int cpu_cnt = cpu_count();
     for (int i = 0; i < cpu_cnt; ++i)
-        for (int j = 0; j < SLAB_LEVEL; ++j) {
-            printf("%d %d %p\n", i, j, &slabs[i][j]);
-            //slabs[i][j].head = NULL;
-        }
+        for (int j = 0; j < SLAB_LEVEL; ++j)
+            get_slab(i, j)->head = NULL;
 }
