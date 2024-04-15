@@ -72,7 +72,7 @@ static void setup_heap_layout() {
         prefix = 
         (nr_page) * sizeof(chunk_t) +
         (log_nr_page + 1) * sizeof(chunklist_t) +
-        (cpu_count() * (SLAB_LEVEL_MAXIMAL - SLAB_LEVEL_MINIMAL + 1)) * sizeof(slab_t);
+        (cpu_count() * (SLAB_LEVEL)) * sizeof(slab_t);
         bound  = align_to_bound(heap.start + prefix, nr_page << LOG_PAGE_SIZE);
         if (bound + nr_page * PAGE_SIZE < heap.end) {
             ++log_nr_page;
@@ -114,7 +114,7 @@ static void pmm_init() {
 
 #else
 
-#define TEST_HEAP_SIZE 16 * 1024 * 1024 //16MiB
+#define TEST_HEAP_SIZE 32 * 1024 * 1024 //16MiB
 
 static void pmm_init() {
     char *ptr = malloc(TEST_HEAP_SIZE);
