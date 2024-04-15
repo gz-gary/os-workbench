@@ -112,6 +112,15 @@ static void setup_heap_layout() {
                                                ((void*)chunks + (nr_page + (1 << temp_log)) * sizeof(chunk_t))                    );
             printf("mem extend [%p, %p)\n", (mem + nr_page * PAGE_SIZE),
                                             (mem + (nr_page + (1 << temp_log)) * PAGE_SIZE));
+            for (size_t i = nr_page; i < nr_page + (1 << temp_log); ++i)
+                chunks[i] = (chunk_t){
+                    .status = CHUNK_FREE,
+                    .size = 0,
+                    .next = NULL,
+                    .prev = NULL
+                };
+            chunks[nr_page].size = (1 << temp_log);
+            chunk_insert(temp_log, nr_page);
             nr_page += (1 << temp_log);
         }
     }
