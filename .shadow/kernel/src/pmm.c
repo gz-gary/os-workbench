@@ -39,8 +39,10 @@ static void *kalloc(size_t size) {
     if (size > REJECT_THRESHOLD) return NULL;
 
     size = power_bound(size);
-    if (size >= PAGE_SIZE / 2) {
+    if (size >= PAGE_SIZE / 2) { //slow path
         return buddy_alloc(size);
+    } else {
+        return slab_allocate(size); //fast path
     }
 }
 
@@ -64,7 +66,7 @@ static void setup_heap_layout() {
         (nr_page) * sizeof(chunk_t) +
         (log_nr_page + 1) * sizeof(chunklist_t) +
         (cpu_count() * (SLAB_LEVEL_MAXIMAL - SLAB_LEVEL_MINIMAL + 1)) * sizeof(slab_t);
-        bound = align_to_bound(heap.start + prefix, nr_page << LOG_PAGE_SIZE);
+        bound  = align_to_bound(heap.start + prefix, nr_page << LOG_PAGE_SIZE);
         if (bound + nr_page * PAGE_SIZE < heap.end) {
             ++log_nr_page;
             nr_page <<= 1;
@@ -73,11 +75,11 @@ static void setup_heap_layout() {
     --log_nr_page;
     nr_page >>= 1;
 
-    chunks = heap.start;
+    chunks    = heap.start;
     chunklist = (void *)chunks + nr_page * sizeof(chunk_t);
-    slabs = (void *)chunklist + (log_nr_page + 1) * sizeof(chunklist_t);
-    mem = align_to_bound(chunklist + (log_nr_page + 1) * sizeof(chunklist_t),
-                         nr_page << LOG_PAGE_SIZE);
+    slabs     = (void *)chunklist + (log_nr_page + 1) * sizeof(chunklist_t);
+    mem       = align_to_bound(chunklist + (log_nr_page + 1) * sizeof(chunklist_t),
+                               nr_page << LOG_PAGE_SIZE);
 
     printf("\nwe make heap to this structure:\n\n");
     printf("Manage %ld pages\n", nr_page);
@@ -127,6 +129,7 @@ static void pmm_init() {
     setup_heap_layout();
     chunk_init();
     buddy_init();
+    slab_init();
 }
 
 #endif

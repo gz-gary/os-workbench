@@ -23,8 +23,10 @@ struct slab_t {
 #define SLAB_LEVEL_MAXIMAL (10)
 #define SLAB_LEVEL_MINIMAL (3)
 #define SLAB_LEVEL ((SLAB_LEVEL_MAXIMAL) - (SLAB_LEVEL_MINIMAL) + 1)
+#define PAGE_SIZE 4 * 1024
 
 extern slab_t **slabs;
 
+extern void slab_init();
 extern void *slab_allocate(size_t size);
 extern void slab_free(void *ptr);
