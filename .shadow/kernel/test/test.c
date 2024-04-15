@@ -131,6 +131,8 @@ struct lock_counter {
     spinlock_t lock;
 } total_free;
 
+size_t sum_size;
+
 static void workload_producer() {
     size_t size;
     int _ = 0;
@@ -153,10 +155,12 @@ static void workload_producer() {
             .type = WORK_ALLOC,
             .size = size
         };
+        sum_size += size;
         spinlock_lock(&consumer_queue[cpuid].lock);
         queue_push(&consumer_queue[cpuid], workload);
         spinlock_unlock(&consumer_queue[cpuid].lock);
     }
+    printf("sum_size: %ld\n", sum_size);
 }
 
 static void workload_consumer(int id) {
