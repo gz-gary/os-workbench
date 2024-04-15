@@ -3,7 +3,7 @@
 #include <slab.h>
 #include <buddy.h>
 
-slab_t **slabs;
+slab_t *(*slabs);
 
 static inline void *get_page_start(void *ptr) {
     return (void *)(((uintptr_t)ptr) & (~(PAGE_SIZE - 1)));
