@@ -22,10 +22,12 @@ static void fetch_slab(slab_t *slab, size_t size) {
     hdr->size       = size;
     hdr->mem        = (void *)hdr + PAGE_SIZE - nr_pieces * size;
 
+    spinlock_lock(&slab->lock);
     for (int i = 0; i < nr_pieces; ++i) {
         piece[i].next = slab->head;
         slab->head = &piece[i];
     }
+    spinlock_unlock(&slab->lock);
 }
 
 void *slab_allocate(size_t size) {
@@ -44,8 +46,10 @@ void *slab_allocate(size_t size) {
     int        idx     = ((void *)piece - ((void *)hdr + sizeof(slab_hdr_t))) / sizeof(piece_t);
     void       *ret    = hdr->mem + idx * hdr->size;
 
+    spinlock_lock(&slab->lock);
     slab->head = piece->next;
     piece->next = NULL;
+    spinlock_unlock(&slab->lock);
 
     return ret;
 }
@@ -60,9 +64,9 @@ void slab_free(void *ptr) {
     int        idx    = (ptr - hdr->mem) / size;
 
     spinlock_lock(&slab->lock);
-    spinlock_unlock(&slab->lock);
     piece[idx].next = slab->head;
     slab->head = &piece[idx];
+    spinlock_unlock(&slab->lock);
 }
 
 void slab_init() {
