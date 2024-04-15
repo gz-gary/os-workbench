@@ -1,4 +1,5 @@
 #include <sys/types.h>
+#include <spinlock.h>
 
 typedef struct slab_hdr_t slab_hdr_t;
 typedef struct piece_t piece_t;
@@ -10,11 +11,12 @@ struct slab_hdr_t {
 };
 
 struct piece_t {
-    struct piece_t *next;
+    piece_t *next;
 };
 
 struct slab_t {
-    struct piece_t *head;
+    spinlock_t lock;
+    piece_t *head;
 };
 
 //from 8KiB to 1024KiB

@@ -22,10 +22,12 @@ static void fetch_slab(slab_t *slab, size_t size) {
     hdr->size       = size;
     hdr->mem        = (void *)hdr + PAGE_SIZE - nr_pieces * size;
 
+    spinlock_lock(&slab->lock);
     for (int i = 0; i < nr_pieces; ++i) {
         piece[i].next = slab->head;
         slab->head = &piece[i];
     }
+    spinlock_unlock(&slab->lock);
 }
 
 void *slab_allocate(size_t size) {
@@ -44,8 +46,10 @@ void *slab_allocate(size_t size) {
     int        idx     = ((void *)piece - ((void *)hdr + sizeof(slab_hdr_t))) / sizeof(piece_t);
     void       *ret    = hdr->mem + idx * hdr->size;
 
+    spinlock_lock(&slab->lock);
     slab->head = piece->next;
     piece->next = NULL;
+    spinlock_unlock(&slab->lock);
 
     return ret;
 }
@@ -59,13 +63,18 @@ void slab_free(void *ptr) {
     piece_t    *piece = (void *)hdr + sizeof(slab_hdr_t);
     int        idx    = (ptr - hdr->mem) / size;
 
+    spinlock_lock(&slab->lock);
     piece[idx].next = slab->head;
     slab->head = &piece[idx];
+    spinlock_unlock(&slab->lock);
 }
 
 void slab_init() {
     int cpu_cnt = cpu_count();
     for (int i = 0; i < cpu_cnt; ++i)
-        for (int j = 0; j < SLAB_LEVEL; ++j)
-            locate_slab(i, j)->head = NULL;
+        for (int j = 0; j < SLAB_LEVEL; ++j) {
+            slab_t *slab = locate_slab(i, j);
+            slab->head = NULL;
+            spinlock_init(&slab->lock);
+        }
 }
