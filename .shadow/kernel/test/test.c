@@ -131,6 +131,11 @@ struct lock_counter {
     spinlock_t lock;
 } total_free;
 
+struct lock_log {
+    FILE *fp;
+    spinlock_t lock;
+} log_file;
+
 size_t sum_size;
 
 static void workload_producer() {
@@ -171,6 +176,9 @@ static void workload_consumer(int id) {
     while (1) {
         spinlock_lock(&total_free.lock);
         if (total_free.cnt == TOTAL_ALLOC) {
+            spinlock_lock(&log_file.lock);
+            fclose(log_file.fp);
+            spinlock_unlock(&log_file.lock);
             spinlock_unlock(&total_free.lock);
             break;
         }
@@ -187,6 +195,9 @@ static void workload_consumer(int id) {
                 void *ptr = pmm->alloc(workload.size);
                 assert(ptr);
                 assert((((uintptr_t)ptr) & (power_bound(workload.size) - 1)) == 0);
+                spinlock_lock(&log_file.lock);
+                fprintf(log_file.fp, "kalloc %p %p\n", ptr, ptr + workload.size);
+                spinlock_unlock(&log_file.lock);
                 int another_cpuid = rand() % NR_CPUS;
                 workload = (workload_t) {
                     .type = WORK_FREE,
@@ -197,6 +208,9 @@ static void workload_consumer(int id) {
                 spinlock_unlock(&consumer_queue[another_cpuid].lock);
             } else {
                 pmm->free(workload.ptr);
+                spinlock_lock(&log_file.lock);
+                fprintf(log_file.fp, "kfree %p\n", workload.ptr);
+                spinlock_unlock(&log_file.lock);
                 spinlock_lock(&total_free.lock);
                 ++total_free.cnt;
                 spinlock_unlock(&total_free.lock);
@@ -210,6 +224,8 @@ static void alloc_test() {
         queue_init(&consumer_queue[i]);
     }
     spinlock_init(&total_free.lock);
+    log_file.fp = fopen("test/log.txt", "w");
+    spinlock_init(&log_file.lock);
     total_free.cnt = 0;
     for (int i = 0; i < NR_CPUS; ++i) {
         create(workload_consumer);
