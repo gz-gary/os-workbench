@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <common.h>
 #include <slab.h>
 #include <buddy.h>
@@ -11,29 +10,6 @@ struct heap_t {
 } heap;
 
 #endif
-
-static void *kalloc_stupid(size_t size) {
-
-    spinlock_lock(&big_kernel_lock);
-
-    size_t bound = power_bound(size);
-    void *next_available = (void*)(
-        (((uintptr_t)heap.start - 1) & (~(bound - 1)))
-        + bound);
-    assert(((uintptr_t)next_available & (bound - 1)) == 0);
-    if (next_available >= heap.end) {
-        spinlock_unlock(&big_kernel_lock);
-        return NULL;
-    }
-    else {
-        heap.start = next_available + size;
-        LOG_RANGE(size, next_available);
-        spinlock_unlock(&big_kernel_lock);
-        return next_available;
-    }
-
-    return NULL;
-}
 
 static void *kalloc(size_t size) {
     /*spinlock_lock(&big_kernel_lock);
@@ -124,6 +100,7 @@ static void setup_heap_layout() {
             nr_page += (1 << temp_log);
         }
     }
+    printf("mem we use %d MiB\n", (nr_page * PAGE_SIZE) >> 20);
 }
 
 #ifndef TEST
@@ -139,12 +116,14 @@ static void pmm_init() {
         pmsize >> 20, heap.start, heap.end
     );
 
-    spinlock_init(&big_kernel_lock);
+    setup_heap_layout();
+    buddy_init();
+    slab_init();
 }
 
 #else
 
-#define TEST_HEAP_SIZE 32 * 1024 * 1024 //32MiB
+#define TEST_HEAP_SIZE 16 * 1024 * 1024 //32MiB
 
 static void pmm_init() {
     char *ptr = malloc(TEST_HEAP_SIZE);

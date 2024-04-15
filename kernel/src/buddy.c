@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <common.h>
 #include <buddy.h>
 #include <chunklist.h>

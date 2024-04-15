@@ -1,5 +1,4 @@
 // free space list
-#include <assert.h>
 #include <common.h>
 #include <chunklist.h>
 
