@@ -3,7 +3,7 @@
 
 #define NR_CPUS 8
 #define BUF 512
-#define TOTAL_ALLOC 120
+#define TOTAL_ALLOC 4
 
 typedef struct workload_t workload_t;
 typedef struct workload_queue_t workload_queue_t;
@@ -112,7 +112,7 @@ static void os_run() {
                 spinlock_lock(&stdout_log);
                 printf("kalloc %p %p\n", ptr, ptr + workload.size);
                 spinlock_unlock(&stdout_log);
-                int another_cpuid = rand() % NR_CPUS;
+                int another_cpuid = rand() % cpu_count();
                 workload = (workload_t) {
                     .type = WORK_FREE,
                     .ptr = ptr
