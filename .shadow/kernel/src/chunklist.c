@@ -1,9 +1,7 @@
 // free space list
 #include <assert.h>
+#include <common.h>
 #include <chunklist.h>
-#include <util-funcs.h>
-
-#define NULL 0
 
 chunk_t *chunks;
 chunklist_t *chunklist;
