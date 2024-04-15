@@ -19,7 +19,7 @@ int cpu_current() {
 }
 
 int cpu_count() {
-    return n_;
+    return NR_CPUS;
 }
 
 inline void putch(char ch) {
