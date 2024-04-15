@@ -113,10 +113,10 @@ static void os_run() {
         spinlock_unlock(&consumer_queue[cpuid].lock);
         if (work_to_do) {
             if (workload.type == WORK_ALLOC) {
+                spinlock_lock(&stdout_log);
                 void *ptr = pmm->alloc(workload.size);
                 assert(ptr);
                 assert((((uintptr_t)ptr) & (power_bound(workload.size) - 1)) == 0);
-                spinlock_lock(&stdout_log);
                 printf("kalloc %p %p\n", ptr, ptr + workload.size);
                 spinlock_unlock(&stdout_log);
                 int another_cpuid = rand() % cpu_count();
@@ -128,8 +128,8 @@ static void os_run() {
                 queue_push(&consumer_queue[another_cpuid], workload);
                 spinlock_unlock(&consumer_queue[another_cpuid].lock);
             } else {
-                pmm->free(workload.ptr);
                 spinlock_lock(&stdout_log);
+                pmm->free(workload.ptr);
                 printf("kfree %p\n", workload.ptr);
                 spinlock_unlock(&stdout_log);
             }
