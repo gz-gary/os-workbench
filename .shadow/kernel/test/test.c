@@ -6,9 +6,9 @@
 #include <spinlock.h>
 #include <debug-macros.h>
 
-#define NR_CPUS 4
+#define NR_CPUS 1
 #define BUF 512
-#define TOTAL_ALLOC 100
+#define TOTAL_ALLOC 10
 
 typedef struct workload_t workload_t;
 typedef struct workload_queue_t workload_queue_t;
@@ -245,6 +245,6 @@ static void simple_test() {
 int main() {
     srand(time(0));
     pmm->init();
-    // alloc_test();
+    alloc_test();
     // simple_test();
 }
