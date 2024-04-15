@@ -146,7 +146,7 @@ static void workload_producer() {
         } else if (rnd < 0.95) {
             size = (rand() % 16 + 1) * 4096;
         } else {
-            size = (rand() % 4 + 1) * 4096 * 4096;
+            size = (rand() % 4 + 1) * 4096 * 1024;
         }
         int cpuid = rand() % NR_CPUS;
         workload_t workload = (workload_t) {
@@ -164,12 +164,7 @@ static void workload_consumer(int id) {
     int cpuid = id - 1;
     workload_t workload;
     int work_to_do;
-                spinlock_lock(&total_free.lock);
-                ++total_free.cnt;
-                printf("id: %d\n", cpuid);
-                printf("cnt: %d\n", total_free.cnt);
-                spinlock_unlock(&total_free.lock);
-    /*while (1) {
+    while (1) {
         spinlock_lock(&total_free.lock);
         if (total_free.cnt == TOTAL_ALLOC) {
             spinlock_unlock(&total_free.lock);
@@ -201,7 +196,7 @@ static void workload_consumer(int id) {
                 spinlock_unlock(&total_free.lock);
             }
         }
-    }*/
+    }
 }
 
 static void alloc_test() {
@@ -213,7 +208,7 @@ static void alloc_test() {
     for (int i = 0; i < NR_CPUS; ++i) {
         create(workload_consumer);
     }
-    //create(workload_producer);
+    create(workload_producer);
 }
 
 static void simple_test() {
