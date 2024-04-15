@@ -75,7 +75,7 @@ static void setup_heap_layout() {
 
     chunks = heap.start;
     chunklist = (void *)chunks + nr_page * sizeof(chunk_t);
-    slabs = (void *)chunklist + (cpu_count() * (SLAB_LEVEL_MAXIMAL - SLAB_LEVEL_MINIMAL + 1)) * sizeof(slab_t);
+    slabs = (void *)chunklist + (log_nr_page + 1) * sizeof(chunklist_t);
     mem = align_to_bound(chunklist + (log_nr_page + 1) * sizeof(chunklist_t),
                          nr_page << LOG_PAGE_SIZE);
 
