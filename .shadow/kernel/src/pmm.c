@@ -99,8 +99,9 @@ static void setup_heap_layout() {
     }
     int temp_log = log_nr_page - 1;
     while (1) {
-        while ((1 << temp_log) * sizeof(chunk_t) > mem - ((void*)chunks + nr_page * sizeof(chunk_t)) ||
-               (1 << temp_log) * PAGE_SIZE > heap.end - (mem + nr_page * PAGE_SIZE))
+        while (temp_log >= 0 &&
+               ((1 << temp_log) * sizeof(chunk_t) > mem - ((void*)chunks + nr_page * sizeof(chunk_t)) ||
+               (1 << temp_log) * PAGE_SIZE > heap.end - (mem + nr_page * PAGE_SIZE)))
                --temp_log;
 
         if (temp_log < 0) break;
