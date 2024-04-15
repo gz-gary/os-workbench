@@ -6,9 +6,9 @@
 #include <spinlock.h>
 #include <debug-macros.h>
 
-#define NR_CPUS 1
+#define NR_CPUS 4
 #define BUF 512
-#define TOTAL_ALLOC 10
+#define TOTAL_ALLOC 50
 
 typedef struct workload_t workload_t;
 typedef struct workload_queue_t workload_queue_t;
