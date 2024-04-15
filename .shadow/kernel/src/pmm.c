@@ -36,9 +36,9 @@ static void *kalloc_stupid(size_t size) {
 }
 
 static void *kalloc(size_t size) {
-    /*spinlock_lock(&big_kernel_lock);
+    spinlock_lock(&big_kernel_lock);
     printf("[kalloc] cpu%d wants %ld bytes\n", cpu_current(), size);
-    spinlock_unlock(&big_kernel_lock);*/
+    spinlock_unlock(&big_kernel_lock);
     if (size > REJECT_THRESHOLD) return NULL;
 
     size = power_bound(size);
@@ -50,9 +50,9 @@ static void *kalloc(size_t size) {
 }
 
 static void kfree(void *ptr) {
-    /*spinlock_lock(&big_kernel_lock);
+    spinlock_lock(&big_kernel_lock);
     printf("[kfree] cpu%d free %p\n", cpu_current(), ptr);
-    spinlock_unlock(&big_kernel_lock);*/
+    spinlock_unlock(&big_kernel_lock);
     if ((((uintptr_t)ptr) & (PAGE_SIZE - 1)) == 0) {
         // aligned to page, it must be allocate by buddy
         buddy_free(ptr);
