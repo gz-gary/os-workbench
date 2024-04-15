@@ -78,18 +78,56 @@ static void producer() {
     printf("sum_size: %d\n", sum_size);
 }
 
+spinlock_t stdout_log;
+
 static void os_init() {
     pmm->init();
     for (int i = 0; i < cpu_count(); ++i) {
         queue_init(&consumer_queue[i]);
     }
     producer();
+    spinlock_init(&stdout_log);
 }
 
 static void os_run() {
     /*for (const char *s = "Hello World from CPU #*\n"; *s; s++) {
         putch(*s == '*' ? '0' + cpu_current() : *s);
     }*/
+    int cpuid = cpu_current();
+    workload_t workload;
+    int work_to_do = 0;
+    while (1) {
+        work_to_do = 0;
+        spinlock_lock(&consumer_queue[cpuid].lock);
+        if (consumer_queue[cpuid].size > 0) {
+            workload = queue_pop(&consumer_queue[cpuid]);
+            work_to_do = 1;
+        }
+        spinlock_unlock(&consumer_queue[cpuid].lock);
+        if (work_to_do) {
+            if (workload.type == WORK_ALLOC) {
+                void *ptr = pmm->alloc(workload.size);
+                assert(ptr);
+                assert((((uintptr_t)ptr) & (power_bound(workload.size) - 1)) == 0);
+                spinlock_lock(&stdout_log);
+                printf("kalloc %p %p\n", ptr, ptr + workload.size);
+                spinlock_unlock(&stdout_log);
+                int another_cpuid = rand() % NR_CPUS;
+                workload = (workload_t) {
+                    .type = WORK_FREE,
+                    .ptr = ptr
+                };
+                spinlock_lock(&consumer_queue[another_cpuid].lock);
+                queue_push(&consumer_queue[another_cpuid], workload);
+                spinlock_unlock(&consumer_queue[another_cpuid].lock);
+            } else {
+                pmm->free(workload.ptr);
+                spinlock_lock(&stdout_log);
+                printf("kfree %p\n", workload.ptr);
+                spinlock_unlock(&stdout_log);
+            }
+        }
+    }
     while (1) ;
 }
 
