@@ -93,7 +93,7 @@ static void setup_heap_layout() {
             ++log_nr_page;
             nr_page <<= 1;
         } else break;
-    }*/
+    }
     --log_nr_page;
     nr_page >>= 1;
 
@@ -101,7 +101,7 @@ static void setup_heap_layout() {
     chunklist = (void *)chunks + nr_page * sizeof(chunk_t);
     slabs     = (void *)chunklist + (log_nr_page + 1) * sizeof(chunklist_t);
     mem       = align_to_bound(chunklist + (log_nr_page + 1) * sizeof(chunklist_t),
-                               nr_page << LOG_PAGE_SIZE);
+                               nr_page << LOG_PAGE_SIZE);*/
 
     printf("\nwe make heap to this structure:\n\n");
     printf("Manage %ld pages\n", nr_page);
