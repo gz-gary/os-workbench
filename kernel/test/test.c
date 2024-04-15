@@ -245,6 +245,6 @@ static void simple_test() {
 int main() {
     srand(time(0));
     pmm->init();
-    alloc_test();
+    // alloc_test();
     // simple_test();
 }

@@ -60,9 +60,10 @@ void buddy_free(void *ptr) {
     int level = level_bound(chunks[chunk_id].size);
 
     while (level < log_nr_page &&
+           buddy_id < nr_page &&
            chunks[buddy_id].size == chunks[chunk_id].size &&
            chunks[buddy_id].status == CHUNK_FREE) {
-           //not be splited and free
+           //not out of range && not be splited && free
 
         chunk_remove(buddy_id);
         chunk_remove(chunk_id);
