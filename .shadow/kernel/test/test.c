@@ -161,6 +161,7 @@ static void workload_producer() {
             .type = WORK_ALLOC,
             .size = size
         };
+        printf("alloc %ld bytes\n", size);
         sum_size += size;
         spinlock_lock(&consumer_queue[cpuid].lock);
         queue_push(&consumer_queue[cpuid], workload);
