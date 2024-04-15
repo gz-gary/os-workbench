@@ -74,6 +74,7 @@ static void entry(int id) {
         }
 
     for (int i = 0; i < LENGTH(block_size); ++i) pmm->free(ptr[i]);
+    printf("\nSucceed!\n");
 }
 
 static void alloc_test() {
