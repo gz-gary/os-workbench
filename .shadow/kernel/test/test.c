@@ -146,7 +146,7 @@ static void workload_producer() {
         } else if (rnd < 0.98) {
             size = (rand() % 16 + 1) * 4096;
         } else {
-            size = (rand() % 4 + 1) * 4096 * 1024;
+            size = (rand() % 4 + 1) * 1024 * 1024;
         }
         int cpuid = rand() % NR_CPUS;
         workload_t workload = (workload_t) {
