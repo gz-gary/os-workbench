@@ -64,9 +64,9 @@ void slab_free(void *ptr) {
     int        idx    = (ptr - hdr->mem) / size;
 
     spinlock_lock(&slab->lock);
+    spinlock_unlock(&slab->lock);
     piece[idx].next = slab->head;
     slab->head = &piece[idx];
-    spinlock_unlock(&slab->lock);
 }
 
 void slab_init() {
