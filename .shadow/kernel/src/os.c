@@ -3,7 +3,7 @@
 
 #define NR_CPUS 8
 #define BUF 512
-#define TOTAL_ALLOC 4
+#define TOTAL_ALLOC 20
 
 typedef struct workload_t workload_t;
 typedef struct workload_queue_t workload_queue_t;
