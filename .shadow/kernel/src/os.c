@@ -69,13 +69,13 @@ static void producer() {
             .type = WORK_ALLOC,
             .size = size
         };
-        printf("cpu %d to allocate %d bytes\n", cpu_current(), size);
+        printf("cpu %d to allocate %d bytes\n", cpuid, size);
         sum_size += size;
         spinlock_lock(&consumer_queue[cpuid].lock);
         queue_push(&consumer_queue[cpuid], workload);
         spinlock_unlock(&consumer_queue[cpuid].lock);
     }
-    printf("sum_size: %ld\n", sum_size);
+    printf("sum_size: %d\n", sum_size);
 }
 
 static void os_init() {
