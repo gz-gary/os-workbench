@@ -164,7 +164,12 @@ static void workload_consumer(int id) {
     int cpuid = id - 1;
     workload_t workload;
     int work_to_do;
-    while (1) {
+                spinlock_lock(&total_free.lock);
+                ++total_free.cnt;
+                printf("id: %d\n", cpuid);
+                printf("cnt: %d\n", total_free.cnt);
+                spinlock_unlock(&total_free.lock);
+    /*while (1) {
         spinlock_lock(&total_free.lock);
         if (total_free.cnt == TOTAL_ALLOC) {
             spinlock_unlock(&total_free.lock);
@@ -196,7 +201,7 @@ static void workload_consumer(int id) {
                 spinlock_unlock(&total_free.lock);
             }
         }
-    }
+    }*/
 }
 
 static void alloc_test() {
