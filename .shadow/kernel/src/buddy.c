@@ -74,6 +74,7 @@ void buddy_free(void *ptr) {
         ++level;
     }
 
+    printf("free %p by cpu%d\n", ptr, cpu_current());
     spinlock_unlock(&big_kernel_lock);
 }
 

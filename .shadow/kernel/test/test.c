@@ -80,7 +80,6 @@ static void alloc_test() {
     for (int i = 0; i < NR_CPUS; ++i) {
         create(entry);
     }
-    printf("\nSucceed!\n");
 }
 
 static void simple_test() {
