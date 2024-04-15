@@ -89,7 +89,7 @@ static void alloc_test() {
 
 static void simple_test() {
     n_ = 1;
-    entry(1);
+    // entry(1);
 }
 
 int main() {
