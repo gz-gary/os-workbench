@@ -7,8 +7,8 @@
 #include <debug-macros.h>
 
 #define NR_CPUS 4
-#define BUF 512
-#define TOTAL_ALLOC 5
+#define BUF 1024
+#define TOTAL_ALLOC 500
 
 typedef struct workload_t workload_t;
 typedef struct workload_queue_t workload_queue_t;
