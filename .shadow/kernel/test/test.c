@@ -5,18 +5,18 @@
 #include <kernel.h>
 #include <debug-macros.h>
 
-#define NR_CPUS 1
+#define NR_CPUS 4
 
 /* ---------------- fake klib and am ---------------- */
 
 int cpu_current() {
-    /*pthread_t pid = pthread_self();
+    pthread_t pid = pthread_self();
     for (int i = 0; i < n_; ++i) {
         if (threads_[i].thread == pid) {
             return threads_[i].id;
         }
-    }*/
-    return 1;
+    }
+    //return 1;
 }
 
 int cpu_count() {
@@ -96,6 +96,6 @@ static void simple_test() {
 int main() {
     srand(time(0));
     pmm->init();
-    // alloc_test();
-    simple_test();
+    alloc_test();
+    // simple_test();
 }
