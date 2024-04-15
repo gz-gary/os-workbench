@@ -83,7 +83,7 @@ static void setup_heap_layout() {
     printf("Manage %ld pages\n", nr_page);
     printf("[%p, %p) to store chunks\n", chunks, chunks + nr_page);
     printf("[%p, %p) to store chunklist\n", chunklist, chunklist + (log_nr_page + 1));
-    printf("[%p, %p) to store slabs\n", slabs, slabs + (cpu_count() * (SLAB_LEVEL_MAXIMAL - SLAB_LEVEL_MINIMAL + 1)) * sizeof(slab_t));
+    printf("[%p, %p) to store slabs\n", slabs, slabs + (cpu_count() * (SLAB_LEVEL)) * sizeof(slab_t));
     printf("[%p, %p) to allocate\n\n", mem, mem + nr_page * PAGE_SIZE);
 }
 

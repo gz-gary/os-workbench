@@ -22,8 +22,9 @@ struct slab_t {
 //use 0 to 7 to represent
 #define SLAB_LEVEL_MAXIMAL (10)
 #define SLAB_LEVEL_MINIMAL (3)
+#define SLAB_LEVEL ((SLAB_LEVEL_MAXIMAL) - (SLAB_LEVEL_MINIMAL) + 1)
 
 extern slab_t **slabs;
 
-extern void *slab_allocate();
+extern void *slab_allocate(size_t size);
 extern void slab_free(void *ptr);
