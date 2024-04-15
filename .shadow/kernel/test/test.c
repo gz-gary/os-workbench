@@ -185,8 +185,8 @@ static void workload_consumer(int id) {
         if (work_to_do) {
             if (workload.type == WORK_ALLOC) {
                 void *ptr = pmm->alloc(workload.size);
-                //assert(ptr);
-                //assert((((uintptr_t)ptr) & (power_bound(workload.size) - 1)) == 0);
+                assert(ptr);
+                assert((((uintptr_t)ptr) & (power_bound(workload.size) - 1)) == 0);
                 int another_cpuid = rand() % NR_CPUS;
                 workload = (workload_t) {
                     .type = WORK_FREE,
