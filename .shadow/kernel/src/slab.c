@@ -77,4 +77,9 @@ void slab_init() {
             slab->head = NULL;
             spinlock_init(&slab->lock);
         }
+    for (int i = 0; i < cpu_cnt; ++i)
+        for (int j = 0; j < SLAB_LEVEL; ++j) {
+            slab_t *slab = locate_slab(i, j);
+            printf("%d\n", slab->lock.flag);
+        }
 }
