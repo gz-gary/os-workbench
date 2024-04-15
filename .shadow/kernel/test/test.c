@@ -61,7 +61,7 @@ int cpu_current() {
             return threads_[i].id;
         }
     }*/
-    return 1;
+    return 0;
 }
 
 inline int cpu_count() {
