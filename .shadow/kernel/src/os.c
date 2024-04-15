@@ -1,7 +1,7 @@
 #include <common.h>
 #include <spinlock.h>
 
-#define NR_CPUS 4
+#define NR_CPUS 8
 #define BUF 512
 #define TOTAL_ALLOC 120
 
@@ -47,11 +47,43 @@ workload_t queue_pop(workload_queue_t *q) {
     return ret;
 }
 
+static void producer() {
+    size_t size;
+    size_t sum_size = 0;
+    for (int _ = 0; _ < TOTAL_ALLOC; ++_) {
+        float rnd = (float)rand() / (float)RAND_MAX;
+        if (rnd < 0.7) {
+            rnd = (float)rand() / (float)RAND_MAX;
+            if (rnd < 0.9) {
+                size = rand() % 128 + 1;
+            } else {
+                size = rand() % (4096 - 129) + 129;
+            }
+        } else if (rnd < 0.98) {
+            size = (rand() % 16 + 1) * 4096;
+        } else {
+            size = (rand() % 4 + 1) * 1024 * 1024;
+        }
+        int cpuid = rand() % cpu_count();
+        workload_t workload = (workload_t) {
+            .type = WORK_ALLOC,
+            .size = size
+        };
+        printf("cpu %d to allocate %d bytes\n", cpu_current(), size);
+        sum_size += size;
+        spinlock_lock(&consumer_queue[cpuid].lock);
+        queue_push(&consumer_queue[cpuid], workload);
+        spinlock_unlock(&consumer_queue[cpuid].lock);
+    }
+    printf("sum_size: %ld\n", sum_size);
+}
+
 static void os_init() {
     pmm->init();
-    for (int i = 0; i < NR_CPUS; ++i) {
+    for (int i = 0; i < cpu_count(); ++i) {
         queue_init(&consumer_queue[i]);
     }
+    producer();
 }
 
 static void os_run() {
