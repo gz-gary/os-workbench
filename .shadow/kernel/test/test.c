@@ -47,9 +47,14 @@ static void entry(int id) {
     size_t block_size[8];
     void *ptr[8];
     size_t max_size = 64 * 1024; //1 B to 64 KiB per request
+    size_t min_size = 128;
 
     for (int i = 0; i < LENGTH(block_size); ++i) {
+        if (rand() & 1) {
         block_size[i] = rand() % max_size + 1;
+        } else {
+        block_size[i] = rand() % min_size + 1;
+        }
         ptr[i] = pmm->alloc(block_size[i]);
 
         // check if we get an available addr
