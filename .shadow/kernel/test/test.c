@@ -6,7 +6,7 @@
 #include <spinlock.h>
 #include <debug-macros.h>
 
-#define NR_CPUS 1
+#define NR_CPUS 4
 #define BUF 512
 #define TOTAL_ALLOC 5
 
@@ -55,13 +55,13 @@ workload_t queue_pop(workload_queue_t *q) {
 /* ---------------- fake klib and am ---------------- */
 
 int cpu_current() {
-    /*pthread_t pid = pthread_self();
+    pthread_t pid = pthread_self();
     for (int i = 0; i < n_; ++i) {
         if (threads_[i].thread == pid) {
             return threads_[i].id;
         }
-    }*/
-    return 0;
+    }
+    // return 0;
 }
 
 inline int cpu_count() {
@@ -245,6 +245,6 @@ static void simple_test() {
 int main() {
     srand(time(0));
     pmm->init();
-    // alloc_test();
-    simple_test();
+    alloc_test();
+    // simple_test();
 }
