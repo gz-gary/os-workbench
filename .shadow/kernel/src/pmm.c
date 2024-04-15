@@ -124,31 +124,6 @@ static void setup_heap_layout() {
             nr_page += (1 << temp_log);
         }
     }
-    /*size_t prefix;
-    void *bound;
-
-    log_nr_page = 0;
-    nr_page = 1;
-    while (1) {
-        prefix = 
-        (nr_page) * sizeof(chunk_t) +
-        (log_nr_page + 1) * sizeof(chunklist_t) +
-        (cpu_count() * (SLAB_LEVEL)) * sizeof(slab_t);
-        bound  = align_to_bound(heap.start + prefix, nr_page << LOG_PAGE_SIZE);
-        if (bound + nr_page * PAGE_SIZE < heap.end) {
-            ++log_nr_page;
-            nr_page <<= 1;
-        } else break;
-    }
-    --log_nr_page;
-    nr_page >>= 1;
-
-    chunks    = heap.start;
-    chunklist = (void *)chunks + nr_page * sizeof(chunk_t);
-    slabs     = (void *)chunklist + (log_nr_page + 1) * sizeof(chunklist_t);
-    mem       = align_to_bound(chunklist + (log_nr_page + 1) * sizeof(chunklist_t),
-                               nr_page << LOG_PAGE_SIZE);*/
-
 }
 
 #ifndef TEST
@@ -189,7 +164,6 @@ static void pmm_init() {
     /* ---------- */
 
     setup_heap_layout();
-    //chunk_init();
     buddy_init();
     slab_init();
 }

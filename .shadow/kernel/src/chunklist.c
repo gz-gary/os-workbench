@@ -33,17 +33,3 @@ void chunk_remove(size_t chunk_id) {
     chunk->next = NULL;
     chunk->prev = NULL;
 }
-
-void chunk_init() {
-    for (size_t i = 0; i < nr_page; ++i)
-        chunks[i] = (chunk_t){
-            .status = CHUNK_FREE,
-            .size = 0, //undefined except chunk[0]
-            .next = NULL,
-            .prev = NULL
-        };
-    chunks[0].size = nr_page;
-    for (int i = 0; i <= log_nr_page; ++i)
-        chunklist[i].head = NULL;
-    chunk_insert(log_nr_page, 0);
-}
