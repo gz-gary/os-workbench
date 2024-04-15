@@ -210,9 +210,9 @@ static void alloc_test() {
     }
     spinlock_init(&total_free.lock);
     total_free.cnt = 0;
-    //for (int i = 0; i < NR_CPUS; ++i) {
-        //create(workload_consumer);
-    //}
+    for (int i = 0; i < NR_CPUS; ++i) {
+        create(workload_consumer);
+    }
     //create(workload_producer);
 }
 
