@@ -177,7 +177,10 @@ static void workload_consumer(int id) {
         spinlock_lock(&total_free.lock);
         if (total_free.cnt == TOTAL_ALLOC) {
             spinlock_lock(&log_file.lock);
-            fclose(log_file.fp);
+            if (log_file.fp) {
+                fclose(log_file.fp);
+                log_file.fp = NULL;
+            }
             spinlock_unlock(&log_file.lock);
             spinlock_unlock(&total_free.lock);
             break;
