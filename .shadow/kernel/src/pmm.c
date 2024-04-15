@@ -50,7 +50,8 @@ static void kfree(void *ptr) {
     if ((((uintptr_t)ptr) & (PAGE_SIZE - 1)) == 0) {
         // aligned to page, it must be allocate by buddy
         buddy_free(ptr);
-        return;
+    } else {
+        slab_free(ptr);
     }
 }
 
