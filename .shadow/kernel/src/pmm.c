@@ -78,6 +78,12 @@ static void setup_heap_layout() {
     slabs            = (void *)chunklist + (log_nr_page + 1) * sizeof(chunklist_t);
     chunks           = (void *)slabs + (cpu_count() * (SLAB_LEVEL)) * sizeof(slab_t);
     mem              = mem_end - PAGE_SIZE * nr_page;
+    printf("\nwe make heap to this structure:\n\n");
+    printf("Manage %ld pages\n", nr_page);
+    printf("[%p, %p) to store chunklist\n", chunklist, chunklist + (log_nr_page + 1));
+    printf("[%p, %p) to store slabs\n", slabs, slabs + (cpu_count() * (SLAB_LEVEL)) * sizeof(slab_t));
+    printf("[%p, %p) to store chunks\n", chunks, chunks + nr_page);
+    printf("[%p, %p) to allocate\n\n", mem, mem + nr_page * PAGE_SIZE);
     for (int i = 0; i <= log_nr_page; ++i)
         chunklist[i].head = NULL;
     for (size_t i = 0; i < nr_page; ++i)
@@ -133,12 +139,6 @@ static void setup_heap_layout() {
     mem       = align_to_bound(chunklist + (log_nr_page + 1) * sizeof(chunklist_t),
                                nr_page << LOG_PAGE_SIZE);*/
 
-    printf("\nwe make heap to this structure:\n\n");
-    printf("Manage %ld pages\n", nr_page);
-    printf("[%p, %p) to store chunklist\n", chunklist, chunklist + (log_nr_page + 1));
-    printf("[%p, %p) to store slabs\n", slabs, slabs + (cpu_count() * (SLAB_LEVEL)) * sizeof(slab_t));
-    printf("[%p, %p) to store chunks\n", chunks, chunks + nr_page);
-    printf("[%p, %p) to allocate\n\n", mem, mem + nr_page * PAGE_SIZE);
 }
 
 #ifndef TEST
