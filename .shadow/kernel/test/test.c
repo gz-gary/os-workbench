@@ -136,7 +136,7 @@ static void workload_producer() {
     int _ = 0;
     for (int _ = 0; _ < TOTAL_ALLOC; ++_) {
         float rnd = (float)rand() / (float)RAND_MAX;
-        if (rnd < 0.7) {
+        if (rnd < 0.8) {
             rnd = (float)rand() / (float)RAND_MAX;
             if (rnd < 0.9) {
                 size = rand() % 128 + 1;
