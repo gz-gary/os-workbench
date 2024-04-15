@@ -114,7 +114,7 @@ static void pmm_init() {
 
 #else
 
-#define TEST_HEAP_SIZE 32 * 1024 * 1024 //16MiB
+#define TEST_HEAP_SIZE 32 * 1024 * 1024 //32MiB
 
 static void pmm_init() {
     char *ptr = malloc(TEST_HEAP_SIZE);
