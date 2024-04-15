@@ -22,7 +22,6 @@ int main() {
     while (scanf("%s", buf) != EOF) {
         if (!strcmp(buf, "kalloc")) {
             scanf("%p%p", &l, &r);
-            printf("%s %p %p\n", buf, l, r);
             range new_range{(uintptr_t)l, (uintptr_t)r - 1};
             for (auto old_range : ranges) {
                 assert(!cross(new_range, old_range));
@@ -35,5 +34,6 @@ int main() {
             ranges.erase(iter);
         }
     }
+    printf("Congratulations! checker passed.\n");
     return 0;
 }

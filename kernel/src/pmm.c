@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <common.h>
+#include <slab.h>
 #include <buddy.h>
 #include <chunklist.h>
 
@@ -35,23 +36,32 @@ static void *kalloc_stupid(size_t size) {
 }
 
 static void *kalloc(size_t size) {
+    /*spinlock_lock(&big_kernel_lock);
+    printf("[kalloc] cpu%d wants %ld bytes\n", cpu_current(), size);
+    spinlock_unlock(&big_kernel_lock);*/
     if (size > REJECT_THRESHOLD) return NULL;
 
     size = power_bound(size);
-    if (size >= PAGE_SIZE / 2) {
+    if (size >= PAGE_SIZE / 2) { //slow path
         return buddy_alloc(size);
+    } else {
+        return slab_allocate(size); //fast path
     }
 }
 
 static void kfree(void *ptr) {
+    /*spinlock_lock(&big_kernel_lock);
+    printf("[kfree] cpu%d free %p\n", cpu_current(), ptr);
+    spinlock_unlock(&big_kernel_lock);*/
     if ((((uintptr_t)ptr) & (PAGE_SIZE - 1)) == 0) {
         // aligned to page, it must be allocate by buddy
         buddy_free(ptr);
-        return;
+    } else {
+        slab_free(ptr);
     }
 }
 
-static void setup_heap_structure() {
+static void setup_heap_layout() {
     // TODO: make more use of heap
     size_t prefix;
     void *bound;
@@ -61,8 +71,9 @@ static void setup_heap_structure() {
     while (1) {
         prefix = 
         (nr_page) * sizeof(chunk_t) +
-        (log_nr_page + 1) * sizeof(chunklist_t);
-        bound = align_to_bound(heap.start + prefix, nr_page << LOG_PAGE_SIZE);
+        (log_nr_page + 1) * sizeof(chunklist_t) +
+        (cpu_count() * (SLAB_LEVEL)) * sizeof(slab_t);
+        bound  = align_to_bound(heap.start + prefix, nr_page << LOG_PAGE_SIZE);
         if (bound + nr_page * PAGE_SIZE < heap.end) {
             ++log_nr_page;
             nr_page <<= 1;
@@ -71,15 +82,17 @@ static void setup_heap_structure() {
     --log_nr_page;
     nr_page >>= 1;
 
-    chunks = heap.start;
-    chunklist = heap.start + nr_page * sizeof(chunk_t);
-    mem = align_to_bound(chunklist + (log_nr_page + 1) * sizeof(chunklist_t),
-                         nr_page << LOG_PAGE_SIZE);
+    chunks    = heap.start;
+    chunklist = (void *)chunks + nr_page * sizeof(chunk_t);
+    slabs     = (void *)chunklist + (log_nr_page + 1) * sizeof(chunklist_t);
+    mem       = align_to_bound(chunklist + (log_nr_page + 1) * sizeof(chunklist_t),
+                               nr_page << LOG_PAGE_SIZE);
 
     printf("\nwe make heap to this structure:\n\n");
     printf("Manage %ld pages\n", nr_page);
     printf("[%p, %p) to store chunks\n", chunks, chunks + nr_page);
     printf("[%p, %p) to store chunklist\n", chunklist, chunklist + (log_nr_page + 1));
+    printf("[%p, %p) to store slabs\n", slabs, slabs + (cpu_count() * (SLAB_LEVEL)) * sizeof(slab_t));
     printf("[%p, %p) to allocate\n\n", mem, mem + nr_page * PAGE_SIZE);
 }
 
@@ -101,7 +114,7 @@ static void pmm_init() {
 
 #else
 
-#define TEST_HEAP_SIZE 16 * 1024 * 1024 //16MiB
+#define TEST_HEAP_SIZE 32 * 1024 * 1024 //32MiB
 
 static void pmm_init() {
     char *ptr = malloc(TEST_HEAP_SIZE);
@@ -120,9 +133,10 @@ static void pmm_init() {
 
     /* ---------- */
 
-    setup_heap_structure();
+    setup_heap_layout();
     chunk_init();
     buddy_init();
+    slab_init();
 }
 
 #endif
