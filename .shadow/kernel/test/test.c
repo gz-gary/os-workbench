@@ -10,12 +10,13 @@
 /* ---------------- fake klib and am ---------------- */
 
 int cpu_current() {
-    pthread_t pid = pthread_self();
+    /*pthread_t pid = pthread_self();
     for (int i = 0; i < n_; ++i) {
         if (threads_[i].thread == pid) {
             return threads_[i].id;
         }
-    }
+    }*/
+    return 1;
 }
 
 int cpu_count() {
