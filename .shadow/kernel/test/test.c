@@ -143,7 +143,7 @@ static void workload_producer() {
             } else {
                 size = rand() % (4096 - 129) + 129;
             }
-        } else if (rnd < 0.95) {
+        } else if (rnd < 0.98) {
             size = (rand() % 16 + 1) * 4096;
         } else {
             size = (rand() % 4 + 1) * 4096 * 1024;
