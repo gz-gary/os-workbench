@@ -63,7 +63,22 @@ static void kfree(void *ptr) {
 
 static void setup_heap_layout() {
     // TODO: make more use of heap
-    size_t prefix;
+    log_nr_page      = 12; //16MiB, 4096 pages
+    void *mem_end;
+    while (1) {
+    mem_end          = (void *)((uintptr_t)heap.end & (~((1 << log_nr_page) * PAGE_SIZE - 1)));
+    nr_page          = (mem_end - heap.start -
+                       (log_nr_page + 1) * sizeof(chunklist_t) -
+                       (cpu_count() * (SLAB_LEVEL)) * sizeof(slab_t))
+                       / (sizeof(chunk_t) + PAGE_SIZE);
+    if (nr_page > 0) break;
+    else --log_nr_page;
+    }
+    chunklist        = heap.start;
+    slabs            = (void *)chunklist + (log_nr_page + 1) * sizeof(chunklist_t);
+    chunks           = (void *)slabs + (cpu_count() * (SLAB_LEVEL)) * sizeof(slab_t);
+    mem              = mem_end - PAGE_SIZE * nr_page;
+    /*size_t prefix;
     void *bound;
 
     log_nr_page = 0;
@@ -78,7 +93,7 @@ static void setup_heap_layout() {
             ++log_nr_page;
             nr_page <<= 1;
         } else break;
-    }
+    }*/
     --log_nr_page;
     nr_page >>= 1;
 
