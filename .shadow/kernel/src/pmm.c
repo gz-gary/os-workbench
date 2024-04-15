@@ -78,6 +78,36 @@ static void setup_heap_layout() {
     slabs            = (void *)chunklist + (log_nr_page + 1) * sizeof(chunklist_t);
     chunks           = (void *)slabs + (cpu_count() * (SLAB_LEVEL)) * sizeof(slab_t);
     mem              = mem_end - PAGE_SIZE * nr_page;
+    for (int i = 0; i <= log_nr_page; ++i)
+        chunklist[i].head = NULL;
+    for (size_t i = 0; i < nr_page; ++i)
+        chunks[i] = (chunk_t){
+            .status = CHUNK_FREE,
+            .size = 0,
+            .next = NULL,
+            .prev = NULL
+        };
+    for (int i = 0; i < nr_page / (1 << log_nr_page); ++i) {
+        chunks[i * (1 << log_nr_page)].size = (1 << log_nr_page);
+        chunk_insert(log_nr_page, i * (1 << log_nr_page));
+    }
+    int temp_log = log_nr_page - 1;
+    while (1) {
+        while ((1 << temp_log) * sizeof(chunk_t) > mem - ((void*)chunks + nr_page * sizeof(chunk_t)) ||
+               (1 << temp_log) * PAGE_SIZE > heap.end - (mem + nr_page * PAGE_SIZE))
+               --temp_log;
+
+        if (temp_log < 0) break;
+        else {
+            
+            printf("ahead %d\n", temp_log);
+            printf("chunks extend [%p, %p)\n", ((void*)chunks + nr_page * sizeof(chunk_t)),
+                                               ((void*)chunks + (nr_page + (1 << temp_log)) * sizeof(chunk_t))                    );
+            printf("mem extend [%p, %p)\n", (mem + nr_page * PAGE_SIZE),
+                                            (mem + (nr_page + (1 << temp_log)) * PAGE_SIZE));
+            nr_page += (1 << temp_log);
+        }
+    }
     /*size_t prefix;
     void *bound;
 
@@ -149,7 +179,7 @@ static void pmm_init() {
     /* ---------- */
 
     setup_heap_layout();
-    chunk_init();
+    //chunk_init();
     buddy_init();
     slab_init();
 }
