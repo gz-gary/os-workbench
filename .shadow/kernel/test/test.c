@@ -3,23 +3,67 @@
 #include <stdint.h>
 #include <thread.h>
 #include <kernel.h>
+#include <spinlock.h>
 #include <debug-macros.h>
 
-#define NR_CPUS 1
+#define NR_CPUS 4
+#define BUF 512
+#define TOTAL_ALLOC 100
+
+typedef struct workload_t workload_t;
+typedef struct workload_queue_t workload_queue_t;
+
+struct workload_t {
+    enum {
+        WORK_ALLOC,
+        WORK_FREE
+    } type;
+    union {
+        void *ptr;
+        size_t size;
+    };
+};
+
+struct workload_queue_t {
+    spinlock_t lock;
+    int head, tail, size;
+    workload_t queue[BUF];
+};
+
+workload_queue_t consumer_queue[NR_CPUS];
+
+void queue_init(workload_queue_t *q) {
+    spinlock_init(&q->lock);
+    q->head = 0;
+    q->tail = 0;
+    q->size = 0;
+}
+
+void queue_push(workload_queue_t *q, workload_t workload) {
+    q->queue[q->tail] = workload;
+    q->tail = (q->tail + 1) % BUF;
+    ++q->size;
+}
+
+workload_t queue_pop(workload_queue_t *q) {
+    workload_t ret = q->queue[q->head];
+    q->head = (q->head + 1) % BUF;
+    --q->size;
+    return ret;
+}
 
 /* ---------------- fake klib and am ---------------- */
 
 int cpu_current() {
-    /*pthread_t pid = pthread_self();
+    pthread_t pid = pthread_self();
     for (int i = 0; i < n_; ++i) {
         if (threads_[i].thread == pid) {
             return threads_[i].id;
         }
-    }*/
-    return 1;
+    }
 }
 
-int cpu_count() {
+inline int cpu_count() {
     return NR_CPUS;
 }
 
@@ -45,8 +89,8 @@ static inline size_t power_bound(size_t x) {
 static void entry(int id) {
     while (n_ < NR_CPUS); //wait until all threads were created
 
-    size_t block_size[1];
-    void *ptr[1];
+    size_t block_size[8];
+    void *ptr[8];
     //size_t max_size = 64 * 1024; //1 B to 64 KiB per request
     size_t min_size = 128;
 
@@ -82,10 +126,89 @@ static void entry(int id) {
     for (int i = 0; i < LENGTH(block_size); ++i) pmm->free(ptr[i]);
 }
 
+struct lock_counter {
+    int cnt;
+    spinlock_t lock;
+} total_free;
+
+static void workload_producer() {
+    size_t size;
+    int _ = 0;
+    for (int _ = 0; _ < TOTAL_ALLOC; ++_) {
+        float rnd = (float)rand() / (float)RAND_MAX;
+        if (rnd < 0.7) {
+            rnd = (float)rand() / (float)RAND_MAX;
+            if (rnd < 0.9) {
+                size = rand() % 128 + 1;
+            } else {
+                size = rand() % (4096 - 129) + 129;
+            }
+        } else if (rnd < 0.95) {
+            size = (rand() % 16 + 1) * 4096;
+        } else {
+            size = (rand() % 4 + 1) * 4096 * 4096;
+        }
+        int cpuid = rand() % NR_CPUS;
+        workload_t workload = (workload_t) {
+            .type = WORK_ALLOC,
+            .size = size
+        };
+        spinlock_lock(&consumer_queue[cpuid].lock);
+        queue_push(&consumer_queue[cpuid], workload);
+        spinlock_unlock(&consumer_queue[cpuid].lock);
+    }
+}
+
+static void workload_consumer(int id) {
+    while (n_ < NR_CPUS); //wait until all threads were created
+    int cpuid = id - 1;
+    workload_t workload;
+    int work_to_do;
+    while (1) {
+        spinlock_lock(&total_free.lock);
+        if (total_free.cnt == TOTAL_ALLOC) {
+            spinlock_unlock(&total_free.lock);
+            break;
+        }
+        spinlock_unlock(&total_free.lock);
+        work_to_do = 0;
+        spinlock_lock(&consumer_queue[cpuid].lock);
+        if (consumer_queue[cpuid].size > 0) {
+            workload = queue_pop(&consumer_queue[cpuid]);
+            work_to_do = 1;
+        }
+        spinlock_unlock(&consumer_queue[cpuid].lock);
+        if (work_to_do) {
+            if (workload.type == WORK_ALLOC) {
+                void *ptr = pmm->alloc(workload.size);
+                int another_cpuid = rand() % NR_CPUS;
+                workload = (workload_t) {
+                    .type = WORK_FREE,
+                    .ptr = ptr
+                };
+                spinlock_lock(&consumer_queue[another_cpuid].lock);
+                queue_push(&consumer_queue[another_cpuid], workload);
+                spinlock_unlock(&consumer_queue[another_cpuid].lock);
+            } else {
+                pmm->free(workload.ptr);
+                spinlock_lock(&total_free.lock);
+                ++total_free.cnt;
+                spinlock_unlock(&total_free.lock);
+            }
+        }
+    }
+}
+
 static void alloc_test() {
     for (int i = 0; i < NR_CPUS; ++i) {
-        create(entry);
+        queue_init(&consumer_queue[i]);
     }
+    spinlock_init(&total_free.lock);
+    total_free.cnt = 0;
+    //for (int i = 0; i < NR_CPUS; ++i) {
+        //create(workload_consumer);
+    //}
+    //create(workload_producer);
 }
 
 static void simple_test() {
@@ -96,6 +219,6 @@ static void simple_test() {
 int main() {
     srand(time(0));
     pmm->init();
-    // alloc_test();
-    simple_test();
+    alloc_test();
+    // simple_test();
 }
