@@ -20,8 +20,8 @@ struct slab_t {
 //from 8KiB to 1024KiB
 //level from 3 to 10
 //use 0 to 7 to represent
-#define SLAB_LEVEL_MAXIMAL 10
-#define SLAB_LEVEL_MINIMAL 3
+#define SLAB_LEVEL_MAXIMAL (10)
+#define SLAB_LEVEL_MINIMAL (3)
 
 extern slab_t **slabs;
 
