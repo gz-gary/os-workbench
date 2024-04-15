@@ -70,7 +70,7 @@ static void setup_heap_layout() {
     nr_page          = (mem_end - heap.start -
                        (log_nr_page + 1) * sizeof(chunklist_t) -
                        (cpu_count() * (SLAB_LEVEL)) * sizeof(slab_t))
-                       / (sizeof(chunk_t) + PAGE_SIZE);
+                       / ((1 << log_nr_page) * (sizeof(chunk_t) + PAGE_SIZE)) * (1 << log_nr_page);
     if (nr_page > 0) break;
     else --log_nr_page;
     }
