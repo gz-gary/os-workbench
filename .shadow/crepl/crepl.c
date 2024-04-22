@@ -112,7 +112,7 @@ c_code_t *def_c_func(char *const code) {
 
 	int err = compile_c_code(src_file_name, dlib_file_name);
 	remove(src_file_name);
-	if (err) return NULL;
+	if (err) { remove(dlib_file_name); return NULL; }
 
 	c_code_t *c_code = malloc(sizeof(c_code_t));
 
@@ -128,6 +128,7 @@ c_code_t *def_c_func(char *const code) {
 }
 
 int eval_c_expr(char *const expr, int *ret) {
+	int ret_code = 0;
 
 	char *wrapper_func_code = malloc(strlen(expr) + 1 + 100);
 	char *wrapper_func_name = malloc(100);
@@ -135,16 +136,19 @@ int eval_c_expr(char *const expr, int *ret) {
 	sprintf(wrapper_func_code, "int %s() { return %s; }", wrapper_func_name, expr);
 
 	c_code_t *c_code = def_c_func(wrapper_func_code);
-	if (c_code == NULL) return -1;
+
+	if (c_code == NULL) { ret_code = -1; goto eval_c_expr_ret; }
+
 	int (*expr_func)(void) = dlsym(c_code->dlib_handle, wrapper_func_name);
 	*ret = expr_func();
 
+	++c_expr_id;
+
+eval_c_expr_ret:
 	free(wrapper_func_code);
 	free(wrapper_func_name);
 
-	++c_expr_id;
-
-	return 0;
+	return ret_code;
 }
 
 __attribute__((destructor))
