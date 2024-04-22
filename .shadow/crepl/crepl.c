@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
             def_c_func(line);
         } else {
             int value = eval_c_expr(line);
-            sprintf("(%s) == %d\n", line, value);
+            printf("(%s) == %d\n", line, value);
             fflush(stdout);
         }
 
