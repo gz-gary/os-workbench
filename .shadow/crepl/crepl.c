@@ -166,16 +166,19 @@ int main(int argc, char *argv[]) {
         if (!fgets(line, sizeof(line), stdin)) {
             break;
         }
-        assert(line[strlen(line)] == '\0');
 
-        if (strlen(line) >= 3 && line[0] == 'i' &&
-                                 line[1] == 'n' &&
-                                 line[2] == 't') {
-            def_c_func(line);
-        } else {
-            int value = eval_c_expr(line);
-            printf("(%s) == %d.\n", line, value);
-            fflush(stdout);
+        if (strlen(line) > 0) {
+            assert(line[strlen(line)] == '\0');
+            line[strlen(line) - 1] = '\0';
+            if (strlen(line) >= 3 && line[0] == 'i' &&
+                                     line[1] == 'n' &&
+                                     line[2] == 't') {
+                def_c_func(line);
+            } else {
+                int value = eval_c_expr(line);
+                printf("(%s) == %d.\n", line, value);
+                fflush(stdout);
+            }
         }
 
         // To be implemented.
