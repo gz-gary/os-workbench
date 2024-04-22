@@ -166,13 +166,14 @@ int main(int argc, char *argv[]) {
         if (!fgets(line, sizeof(line), stdin)) {
             break;
         }
+        int line_len = strlen(line);
+        if (line_len > 0) line[--line_len] = '\0';
 
-        if (strlen(line) > 0) {
-            assert(line[strlen(line)] == '\0');
-            line[strlen(line) - 1] = '\0';
-            if (strlen(line) >= 3 && line[0] == 'i' &&
-                                     line[1] == 'n' &&
-                                     line[2] == 't') {
+        if (line_len > 0) {
+            assert(line[line_len] == '\0');
+            if (line_len >= 3 && line[0] == 'i' &&
+                                 line[1] == 'n' &&
+                                 line[2] == 't') {
                 def_c_func(line);
             } else {
                 int value = eval_c_expr(line);
