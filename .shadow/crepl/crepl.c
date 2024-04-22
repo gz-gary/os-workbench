@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
 
         if (strlen(line) >= 3 && line[0] == 'i' &&
                                  line[1] == 'n' &&
-                                 line[2] == 't' &&) {
+                                 line[2] == 't') {
             def_c_func(line);
         } else {
             int value = eval_c_expr(line);
