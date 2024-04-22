@@ -57,7 +57,7 @@ struct c_code_t {
 	list_node_t list_node;
 };
 
-void compile_c_code(char *const src_file_name,
+int compile_c_code(char *const src_file_name,
                     char *const dlib_file_name) {
     char *const argv[] = {
         "/bin/gcc",
@@ -86,11 +86,17 @@ void compile_c_code(char *const src_file_name,
     } else {
 		int status;
 		pid = wait(&status);
-		printf("[crepl]: exit_status = %d\n", WEXITSTATUS(status));
+		printf("[crepl]: gcc exit_status = %d\n", WEXITSTATUS(status));
 		if (WIFEXITED(status) && !WEXITSTATUS(status)) {
 			printf("[crepl]: Compile successfully.\n");
-		} else printf("[crepl]: Fail to compile.\n");
+			return 0;
+		} else {
+			printf("[crepl]: Fail to compile.\n");
+			return -1;
+		}
 	}
+
+	return 0;
 }
 
 c_code_t *def_c_func(char *const code) {
@@ -104,8 +110,9 @@ c_code_t *def_c_func(char *const code) {
 	int dlib_file_fd = mkstemps(dlib_file_name, strlen(".so"));
 	close(dlib_file_fd);
 
-	compile_c_code(src_file_name, dlib_file_name);
+	int err = compile_c_code(src_file_name, dlib_file_name);
 	remove(src_file_name);
+	if (err) { remove(dlib_file_name); return NULL; }
 
 	c_code_t *c_code = malloc(sizeof(c_code_t));
 
@@ -120,7 +127,8 @@ c_code_t *def_c_func(char *const code) {
 	return c_code;
 }
 
-int eval_c_expr(char *const expr) {
+int eval_c_expr(char *const expr, int *ret) {
+	int ret_code = 0;
 
 	char *wrapper_func_code = malloc(strlen(expr) + 1 + 100);
 	char *wrapper_func_name = malloc(100);
@@ -128,15 +136,19 @@ int eval_c_expr(char *const expr) {
 	sprintf(wrapper_func_code, "int %s() { return %s; }", wrapper_func_name, expr);
 
 	c_code_t *c_code = def_c_func(wrapper_func_code);
-	int (*expr_func)(void) = dlsym(c_code->dlib_handle, wrapper_func_name);
-	int ret = expr_func();
 
-	free(wrapper_func_code);
-	free(wrapper_func_name);
+	if (c_code == NULL) { ret_code = -1; goto eval_c_expr_ret; }
+
+	int (*expr_func)(void) = dlsym(c_code->dlib_handle, wrapper_func_name);
+	*ret = expr_func();
 
 	++c_expr_id;
 
-	return ret;
+eval_c_expr_ret:
+	free(wrapper_func_code);
+	free(wrapper_func_name);
+
+	return ret_code;
 }
 
 __attribute__((destructor))
@@ -173,13 +185,14 @@ int main(int argc, char *argv[]) {
                                  line[2] == 't') {
                 def_c_func(line);
             } else {
-                int value = eval_c_expr(line);
-                printf("(%s) == %d.\n", line, value);
+				int value;
+                if (eval_c_expr(line, &value)) {
+					printf("[crepl]: Bad expression!\n");
+				} else {
+                	printf("(%s) == %d.\n", line, value);
+				}
                 fflush(stdout);
             }
         }
-
-        // To be implemented.
-        // printf("Got %zu chars.\n", strlen(line));
     }
 }
