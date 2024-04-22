@@ -194,8 +194,5 @@ int main(int argc, char *argv[]) {
                 fflush(stdout);
             }
         }
-
-        // To be implemented.
-        // printf("Got %zu chars.\n", strlen(line));
     }
 }
