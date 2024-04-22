@@ -95,6 +95,8 @@ int compile_c_code(char *const src_file_name,
 			return -1;
 		}
 	}
+
+	return 0;
 }
 
 c_code_t *def_c_func(char *const code) {
