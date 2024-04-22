@@ -57,7 +57,7 @@ struct c_code_t {
 	list_node_t list_node;
 };
 
-void compile_c_code(char *const src_file_name,
+int compile_c_code(char *const src_file_name,
                     char *const dlib_file_name) {
     char *const argv[] = {
         "/bin/gcc",
@@ -86,10 +86,14 @@ void compile_c_code(char *const src_file_name,
     } else {
 		int status;
 		pid = wait(&status);
-		printf("[crepl]: exit_status = %d\n", WEXITSTATUS(status));
+		printf("[crepl]: gcc exit_status = %d\n", WEXITSTATUS(status));
 		if (WIFEXITED(status) && !WEXITSTATUS(status)) {
 			printf("[crepl]: Compile successfully.\n");
-		} else printf("[crepl]: Fail to Compile.\n");
+			return 0;
+		} else {
+			printf("[crepl]: Fail to compile.\n");
+			return -1;
+		}
 	}
 }
 
@@ -104,8 +108,9 @@ c_code_t *def_c_func(char *const code) {
 	int dlib_file_fd = mkstemps(dlib_file_name, strlen(".so"));
 	close(dlib_file_fd);
 
-	compile_c_code(src_file_name, dlib_file_name);
+	int err = compile_c_code(src_file_name, dlib_file_name);
 	remove(src_file_name);
+	if (err) return NULL;
 
 	c_code_t *c_code = malloc(sizeof(c_code_t));
 
@@ -120,25 +125,24 @@ c_code_t *def_c_func(char *const code) {
 	return c_code;
 }
 
-int eval_c_expr(char *const expr) {
+int eval_c_expr(char *const expr, int *ret) {
 
 	char *wrapper_func_code = malloc(strlen(expr) + 1 + 100);
 	char *wrapper_func_name = malloc(100);
 	sprintf(wrapper_func_name, "__expr_wrapper_%d", c_expr_id);
 	sprintf(wrapper_func_code, "int %s() { return %s; }", wrapper_func_name, expr);
-	// printf("%s\n", wrapper_func_code);
-	// printf("%s\n", wrapper_func_name);
 
 	c_code_t *c_code = def_c_func(wrapper_func_code);
+	if (c_code == NULL) return -1;
 	int (*expr_func)(void) = dlsym(c_code->dlib_handle, wrapper_func_name);
-	int ret = expr_func();
+	*ret = expr_func();
 
 	free(wrapper_func_code);
 	free(wrapper_func_name);
 
 	++c_expr_id;
 
-	return ret;
+	return 0;
 }
 
 __attribute__((destructor))
@@ -170,19 +174,22 @@ int main(int argc, char *argv[]) {
         if (line_len > 0) line[--line_len] = '\0';
 
         if (line_len > 0) {
-            assert(line[line_len] == '\0');
             if (line_len >= 3 && line[0] == 'i' &&
                                  line[1] == 'n' &&
                                  line[2] == 't') {
                 def_c_func(line);
             } else {
-                int value = eval_c_expr(line);
-                printf("(%s) == %d.\n", line, value);
+				int value;
+                if (eval_c_expr(line, &value)) {
+					printf("[crepl]: Bad expression!\n");
+				} else {
+                	printf("(%s) == %d.\n", line, value);
+				}
                 fflush(stdout);
             }
         }
 
         // To be implemented.
-        printf("Got %zu chars.\n", strlen(line));
+        // printf("Got %zu chars.\n", strlen(line));
     }
 }
