@@ -83,15 +83,26 @@ void layernorm_forward(float* out, float* mean, float* rstd,
     }
 }
 
-void matmul_forward(float* out,
-                    float* inp, float* weight, float* bias,
-                    int B, int T, int C, int OC) {
-    // most of the running time is spent here and in matmul_backward
-    // OC is short for "output channels"
-    // inp is (B,T,C), weight is (OC, C), bias is (OC)
-    // out will be (B,T,OC)
-    for (int b = 0; b < B; b++) {
-        for (int t = 0; t < T; t++) {
+typedef struct matmul_workload matmul_workload;
+struct matmul_workload {
+    int B_l, B_r, B;
+    int T_l, T_r, T;
+    int C, OC;
+    float *out, *inp, *weight, *bias;
+};
+
+void *matmul_worker(void *arg) {
+    matmul_workload *workload = arg;
+    int B         = workload->B;
+    int T         = workload->T;
+    int C         = workload->C;
+    int OC        = workload->OC;
+    float *out    = workload->out;
+    float *inp    = workload->inp;
+    float *weight = workload->weight;
+    float *bias   = workload->bias;
+    for (int b = workload->B_l; b < workload->B_r; b++) {
+        for (int t = workload->T_l; t < workload->T_r; t++) {
             float* out_bt = out + b * T * OC + t * OC;
             float* inp_bt = inp + b * T * C + t * C;
             for (int o = 0; o < OC; o++) {
@@ -103,6 +114,49 @@ void matmul_forward(float* out,
                 out_bt[o] = val;
             }
         }
+    }
+    return NULL;
+}
+
+void matmul_forward(float* out,
+                    float* inp, float* weight, float* bias,
+                    int B, int T, int C, int OC) {
+    // most of the running time is spent here and in matmul_backward
+    // OC is short for "output channels"
+    // inp is (B,T,C), weight is (OC, C), bias is (OC)
+    // out will be (B,T,OC)
+    pthread_t worker[4];
+    matmul_workload workload[4];
+    for (int i = 0; i < 4; ++i) {
+        workload[i] = (matmul_workload) {
+            .B = B, .T = T, .C = C, .OC = OC,
+            .out = out, .inp = inp, .weight = weight, .bias = bias
+        };
+    }
+    workload[0].B_l = 0;
+    workload[0].B_r = B / 2;
+    workload[0].T_l = 0;
+    workload[0].T_r = T / 2;
+
+    workload[1].B_l = 0;
+    workload[1].B_r = B / 2;
+    workload[1].T_l = T / 2;
+    workload[1].T_r = T;
+
+    workload[2].B_l = B / 2;
+    workload[2].B_r = B;
+    workload[2].T_l = 0;
+    workload[2].T_r = T / 2;
+
+    workload[3].B_l = B / 2;
+    workload[3].B_r = B;
+    workload[3].T_l = T / 2;
+    workload[3].T_r = T;
+    for (int i = 0; i < 4; ++i) {
+        pthread_create(&worker[i], NULL, matmul_worker, &workload[i]);
+    }
+    for (int i = 0; i < 4; ++i) {
+        pthread_join(worker[i], NULL);
     }
 }
 
