@@ -158,20 +158,6 @@ void matmul_forward(float* out,
     for (int i = 0; i < 4; ++i) {
         pthread_join(worker[i], NULL);
     }
-    /*for (int b = 0; b < B; b++) {
-        for (int t = 0; t < T; t++) {
-            float* out_bt = out + b * T * OC + t * OC;
-            float* inp_bt = inp + b * T * C + t * C;
-            for (int o = 0; o < OC; o++) {
-                float val = (bias != NULL) ? bias[o] : 0.0f;
-                float* wrow = weight + o*C;
-                for (int i = 0; i < C; i++) {
-                    val += inp_bt[i] * wrow[i];
-                }
-                out_bt[o] = val;
-            }
-        }
-    }*/
 }
 
 void attention_forward(float* out, float* preatt, float* att,
