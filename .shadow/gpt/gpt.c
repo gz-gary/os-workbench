@@ -83,7 +83,7 @@ void layernorm_forward(float* out, float* mean, float* rstd,
     }
 }
 
-typedef struct matmul_workload matmul_workload;
+/*typedef struct matmul_workload matmul_workload;
 struct matmul_workload {
     int B_l, B_r, B;
     int T_l, T_r, T;
@@ -116,7 +116,7 @@ void *matmul_worker(void *arg) {
         }
     }
     return NULL;
-}
+}*/
 
 void matmul_forward(float* out,
                     float* inp, float* weight, float* bias,
@@ -125,7 +125,7 @@ void matmul_forward(float* out,
     // OC is short for "output channels"
     // inp is (B,T,C), weight is (OC, C), bias is (OC)
     // out will be (B,T,OC)
-    pthread_t worker[4];
+    /*pthread_t worker[4];
     matmul_workload workload[4];
     for (int i = 0; i < 4; ++i) {
         workload[i] = (matmul_workload) {
@@ -157,8 +157,8 @@ void matmul_forward(float* out,
     }
     for (int i = 0; i < 4; ++i) {
         pthread_join(worker[i], NULL);
-    }
-    /*for (int b = 0; b < B; b++) {
+    }*/
+    for (int b = 0; b < B; b++) {
         for (int t = 0; t < T; t++) {
             float* out_bt = out + b * T * OC + t * OC;
             float* inp_bt = inp + b * T * C + t * C;
@@ -171,7 +171,7 @@ void matmul_forward(float* out,
                 out_bt[o] = val;
             }
         }
-    }*/
+    }
 }
 
 void attention_forward(float* out, float* preatt, float* att,
