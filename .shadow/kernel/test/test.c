@@ -96,6 +96,7 @@ static void entry(int id) {
     for (int i = 0; i < LENGTH(block_size); ++i) {
         block_size[i] = rand() % min_size + 1;
         ptr[i] = pmm->alloc(block_size[i]);
+        printf("ask for %d get [%p, %p)", block_size[i], ptr[i], ptr[i] + block_size[i]);
 
         // check if we get an available addr
         assert(ptr[i]);
@@ -240,5 +241,5 @@ int main() {
     srand(time(0));
     pmm->init();
     // alloc_test();
-    // simple_test();
+    simple_test();
 }
