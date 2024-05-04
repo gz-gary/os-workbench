@@ -88,7 +88,7 @@ void buddy_dump() {
         printf("level %d\n\n", level);
         for (chunk_t *chunk = chunklist[level].head; chunk; chunk = chunk->next) {
             void *tmp = mem + get_chunk_id(chunk) * PAGE_SIZE;
-            printf("[%p, %p)\n", tmp, tmp + chunk->size);
+            printf("[%p, %p)\n", tmp, tmp + chunk->size * PAGE_SIZE);
         }
         printf("\n");
     }
