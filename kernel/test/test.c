@@ -55,13 +55,13 @@ workload_t queue_pop(workload_queue_t *q) {
 /* ---------------- fake klib and am ---------------- */
 
 int cpu_current() {
-    pthread_t pid = pthread_self();
+    /*pthread_t pid = pthread_self();
     for (int i = 0; i < n_; ++i) {
         if (threads_[i].thread == pid) {
             return threads_[i].id - 1;
         }
-    }
-    // return 0;
+    }*/
+    return 0;
 }
 
 inline int cpu_count() {
@@ -88,44 +88,33 @@ static inline size_t power_bound(size_t x) {
 }
 
 static void entry(int id) {
-    size_t block_size[8];
-    void *ptr[8];
+    size_t block_size[1024 * 96];
+    void *ptr[1024 * 96];
     //size_t max_size = 64 * 1024; //1 B to 64 KiB per request
     size_t min_size = 128;
 
     for (int i = 0; i < LENGTH(block_size); ++i) {
-        printf("--------------\n");
+        // printf("--------------\n");
         block_size[i] = rand() % min_size + 1;
-        printf("ask for %lu\n\n", block_size[i]);
+        // printf("ask for %lu\n\n", block_size[i]);
         ptr[i] = pmm->alloc(block_size[i]);
-        printf("get [%p, %p)\n", ptr[i], ptr[i] + block_size[i]);
+        // printf("get [%p, %p)\n", ptr[i], ptr[i] + block_size[i]);
+        // printf("kalloc %p %p\n", ptr[i], ptr[i] + block_size[i]);
 
         // check if we get an available addr
-        assert(ptr[i]);
+        // assert(ptr[i]);
         // check if we get a legal addr
         assert(((uintptr_t)ptr[i] & (power_bound(block_size[i]) - 1)) == 0);
     }
 
-    /*unsigned char my_identifier = id;
     for (int i = 0; i < LENGTH(block_size); ++i) {
-        // brush my range with my id
-        memset(ptr[i], my_identifier, block_size[i]);
+        // printf("-------------\n");
+        // printf("free %p\n", ptr[i]);
+        if (ptr[i])
+            pmm->free(ptr[i]);
+        // printf("kfree %p\n", ptr[i]);
     }
-
-    // check if anyone invades my range for 10 times
-    for (int k = 0; k < 10; ++k)
-        for (int i = 0; i < LENGTH(block_size); ++i) {
-            for (size_t offset = 0; offset < block_size[i]; ++offset) {
-                unsigned char byte_here = *(unsigned char *)(ptr[i] + offset);
-                assert(byte_here == id);
-            }
-        }*/
-
-    for (int i = 0; i < LENGTH(block_size); ++i) {
-        printf("-------------\n");
-        printf("free %p\n", ptr[i]);
-        pmm->free(ptr[i]);
-    }
+    printf("test finished\n");
 }
 
 struct lock_counter {

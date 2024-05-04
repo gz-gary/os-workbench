@@ -12,10 +12,9 @@ static inline void *get_page_start(void *ptr) {
     return (void *)(((uintptr_t)ptr) & (~(PAGE_SIZE - 1)));
 }
 
-static void fetch_slab(slab_t *slab, size_t size) {
-    // end - x * size == start + prefix + x * sizeof(piece_t)
-
+static int fetch_slab(slab_t *slab, size_t size) {
     slab_hdr_t *hdr = buddy_alloc(PAGE_SIZE);
+    if (hdr == NULL) return -1;
     int nr_pieces   = (PAGE_SIZE - sizeof(slab_hdr_t)) / (size + sizeof(piece_t));
     piece_t *piece  = (void *)hdr + sizeof(slab_hdr_t);
     hdr->size       = size;
@@ -27,6 +26,8 @@ static void fetch_slab(slab_t *slab, size_t size) {
         slab->head = &piece[i];
     }
     spinlock_unlock(&slab->lock);
+
+    return 0;
 }
 
 void *slab_allocate(size_t size) {
@@ -37,8 +38,9 @@ void *slab_allocate(size_t size) {
     int cpu      = cpu_current();
     slab_t *slab = locate_slab(cpu, level - SLAB_LEVEL_MINIMAL);
 
-    if (!slab->head)
-        fetch_slab(slab, size);
+    if (!slab->head) {
+        if (fetch_slab(slab, size)) return NULL;
+    }
 
     piece_t    *piece  = slab->head;
     slab_hdr_t *hdr    = get_page_start(piece);
