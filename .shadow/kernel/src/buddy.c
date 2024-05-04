@@ -58,6 +58,7 @@ void buddy_free(void *ptr) {
     chunks[chunk_id].status = CHUNK_FREE;
     size_t buddy_id = get_buddy_id(chunk_id);
     int level = level_bound(chunks[chunk_id].size);
+    chunk_insert(level, chunk_id);
 
     while (level < log_nr_page &&
            buddy_id < nr_page &&
