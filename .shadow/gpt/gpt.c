@@ -133,25 +133,23 @@ void matmul_forward(float* out,
             .out = out, .inp = inp, .weight = weight, .bias = bias
         };
     }
-    workload[0].B_l = 0;
-    workload[0].B_r = B / 2;
-    workload[0].T_l = 0;
-    workload[0].T_r = T / 2;
-
-    workload[1].B_l = 0;
-    workload[1].B_r = B / 2;
-    workload[1].T_l = T / 2;
-    workload[1].T_r = T;
-
-    workload[2].B_l = B / 2;
-    workload[2].B_r = B;
-    workload[2].T_l = 0;
-    workload[2].T_r = T / 2;
-
-    workload[3].B_l = B / 2;
-    workload[3].B_r = B;
-    workload[3].T_l = T / 2;
-    workload[3].T_r = T;
+    if (B > T) {
+        for (int i = 0; i < 4; ++i) {
+            workload[i].B_l = i * (B / 4);
+            workload[i].B_r = (i + 1) * (B / 4);
+            workload[i].T_l = 0;
+            workload[i].T_r = T;
+        }
+        workload[3].B_r = B;
+    } else {
+        for (int i = 0; i < 4; ++i) {
+            workload[i].T_l = i * (T / 4);
+            workload[i].T_r = (i + 1) * (T / 4);
+            workload[i].B_l = 0;
+            workload[i].B_r = B;
+        }
+        workload[3].T_r = T;
+    }
     for (int i = 0; i < 4; ++i) {
         pthread_create(&worker[i], NULL, matmul_worker, &workload[i]);
     }
