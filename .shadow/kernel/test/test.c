@@ -113,6 +113,7 @@ static void entry(int id) {
         pmm->free(ptr[i]);
         // printf("kfree %p\n", ptr[i]);
     }
+    printf("test finished\n");
 }
 
 struct lock_counter {
