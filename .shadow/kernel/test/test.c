@@ -95,7 +95,7 @@ static void entry(int id) {
 
     for (int i = 0; i < LENGTH(block_size); ++i) {
         printf("--------------\n");
-        printf("ask for %d\n\n", block_size[i]);
+        printf("ask for %lu\n\n", block_size[i]);
         block_size[i] = rand() % min_size + 1;
         ptr[i] = pmm->alloc(block_size[i]);
         printf("get [%p, %p)\n", ptr[i], ptr[i] + block_size[i]);
