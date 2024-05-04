@@ -82,3 +82,6 @@ void buddy_free(void *ptr) {
 void buddy_init() {
     spinlock_init(&big_kernel_lock);
 }
+
+void buddy_dump() {
+}
