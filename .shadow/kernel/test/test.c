@@ -88,8 +88,8 @@ static inline size_t power_bound(size_t x) {
 }
 
 static void entry(int id) {
-    size_t block_size[8];
-    void *ptr[8];
+    size_t block_size[1024];
+    void *ptr[1024];
     //size_t max_size = 64 * 1024; //1 B to 64 KiB per request
     size_t min_size = 128;
 
