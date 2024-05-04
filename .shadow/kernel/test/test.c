@@ -55,13 +55,13 @@ workload_t queue_pop(workload_queue_t *q) {
 /* ---------------- fake klib and am ---------------- */
 
 int cpu_current() {
-    pthread_t pid = pthread_self();
+    /*pthread_t pid = pthread_self();
     for (int i = 0; i < n_; ++i) {
         if (threads_[i].thread == pid) {
             return threads_[i].id - 1;
         }
-    }
-    // return 0;
+    }*/
+    return 0;
 }
 
 inline int cpu_count() {

@@ -82,7 +82,7 @@ void slab_init() {
 
 void slab_dump() {
     for (int j = 0; j < SLAB_LEVEL; ++j) {
-        printf("level %d size %d\n", j, (1 << (j + SLAB_LEVEL_MINIMAL)));
+        printf("slab level %d size %d\n", j, (1 << (j + SLAB_LEVEL_MINIMAL)));
         slab_t *slab = locate_slab(0, j);
         for (piece_t *piece = slab->head; piece; piece = piece->next) {
             slab_hdr_t *hdr = get_page_start(piece);
