@@ -126,6 +126,7 @@ void matmul_forward(float* out,
     // OC is short for "output channels"
     // inp is (B,T,C), weight is (OC, C), bias is (OC)
     // out will be (B,T,OC)
+    printf("B=%d T=%d C=%d OC=%d\n", B, T, C, OC);
     for (int b = 0; b < B; b++) {
         for (int t = 0; t < T; t++) {
             float* out_bt = out + b * T * OC + t * OC;
