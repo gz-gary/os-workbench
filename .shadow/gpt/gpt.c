@@ -186,11 +186,17 @@ void matmul_forward(float* out,
             pthread_join(worker[i], NULL);
         }
     } else {
-        assert(0);
-        // for (int i = 0; i < 4; ++i) {
-            // workload[i].OC_l = i * (OC / 4);
-            // workload[i].OC_r = i * (OC / 4);
-        // }
+        for (int i = 0; i < 4; ++i) {
+            workload[i].OC_l = i * (OC / 4);
+            workload[i].OC_r = (i + 1) * (OC / 4);
+        }
+        workload[3].OC_r = OC;
+        for (int i = 0; i < 4; ++i) {
+            pthread_create(&worker[i], NULL, matmul_worker_OC, &workload[i]);
+        }
+        for (int i = 0; i < 4; ++i) {
+            pthread_join(worker[i], NULL);
+        }
     }
 }
 
