@@ -46,6 +46,7 @@ void *buddy_alloc(size_t size) {
     // LOG_RANGE(chunks[chunk_id].size * PAGE_SIZE, mem + (chunk_id * PAGE_SIZE));
 
     spinlock_unlock(&big_kernel_lock);
+    // buddy_dump();
     return mem + (chunk_id * PAGE_SIZE);
 }
 
@@ -57,6 +58,7 @@ void buddy_free(void *ptr) {
     chunks[chunk_id].status = CHUNK_FREE;
     size_t buddy_id = get_buddy_id(chunk_id);
     int level = level_bound(chunks[chunk_id].size);
+    chunk_insert(level, chunk_id);
 
     while (level < log_nr_page &&
            buddy_id < nr_page &&
@@ -77,8 +79,20 @@ void buddy_free(void *ptr) {
     }
 
     spinlock_unlock(&big_kernel_lock);
+    // buddy_dump();
 }
 
 void buddy_init() {
     spinlock_init(&big_kernel_lock);
+}
+
+void buddy_dump() {
+    for (int level = log_nr_page; level >= 0; --level) {
+        printf("level %d\n", level);
+        for (chunk_t *chunk = chunklist[level].head; chunk; chunk = chunk->next) {
+            void *tmp = mem + get_chunk_id(chunk) * PAGE_SIZE;
+            printf("[%p, %p)\n", tmp, tmp + chunk->size * PAGE_SIZE);
+        }
+        printf("\n");
+    }
 }

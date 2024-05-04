@@ -18,23 +18,25 @@ static void *kalloc(size_t size) {
     if (size > REJECT_THRESHOLD) return NULL;
 
     size = power_bound(size);
-    if (size >= PAGE_SIZE / 2) { //slow path
+    return buddy_alloc(size);
+    /*if (size >= PAGE_SIZE / 2) { //slow path
         return buddy_alloc(size);
     } else {
         return slab_allocate(size); //fast path
-    }
+    }*/
 }
 
 static void kfree(void *ptr) {
     /*spinlock_lock(&big_kernel_lock);
     printf("[kfree] cpu%d free %p\n", cpu_current(), ptr);
     spinlock_unlock(&big_kernel_lock);*/
-    if ((((uintptr_t)ptr) & (PAGE_SIZE - 1)) == 0) {
+    buddy_free(ptr);
+    /*if ((((uintptr_t)ptr) & (PAGE_SIZE - 1)) == 0) {
         // aligned to page, it must be allocate by buddy
         buddy_free(ptr);
     } else {
         slab_free(ptr);
-    }
+    }*/
 }
 
 static void setup_heap_layout() {
@@ -73,7 +75,8 @@ static void setup_heap_layout() {
         chunks[i * (1 << log_nr_page)].size = (1 << log_nr_page);
         chunk_insert(log_nr_page, i * (1 << log_nr_page));
     }
-    int temp_log = log_nr_page - 1;
+    // buddy_dump();
+    /*int temp_log = log_nr_page - 1;
     while (1) {
         while (temp_log >= 0 &&
                ((1 << temp_log) * sizeof(chunk_t) > mem - ((void*)chunks + nr_page * sizeof(chunk_t)) ||
@@ -83,11 +86,11 @@ static void setup_heap_layout() {
         if (temp_log < 0) break;
         else {
             
-            /*printf("ahead %d %d\n", temp_log, 1 << temp_log);
+            printf("ahead %d %d\n", temp_log, 1 << temp_log);
             printf("chunks extend [%p, %p)\n", ((void*)chunks + nr_page * sizeof(chunk_t)),
                                                ((void*)chunks + (nr_page + (1 << temp_log)) * sizeof(chunk_t))                    );
             printf("mem extend [%p, %p)\n", (mem + nr_page * PAGE_SIZE),
-                                            (mem + (nr_page + (1 << temp_log)) * PAGE_SIZE));*/
+                                            (mem + (nr_page + (1 << temp_log)) * PAGE_SIZE));
             for (size_t i = nr_page; i < nr_page + (1 << temp_log); ++i)
                 chunks[i] = (chunk_t){
                     .status = CHUNK_FREE,
@@ -99,7 +102,7 @@ static void setup_heap_layout() {
             chunk_insert(temp_log, nr_page);
             nr_page += (1 << temp_log);
         }
-    }
+    }*/
     //printf("mem we use %d MiB\n", (nr_page * PAGE_SIZE) >> 20);
 }
 
