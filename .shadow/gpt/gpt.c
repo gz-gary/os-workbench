@@ -87,7 +87,8 @@ typedef struct matmul_workload matmul_workload;
 struct matmul_workload {
     int B_l, B_r, B;
     int T_l, T_r, T;
-    int C, OC;
+    int OC_l, OC_r, OC;
+    int C;
     float *out, *inp, *weight, *bias;
 };
 
@@ -118,6 +119,33 @@ void *matmul_worker(void *arg) {
     return NULL;
 }
 
+void *matmul_worker_OC(void *arg) {
+    matmul_workload *workload = arg;
+    int B         = workload->B;
+    int T         = workload->T;
+    int C         = workload->C;
+    int OC        = workload->OC;
+    float *out    = workload->out;
+    float *inp    = workload->inp;
+    float *weight = workload->weight;
+    float *bias   = workload->bias;
+    for (int b = 0; b < B; b++) {
+        for (int t = 0; t < T; t++) {
+            float* out_bt = out + b * T * OC + t * OC;
+            float* inp_bt = inp + b * T * C + t * C;
+            for (int o = workload->OC_l; o < workload->OC_r; o++) {
+                float val = (bias != NULL) ? bias[o] : 0.0f;
+                float* wrow = weight + o*C;
+                for (int i = 0; i < C; i++) {
+                    val += inp_bt[i] * wrow[i];
+                }
+                out_bt[o] = val;
+            }
+        }
+    }
+    return NULL;
+}
+
 void matmul_forward(float* out,
                     float* inp, float* weight, float* bias,
                     int B, int T, int C, int OC) {
@@ -133,28 +161,36 @@ void matmul_forward(float* out,
             .out = out, .inp = inp, .weight = weight, .bias = bias
         };
     }
-    if (B > T) {
-        for (int i = 0; i < 4; ++i) {
-            workload[i].B_l = i * (B / 4);
-            workload[i].B_r = (i + 1) * (B / 4);
-            workload[i].T_l = 0;
-            workload[i].T_r = T;
+    if (B >= 4 || T >= 4) {
+        if (B > T) {
+            for (int i = 0; i < 4; ++i) {
+                workload[i].B_l = i * (B / 4);
+                workload[i].B_r = (i + 1) * (B / 4);
+                workload[i].T_l = 0;
+                workload[i].T_r = T;
+            }
+            workload[3].B_r = B;
+        } else {
+            for (int i = 0; i < 4; ++i) {
+                workload[i].T_l = i * (T / 4);
+                workload[i].T_r = (i + 1) * (T / 4);
+                workload[i].B_l = 0;
+                workload[i].B_r = B;
+            }
+            workload[3].T_r = T;
         }
-        workload[3].B_r = B;
+        for (int i = 0; i < 4; ++i) {
+            pthread_create(&worker[i], NULL, matmul_worker, &workload[i]);
+        }
+        for (int i = 0; i < 4; ++i) {
+            pthread_join(worker[i], NULL);
+        }
     } else {
-        for (int i = 0; i < 4; ++i) {
-            workload[i].T_l = i * (T / 4);
-            workload[i].T_r = (i + 1) * (T / 4);
-            workload[i].B_l = 0;
-            workload[i].B_r = B;
-        }
-        workload[3].T_r = T;
-    }
-    for (int i = 0; i < 4; ++i) {
-        pthread_create(&worker[i], NULL, matmul_worker, &workload[i]);
-    }
-    for (int i = 0; i < 4; ++i) {
-        pthread_join(worker[i], NULL);
+        assert(0);
+        // for (int i = 0; i < 4; ++i) {
+            // workload[i].OC_l = i * (OC / 4);
+            // workload[i].OC_r = i * (OC / 4);
+        // }
     }
 }
 
