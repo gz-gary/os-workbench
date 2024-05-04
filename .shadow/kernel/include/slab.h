@@ -34,3 +34,4 @@ extern void *slabs;
 extern void slab_init();
 extern void *slab_allocate(size_t size);
 extern void slab_free(void *ptr);
+extern void slab_dump();

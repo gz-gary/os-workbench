@@ -27,6 +27,8 @@ static void fetch_slab(slab_t *slab, size_t size) {
         slab->head = &piece[i];
     }
     spinlock_unlock(&slab->lock);
+
+    slab_dump();
 }
 
 void *slab_allocate(size_t size) {
@@ -76,4 +78,17 @@ void slab_init() {
             slab->head = NULL;
             spinlock_init(&slab->lock);
         }
+}
+
+void slab_dump() {
+    for (int j = 0; j < SLAB_LEVEL; ++j) {
+        printf("level %d size %d\n", j, (1 << (j + SLAB_LEVEL_MINIMAL)));
+        slab_t *slab = locate_slab(0, j);
+        for (piece_t *piece = slab->head; piece; piece = piece->next) {
+            slab_hdr_t *hdr = get_page_start(piece);
+            int idx = ((void *)piece - ((void *)hdr + sizeof(slab_hdr_t))) / sizeof(piece_t);
+            printf("[%p, %p) ", hdr->mem + idx * hdr->size, hdr->mem + (idx + 1) * hdr->size);
+        }
+        printf("\n");
+    }
 }
