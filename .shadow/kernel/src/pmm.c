@@ -48,12 +48,6 @@ static void setup_heap_layout() {
     slabs     = (void *)chunklist + (log_nr_page + 1) * sizeof(chunklist_t);
     chunks    = (void *)slabs + (cpu_count() * (SLAB_LEVEL)) * sizeof(slab_t);
     mem       = mem_end - PAGE_SIZE * nr_page;
-    /*printf("\nwe make heap to this structure:\n\n");
-    printf("Manage %d pages\n", nr_page);
-    printf("[%p, %p) to store chunklist\n", chunklist, chunklist + (log_nr_page + 1));
-    printf("[%p, %p) to store slabs\n", slabs, slabs + (cpu_count() * (SLAB_LEVEL)) * sizeof(slab_t));
-    printf("[%p, %p) to store chunks\n", chunks, chunks + nr_page);
-    printf("[%p, %p) to allocate\n\n", mem, mem + nr_page * PAGE_SIZE);*/
     for (int i = 0; i <= log_nr_page; ++i)
         chunklist[i].head = NULL;
     for (size_t i = 0; i < nr_page; ++i)
@@ -67,7 +61,7 @@ static void setup_heap_layout() {
         chunks[i * (1 << log_nr_page)].size = (1 << log_nr_page);
         chunk_insert(log_nr_page, i * (1 << log_nr_page));
     }
-    /*int temp_log = log_nr_page - 1;
+    int temp_log = log_nr_page - 1;
     while (1) {
         while (temp_log >= 0 &&
                ((1 << temp_log) * sizeof(chunk_t) > mem - ((void*)chunks + nr_page * sizeof(chunk_t)) ||
@@ -93,9 +87,7 @@ static void setup_heap_layout() {
             chunk_insert(temp_log, nr_page);
             nr_page += (1 << temp_log);
         }
-    }*/
-    // buddy_dump();
-    //printf("mem we use %d MiB\n", (nr_page * PAGE_SIZE) >> 20);
+    }
 }
 
 #ifndef TEST
