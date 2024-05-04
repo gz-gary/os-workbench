@@ -94,9 +94,11 @@ static void entry(int id) {
     size_t min_size = 128;
 
     for (int i = 0; i < LENGTH(block_size); ++i) {
+        printf("--------------\n");
+        printf("ask for %d\n\n", block_size[i]);
         block_size[i] = rand() % min_size + 1;
         ptr[i] = pmm->alloc(block_size[i]);
-        printf("ask for %d get [%p, %p)", block_size[i], ptr[i], ptr[i] + block_size[i]);
+        printf("get [%p, %p)\n", ptr[i], ptr[i] + block_size[i]);
 
         // check if we get an available addr
         assert(ptr[i]);
@@ -119,7 +121,11 @@ static void entry(int id) {
             }
         }*/
 
-    for (int i = 0; i < LENGTH(block_size); ++i) pmm->free(ptr[i]);
+    for (int i = 0; i < LENGTH(block_size); ++i) {
+        printf("-------------\n");
+        printf("free %p\n", ptr[i]);
+        pmm->free(ptr[i]);
+    }
 }
 
 struct lock_counter {
