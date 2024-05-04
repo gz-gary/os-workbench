@@ -110,7 +110,8 @@ static void entry(int id) {
     for (int i = 0; i < LENGTH(block_size); ++i) {
         // printf("-------------\n");
         // printf("free %p\n", ptr[i]);
-        pmm->free(ptr[i]);
+        if (ptr[i])
+            pmm->free(ptr[i]);
         // printf("kfree %p\n", ptr[i]);
     }
     printf("test finished\n");
