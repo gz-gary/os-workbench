@@ -186,6 +186,7 @@ void matmul_forward(float* out,
             pthread_join(worker[i], NULL);
         }
     } else {
+        if (OC <= 4) assert(0);
         for (int i = 0; i < 4; ++i) {
             workload[i].OC_l = i * (OC / 4);
             workload[i].OC_r = (i + 1) * (OC / 4);
