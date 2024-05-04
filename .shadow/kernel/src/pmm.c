@@ -55,6 +55,7 @@ static void setup_heap_layout() {
     chunks           = (void *)slabs + (cpu_count() * (SLAB_LEVEL)) * sizeof(slab_t);
     mem              = mem_end - PAGE_SIZE * nr_page;
     printf("\nwe make heap to this structure:\n\n");
+    printf("log_nr_page = %d", log_nr_page);
     printf("Manage %d pages\n", nr_page);
     printf("[%p, %p) to store chunklist\n", chunklist, chunklist + (log_nr_page + 1));
     printf("[%p, %p) to store slabs\n", slabs, slabs + (cpu_count() * (SLAB_LEVEL)) * sizeof(slab_t));
