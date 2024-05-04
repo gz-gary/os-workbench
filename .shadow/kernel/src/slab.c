@@ -28,7 +28,7 @@ static void fetch_slab(slab_t *slab, size_t size) {
     }
     spinlock_unlock(&slab->lock);
 
-    slab_dump();
+    // slab_dump();
 }
 
 void *slab_allocate(size_t size) {

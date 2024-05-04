@@ -46,7 +46,7 @@ void *buddy_alloc(size_t size) {
     // LOG_RANGE(chunks[chunk_id].size * PAGE_SIZE, mem + (chunk_id * PAGE_SIZE));
 
     spinlock_unlock(&big_kernel_lock);
-    buddy_dump();
+    // buddy_dump();
     return mem + (chunk_id * PAGE_SIZE);
 }
 
@@ -79,7 +79,7 @@ void buddy_free(void *ptr) {
     }
 
     spinlock_unlock(&big_kernel_lock);
-    buddy_dump();
+    // buddy_dump();
 }
 
 void buddy_init() {
