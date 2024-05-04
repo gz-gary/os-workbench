@@ -124,7 +124,7 @@ void matmul_forward(float* out,
     // OC is short for "output channels"
     // inp is (B,T,C), weight is (OC, C), bias is (OC)
     // out will be (B,T,OC)
-    #ifdef TEST
+#ifndef TEST
     for (int b = 0; b < B; b++) {
         for (int t = 0; t < T; t++) {
             float* out_bt = out + b * T * OC + t * OC;
@@ -139,7 +139,7 @@ void matmul_forward(float* out,
             }
         }
     }
-    #endif
+#else
     pthread_t worker[4];
     matmul_workload workload[4];
     for (int i = 0; i < 4; ++i) {
@@ -159,6 +159,7 @@ void matmul_forward(float* out,
     for (int i = 0; i < 4; ++i) {
         pthread_join(worker[i], NULL);
     }
+#endif
 }
 
 void attention_forward(float* out, float* preatt, float* att,
