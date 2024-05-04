@@ -84,4 +84,12 @@ void buddy_init() {
 }
 
 void buddy_dump() {
+    for (int level = log_nr_page; level >= 0; --level) {
+        printf("level %d\n\n", level);
+        for (chunk_t *chunk = chunklist[level].head; chunk; chunk = chunk->next) {
+            void *tmp = mem + get_chunk_id(chunk) * PAGE_SIZE;
+            printf("[%p, %p)\n", tmp, tmp + chunk->size);
+        }
+        printf("\n");
+    }
 }
