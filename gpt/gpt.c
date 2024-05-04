@@ -85,9 +85,8 @@ void layernorm_forward(float* out, float* mean, float* rstd,
 
 typedef struct matmul_workload matmul_workload;
 struct matmul_workload {
-    int B_l, B_r, B;
-    int T_l, T_r, T;
-    int C, OC;
+    int B, T, C, OC;
+    int OC_l, OC_r;
     float *out, *inp, *weight, *bias;
 };
 
@@ -101,11 +100,11 @@ void *matmul_worker(void *arg) {
     float *inp    = workload->inp;
     float *weight = workload->weight;
     float *bias   = workload->bias;
-    for (int b = workload->B_l; b < workload->B_r; b++) {
-        for (int t = workload->T_l; t < workload->T_r; t++) {
+    for (int b = 0; b < B; b++) {
+        for (int t = 0; t < T; t++) {
             float* out_bt = out + b * T * OC + t * OC;
             float* inp_bt = inp + b * T * C + t * C;
-            for (int o = 0; o < OC; o++) {
+            for (int o = workload->OC_l; o < workload->OC_r; o++) {
                 float val = (bias != NULL) ? bias[o] : 0.0f;
                 float* wrow = weight + o*C;
                 for (int i = 0; i < C; i++) {
@@ -125,6 +124,22 @@ void matmul_forward(float* out,
     // OC is short for "output channels"
     // inp is (B,T,C), weight is (OC, C), bias is (OC)
     // out will be (B,T,OC)
+#ifndef TEST
+    for (int b = 0; b < B; b++) {
+        for (int t = 0; t < T; t++) {
+            float* out_bt = out + b * T * OC + t * OC;
+            float* inp_bt = inp + b * T * C + t * C;
+            for (int o = 0; o < OC; o++) {
+                float val = (bias != NULL) ? bias[o] : 0.0f;
+                float* wrow = weight + o*C;
+                for (int i = 0; i < C; i++) {
+                    val += inp_bt[i] * wrow[i];
+                }
+                out_bt[o] = val;
+            }
+        }
+    }
+#else
     pthread_t worker[4];
     matmul_workload workload[4];
     for (int i = 0; i < 4; ++i) {
@@ -133,29 +148,18 @@ void matmul_forward(float* out,
             .out = out, .inp = inp, .weight = weight, .bias = bias
         };
     }
-    if (B > T) {
-        for (int i = 0; i < 4; ++i) {
-            workload[i].B_l = i * (B / 4);
-            workload[i].B_r = (i + 1) * (B / 4);
-            workload[i].T_l = 0;
-            workload[i].T_r = T;
-        }
-        workload[3].B_r = B;
-    } else {
-        for (int i = 0; i < 4; ++i) {
-            workload[i].T_l = i * (T / 4);
-            workload[i].T_r = (i + 1) * (T / 4);
-            workload[i].B_l = 0;
-            workload[i].B_r = B;
-        }
-        workload[3].T_r = T;
+    for (int i = 0; i < 4; ++i) {
+        workload[i].OC_l = i * (OC / 4);
+        workload[i].OC_r = (i + 1) * (OC / 4);
     }
+    workload[3].OC_r = OC;
     for (int i = 0; i < 4; ++i) {
         pthread_create(&worker[i], NULL, matmul_worker, &workload[i]);
     }
     for (int i = 0; i < 4; ++i) {
         pthread_join(worker[i], NULL);
     }
+#endif
 }
 
 void attention_forward(float* out, float* preatt, float* att,
