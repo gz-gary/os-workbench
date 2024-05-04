@@ -73,7 +73,7 @@ static void setup_heap_layout() {
         chunks[i * (1 << log_nr_page)].size = (1 << log_nr_page);
         chunk_insert(log_nr_page, i * (1 << log_nr_page));
     }
-    int temp_log = log_nr_page - 1;
+    /*int temp_log = log_nr_page - 1;
     while (1) {
         while (temp_log >= 0 &&
                ((1 << temp_log) * sizeof(chunk_t) > mem - ((void*)chunks + nr_page * sizeof(chunk_t)) ||
@@ -83,11 +83,11 @@ static void setup_heap_layout() {
         if (temp_log < 0) break;
         else {
             
-            /*printf("ahead %d %d\n", temp_log, 1 << temp_log);
+            printf("ahead %d %d\n", temp_log, 1 << temp_log);
             printf("chunks extend [%p, %p)\n", ((void*)chunks + nr_page * sizeof(chunk_t)),
                                                ((void*)chunks + (nr_page + (1 << temp_log)) * sizeof(chunk_t)));
             printf("mem extend [%p, %p)\n", (mem + nr_page * PAGE_SIZE),
-                                            (mem + (nr_page + (1 << temp_log)) * PAGE_SIZE));*/
+                                            (mem + (nr_page + (1 << temp_log)) * PAGE_SIZE));
             for (size_t i = nr_page; i < nr_page + (1 << temp_log); ++i)
                 chunks[i] = (chunk_t){
                     .status = CHUNK_FREE,
@@ -99,7 +99,7 @@ static void setup_heap_layout() {
             chunk_insert(temp_log, nr_page);
             nr_page += (1 << temp_log);
         }
-    }
+    }*/
     // buddy_dump();
     //printf("mem we use %d MiB\n", (nr_page * PAGE_SIZE) >> 20);
 }
