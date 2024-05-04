@@ -19,9 +19,13 @@ static void *kalloc(size_t size) {
 
     size = power_bound(size);
     if (size >= PAGE_SIZE / 2) { //slow path
-        return buddy_alloc(size);
+        void *result = buddy_alloc(size);
+        assert(result + size <= heap.end);
+        return result;
     } else {
-        return slab_allocate(size); //fast path
+        void *result = slab_allocate(size);
+        assert(result + size <= heap.end);
+        return result; //fast path
     }
 }
 

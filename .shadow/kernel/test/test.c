@@ -99,7 +99,7 @@ static void entry(int id) {
         // printf("ask for %lu\n\n", block_size[i]);
         ptr[i] = pmm->alloc(block_size[i]);
         // printf("get [%p, %p)\n", ptr[i], ptr[i] + block_size[i]);
-        printf("kalloc %p %p\n", ptr[i], ptr[i] + block_size[i]);
+        // printf("kalloc %p %p\n", ptr[i], ptr[i] + block_size[i]);
 
         // check if we get an available addr
         assert(ptr[i]);
@@ -111,7 +111,7 @@ static void entry(int id) {
         // printf("-------------\n");
         // printf("free %p\n", ptr[i]);
         pmm->free(ptr[i]);
-        printf("kfree %p\n", ptr[i]);
+        // printf("kfree %p\n", ptr[i]);
     }
 }
 
