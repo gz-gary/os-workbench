@@ -1,7 +1,7 @@
 #include <common.h>
 #include <spinlock.h>
 
-#ifndef TEST
+#ifdef TEST
 
 #define NR_CPUS 8
 #define BUF 512
@@ -80,13 +80,13 @@ static void producer() {
     //printf("sum_size: %d\n", sum_size);
 }
 
-#endif 
-
 spinlock_t stdout_log;
+
+#endif 
 
 static void os_init() {
     pmm->init();
-    #ifndef TEST
+    #ifdef TEST
     for (int i = 0; i < cpu_count(); ++i) {
         queue_init(&consumer_queue[i]);
     }
@@ -96,10 +96,10 @@ static void os_init() {
 }
 
 static void os_run() {
-    /*for (const char *s = "Hello World from CPU #*\n"; *s; s++) {
+    for (const char *s = "Hello World from CPU #*\n"; *s; s++) {
         putch(*s == '*' ? '0' + cpu_current() : *s);
-    }*/
-    #ifndef TEST
+    }
+    #ifdef TEST
     int cpuid = cpu_current();
     workload_t workload;
     int work_to_do = 0;
