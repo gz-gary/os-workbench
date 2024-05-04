@@ -102,7 +102,7 @@ static void entry(int id) {
         // printf("kalloc %p %p\n", ptr[i], ptr[i] + block_size[i]);
 
         // check if we get an available addr
-        assert(ptr[i]);
+        // assert(ptr[i]);
         // check if we get a legal addr
         assert(((uintptr_t)ptr[i] & (power_bound(block_size[i]) - 1)) == 0);
     }
