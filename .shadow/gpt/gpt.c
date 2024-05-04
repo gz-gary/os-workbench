@@ -92,33 +92,6 @@ struct matmul_workload {
     float *out, *inp, *weight, *bias;
 };
 
-void *matmul_worker(void *arg) {
-    matmul_workload *workload = arg;
-    int B         = workload->B;
-    int T         = workload->T;
-    int C         = workload->C;
-    int OC        = workload->OC;
-    float *out    = workload->out;
-    float *inp    = workload->inp;
-    float *weight = workload->weight;
-    float *bias   = workload->bias;
-    for (int b = workload->B_l; b < workload->B_r; b++) {
-        for (int t = workload->T_l; t < workload->T_r; t++) {
-            float* out_bt = out + b * T * OC + t * OC;
-            float* inp_bt = inp + b * T * C + t * C;
-            for (int o = 0; o < OC; o++) {
-                float val = (bias != NULL) ? bias[o] : 0.0f;
-                float* wrow = weight + o*C;
-                for (int i = 0; i < C; i++) {
-                    val += inp_bt[i] * wrow[i];
-                }
-                out_bt[o] = val;
-            }
-        }
-    }
-    return NULL;
-}
-
 void *matmul_worker_OC(void *arg) {
     matmul_workload *workload = arg;
     int B         = workload->B;
@@ -161,45 +134,17 @@ void matmul_forward(float* out,
             .out = out, .inp = inp, .weight = weight, .bias = bias
         };
     }
-    /*if (B >= 4 || T >= 4) {
-        if (B > T) {
-            for (int i = 0; i < 4; ++i) {
-                workload[i].B_l = i * (B / 4);
-                workload[i].B_r = (i + 1) * (B / 4);
-                workload[i].T_l = 0;
-                workload[i].T_r = T;
-            }
-            workload[3].B_r = B;
-        } else {
-            for (int i = 0; i < 4; ++i) {
-                workload[i].T_l = i * (T / 4);
-                workload[i].T_r = (i + 1) * (T / 4);
-                workload[i].B_l = 0;
-                workload[i].B_r = B;
-            }
-            workload[3].T_r = T;
-        }
-        for (int i = 0; i < 4; ++i) {
-            pthread_create(&worker[i], NULL, matmul_worker, &workload[i]);
-        }
-        for (int i = 0; i < 4; ++i) {
-            pthread_join(worker[i], NULL);
-        }
-    } else {
-        if (OC <= 4) assert(0);*/
-        printf("OC: %d\n", OC);
-        for (int i = 0; i < 4; ++i) {
-            workload[i].OC_l = i * (OC / 4);
-            workload[i].OC_r = (i + 1) * (OC / 4);
-        }
-        workload[3].OC_r = OC;
-        for (int i = 0; i < 4; ++i) {
-            pthread_create(&worker[i], NULL, matmul_worker_OC, &workload[i]);
-        }
-        for (int i = 0; i < 4; ++i) {
-            pthread_join(worker[i], NULL);
-        }
-    // }
+    for (int i = 0; i < 4; ++i) {
+        workload[i].OC_l = i * (OC / 4);
+        workload[i].OC_r = (i + 1) * (OC / 4);
+    }
+    workload[3].OC_r = OC;
+    for (int i = 0; i < 4; ++i) {
+        pthread_create(&worker[i], NULL, matmul_worker_OC, &workload[i]);
+    }
+    for (int i = 0; i < 4; ++i) {
+        pthread_join(worker[i], NULL);
+    }
 }
 
 void attention_forward(float* out, float* preatt, float* att,
