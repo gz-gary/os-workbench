@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
 
     int pid = fork();
     if (pid == 0) {
-        syscall(SYS_close, 1);
+        syscall(SYS_close, 2);
         syscall(SYS_dup, fid);
         syscall(SYS_close, fid);
 
