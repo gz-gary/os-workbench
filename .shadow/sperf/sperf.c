@@ -10,6 +10,8 @@
 #include <sys/syscall.h>
 
 void parse(const char *info) {
+    if (!strncmp(info, "+++", 3)) return;
+
     const char *ptr_l, *ptr_r;
     int token_len;
 
