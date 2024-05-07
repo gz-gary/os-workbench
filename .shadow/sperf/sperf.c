@@ -9,6 +9,10 @@
 #include <sys/stat.h>
 #include <sys/syscall.h>
 
+void parse(const char *info) {
+    printf("parse: %s \n", info);
+}
+
 int main(int argc, char *argv[]) {
     char **exec_argv = malloc((argc + 2) * sizeof(char *));
     exec_argv[0] = "strace";
@@ -46,7 +50,7 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-        printf("parse: %s \n", line_buf);
+        parse(line_buf);
     }
     // int status;
     // pid = wait(&status);
