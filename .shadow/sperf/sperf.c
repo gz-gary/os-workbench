@@ -11,6 +11,7 @@
 
 void parse(const char *info) {
     const char *ptr_l, *ptr_r;
+    int token_len;
 
     long syscall_id;
     sscanf(info, "[%ld]", &syscall_id);
@@ -24,8 +25,11 @@ void parse(const char *info) {
     while (*ptr_l != ']') ++ptr_l;
     ptr_l += 2;
 
-    strncpy(syscall_name, ptr_l, ptr_r - ptr_l);
-    printf("%d %s id=%ld\n", (int)(ptr_r - ptr_l), syscall_name, syscall_id);
+    token_len = ptr_r - ptr_l;
+
+    strncpy(syscall_name, ptr_l, token_len);
+    syscall_name[token_len] = '\0';
+    printf("%s id=%ld\n", syscall_name, syscall_id);
 }
 
 int main(int argc, char *argv[]) {
