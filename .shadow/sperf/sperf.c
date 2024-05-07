@@ -11,9 +11,9 @@
 
 int main(int argc, char *argv[]) {
     char **exec_argv = malloc((argc + 2) * sizeof(char *));
-    memcpy(exec_argv, argv, argc * sizeof(char *));
     exec_argv[0] = "strace";
     exec_argv[1] = "-T";
+    memcpy(exec_argv + 2, argv + 1, (argc - 1) * sizeof(char *));
     exec_argv[argc + 1] = NULL;
 
     char *exec_envp[] = { "PATH=/bin", NULL, };
