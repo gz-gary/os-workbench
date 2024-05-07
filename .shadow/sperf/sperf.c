@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     exec_argv[argc] = NULL;
     for (int i = 0; i < argc; ++i) {
         assert(exec_argv[i]);
-        printf("exec_argv[%d] = %s\n", i, argv[i]);
+        printf("exec_argv[%d] = %s\n", i, exec_argv[i]);
     }
     
     /*int fid = open("log.txt", O_CREAT | O_WRONLY | O_TRUNC);
