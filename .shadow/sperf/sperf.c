@@ -10,8 +10,6 @@
 #include <sys/syscall.h>
 
 void parse(const char *info) {
-    if (!strncmp(info, "+++", 3)) return;
-
     const char *ptr_l, *ptr_r;
     int token_len;
 
@@ -20,12 +18,14 @@ void parse(const char *info) {
 
     char syscall_name[64];
 
-    ptr_r = info;
-    while (*ptr_r != '(') ++ptr_r;
-
     ptr_l = info;
     while (*ptr_l != ']') ++ptr_l;
     ptr_l += 2;
+
+    if (*ptr_l == '+') return;
+
+    ptr_r = info;
+    while (*ptr_r != '(') ++ptr_r;
 
     token_len = ptr_r - ptr_l;
 
