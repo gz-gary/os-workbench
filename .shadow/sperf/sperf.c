@@ -10,10 +10,11 @@
 #include <sys/syscall.h>
 
 int main(int argc, char *argv[]) {
-    char **exec_argv = malloc((argc + 1) * sizeof(char *));
+    char **exec_argv = malloc((argc + 2) * sizeof(char *));
     memcpy(exec_argv, argv, argc * sizeof(char *));
     exec_argv[0] = "strace";
-    exec_argv[argc] = NULL;
+    exec_argv[1] = "-T";
+    exec_argv[argc + 1] = NULL;
 
     char *exec_envp[] = { "PATH=/bin", NULL, };
     
