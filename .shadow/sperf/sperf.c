@@ -10,9 +10,22 @@
 #include <sys/syscall.h>
 
 void parse(const char *info) {
-    int syscall_id;
-    sscanf(info, "[%d]", &syscall_id);
-    printf("syscall %d\n", syscall_id);
+    const char *ptr_l, *ptr_r;
+
+    long syscall_id;
+    sscanf(info, "[%ld]", &syscall_id);
+
+    char syscall_name[64];
+
+    ptr_r = info;
+    while (*ptr_r != '(') ++ptr_r;
+
+    ptr_l = info;
+    while (*ptr_l != ']') ++ptr_l;
+    ptr_l += 2;
+
+    strncpy(syscall_name, ptr_l, ptr_r - ptr_l);
+    printf("%s id=%ld\n", syscall_name, syscall_id);
 }
 
 int main(int argc, char *argv[]) {
