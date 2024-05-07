@@ -25,7 +25,7 @@ void parse(const char *info) {
     ptr_l += 2;
 
     strncpy(syscall_name, ptr_l, ptr_r - ptr_l);
-    printf("%ld %s id=%ld\n", ptr_r - ptr_l, syscall_name, syscall_id);
+    printf("%d %s id=%ld\n", (int)(ptr_r - ptr_l), syscall_name, syscall_id);
 }
 
 int main(int argc, char *argv[]) {
