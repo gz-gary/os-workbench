@@ -1,4 +1,5 @@
-export TOKEN := ???
+export TOKEN := ZHOO1rq9
+export MODULE := M5
 
 # ----- DO NOT MODIFY -----
 
