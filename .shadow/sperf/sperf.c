@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 
     char *exec_envp[] = { "PATH=/bin", NULL, };
     
-    int fid = open("log.txt", O_CREAT | O_WRONLY | O_TRUNC);
+    int fid = syscall(SYS_open, "log.txt", O_CREAT | O_WRONLY | O_TRUNC);
     assert(fid);
     dprintf(fid, "--- strace log below ---\n\n");
 
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
     if (pid == 0) {
         syscall(SYS_close, 2);
         syscall(SYS_dup, fid);
-        close(fid);
+        syscall(SYS_close, fid);
 
         execve("strace",          exec_argv, exec_envp);
         execve("/bin/strace",     exec_argv, exec_envp);
@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
     pid = wait(&status);
     assert(!WEXITSTATUS(status)); // strace exits normally
 
-    close(fid);
+    syscall(SYS_close, fid);
     free(exec_argv);
     return 0;
 }
