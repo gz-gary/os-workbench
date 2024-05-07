@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
     }
     assert(!argv[argc]);*/
     char **exec_argv = malloc((argc + 1) * sizeof(char *));
-    memcpy(exec_argv, argv, argc);
+    memcpy(exec_argv, argv, argc * sizeof(char *));
     exec_argv[0] = "strace";
     exec_argv[argc] = NULL;
     for (int i = 0; i < argc; ++i) {
