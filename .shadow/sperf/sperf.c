@@ -131,13 +131,17 @@ int main(int argc, char *argv[]) {
     int pipefd[2];
     assert(syscall(SYS_pipe, pipefd) >= 0);
 
+    int dev_null = syscall(SYS_open, "/dev/null", O_WRONLY);
+
     int pid = fork();
     if (pid == 0) {
         syscall(SYS_close, 2);
         syscall(SYS_dup, pipefd[1]);
         syscall(SYS_close, pipefd[0]);
         syscall(SYS_close, pipefd[1]);
+
         syscall(SYS_close, 1);
+        syscall(SYS_dup, dev_null);
 
         execve("strace",          exec_argv, exec_envp);
         execve("/bin/strace",     exec_argv, exec_envp);
