@@ -51,7 +51,7 @@ void parse(const char *info) {
     assert(*ptr_l == ']');
     ptr_l += 2;
 
-    if (*ptr_l == '+') return;
+    if (*ptr_l == '+') return; // end of strace output
 
     for (ptr_r = ptr_l, name_len = 0; *ptr_r && *ptr_r != '('; ++ptr_r, ++name_len);
     assert(*ptr_r == '(');
@@ -59,10 +59,7 @@ void parse(const char *info) {
     syscall_name[name_len] = '\0';
 
     for (ptr_l = ptr_r; *ptr_l && *ptr_l != '<'; ++ptr_l);
-    if (*ptr_l != '<') {
-        printf("%s\n", info);
-    }
-    assert(*ptr_l == '<');
+    if (*ptr_l == '\0') return; // strace fail to get syscall time
     ++ptr_l;
     sscanf(ptr_l, "%f", &time);
 
