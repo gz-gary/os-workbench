@@ -111,7 +111,6 @@ void init() {
 
 int main(int argc, char *argv[]) {
     assert(argc >= 2);
-    printf("%d\n", argc);
 
     init();
 
@@ -134,6 +133,7 @@ int main(int argc, char *argv[]) {
         syscall(SYS_dup, pipefd[1]);
         syscall(SYS_close, pipefd[0]);
         syscall(SYS_close, pipefd[1]);
+        syscall(SYS_close, 1);
 
         execve("strace",          exec_argv, exec_envp);
         execve("/bin/strace",     exec_argv, exec_envp);
