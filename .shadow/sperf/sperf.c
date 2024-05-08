@@ -110,8 +110,7 @@ void init() {
 }
 
 int main(int argc, char *argv[]) {
-    printf("%d\n", argc);
-    assert(argc >= 2);
+    assert(argc == 4);
 
     init();
 
