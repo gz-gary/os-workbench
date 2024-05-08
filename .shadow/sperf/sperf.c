@@ -38,6 +38,8 @@ void parse(const char *info) {
 }
 
 int main(int argc, char *argv[]) {
+    assert(argc >= 2);
+
     char **exec_argv = malloc((argc + 3 + 1) * sizeof(char *));
     exec_argv[0] = "strace";
     exec_argv[1] = "-T";
