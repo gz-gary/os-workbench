@@ -87,10 +87,12 @@ void parse(const char *info) {
 }
 
 void output_stat() {
+    printf("---\n");
     for (int i = 0, syscall_id; i < 5 && i < nr_syscalls; ++i) {
         syscall_id = rank_to_syscall_id[i];
         printf("%s (%d%%)\n", syscall_stats[syscall_id].syscall_name, (int)(syscall_stats[syscall_id].time / total_time * 100.f));
     }
+    printf("---\n");
     for (int i = 0; i < 80; ++i) putchar('\0');
     fflush(stdout);
 }
