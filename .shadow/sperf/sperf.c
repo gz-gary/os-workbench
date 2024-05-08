@@ -4,15 +4,41 @@
 #include <assert.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/time.h>
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
 
+#define swap(a, b) {     \
+    typeof(a) t = (a);   \
+    a = (b);             \
+    b = t; }             \
+
+#define SYSCALL_NAME_LEN 64
+#define NR_SYSCALLS 512
+
+typedef struct {
+    char syscall_name[SYSCALL_NAME_LEN];
+    float time;
+    int rank;
+} syscall_stat_t;
+syscall_stat_t syscall_stats[NR_SYSCALLS];
+
+int rank_to_syscall_id[NR_SYSCALLS];
+
+float total_time;
+
+int nr_syscalls;
+int last_print_flag;
+struct timeval last_print_time;
+
 void parse(const char *info) {
+    /* --- parse information from strace output --- */
+
     const char *ptr_l, *ptr_r;
     long syscall_id;
-    char syscall_name[64];
+    char syscall_name[SYSCALL_NAME_LEN];
     int name_len;
     float time;
 
@@ -33,13 +59,51 @@ void parse(const char *info) {
     ++ptr_l;
     sscanf(ptr_l, "%f", &time);
 
-    printf("%c\n", *ptr_l);
-    printf("%s id=%ld cost=%.8f\n", syscall_name, syscall_id, time);
-    printf("\n");
+    /* --- update statistics ---*/
+
+    syscall_stat_t *stat = &syscall_stats[syscall_id];
+    if (stat->syscall_name[0] == '\0') {
+        strcpy(stat->syscall_name, syscall_name);
+        ++nr_syscalls;
+    }
+    stat->time += time;
+    total_time += time;
+
+    /* --- update ranking using bubble sort --- */
+
+    int rank = stat->rank;
+    while (rank > 0) {
+        syscall_stat_t *pre_stat = &syscall_stats[rank_to_syscall_id[rank - 1]];
+        if (stat->time > pre_stat->time) {
+            swap(stat->rank, pre_stat->rank);
+            swap(rank_to_syscall_id[rank], rank_to_syscall_id[rank - 1]);
+            --rank;
+        } else break;
+    }
+}
+
+void output_stat() {
+    for (int i = 0; i < 5 && i < nr_syscalls; ++i) {
+        printf("%s (%d%%)\n", syscall_stats[i].syscall_name, (int)(syscall_stats[i].time / total_time * 100.f));
+    }
+}
+
+void init() {
+    memset(syscall_stats, 0, sizeof(syscall_stats));
+    total_time = 0.f;
+    last_print_flag = 0;
+    nr_syscalls = 0;
+
+    for (int i = 0; i < NR_SYSCALLS; ++i) {
+        syscall_stats[i].rank = i;
+        rank_to_syscall_id[i] = i;
+    }
 }
 
 int main(int argc, char *argv[]) {
     assert(argc >= 2);
+
+    init();
 
     char **exec_argv = malloc((argc + 3 + 1) * sizeof(char *));
     exec_argv[0] = "strace";
@@ -80,7 +144,16 @@ int main(int argc, char *argv[]) {
         }
 
         parse(line_buf);
+        struct timeval current_time;
+        gettimeofday(&current_time, NULL);
+        if (!last_print_flag || current_time.tv_usec - last_print_time.tv_usec >= 100) {
+            last_print_flag = 1;
+            last_print_time = current_time;
+            output_stat();
+        }
     }
+    if (!last_print_flag)
+        output_stat();
     // int status;
     // pid = wait(&status);
     // assert(!WEXITSTATUS(status)); // strace exits normally
