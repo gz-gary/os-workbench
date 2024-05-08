@@ -43,6 +43,7 @@ void parse(const char *info) {
     float time;
 
     for (ptr_l = info; *ptr_l && *ptr_l != '['; ++ptr_l);
+    if (*ptr_l != '[') printf("%s\n", info);
     assert(*ptr_l == '[');
     ++ptr_l;
     sscanf(ptr_l, "%ld", &syscall_id);
