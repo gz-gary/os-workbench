@@ -36,6 +36,9 @@ struct timeval last_print_time;
 void parse(const char *info) {
     /* --- parse information from strace output --- */
 
+    printf("parse %s\n", info);
+    return;
+
     const char *ptr_l, *ptr_r;
     long syscall_id;
     char syscall_name[SYSCALL_NAME_LEN];
@@ -43,6 +46,7 @@ void parse(const char *info) {
     float time;
 
     for (ptr_l = info; *ptr_l && *ptr_l != '['; ++ptr_l);
+    if (*ptr_l != '[') printf("%s\n", info);
     assert(*ptr_l == '[');
     ++ptr_l;
     sscanf(ptr_l, "%ld", &syscall_id);
@@ -127,12 +131,17 @@ int main(int argc, char *argv[]) {
     int pipefd[2];
     assert(syscall(SYS_pipe, pipefd) >= 0);
 
+    int dev_null = syscall(SYS_open, "/dev/null", O_WRONLY);
+
     int pid = fork();
     if (pid == 0) {
         syscall(SYS_close, 2);
         syscall(SYS_dup, pipefd[1]);
         syscall(SYS_close, pipefd[0]);
         syscall(SYS_close, pipefd[1]);
+
+        syscall(SYS_close, 1);
+        syscall(SYS_dup, dev_null);
 
         execve("strace",          exec_argv, exec_envp);
         execve("/bin/strace",     exec_argv, exec_envp);
@@ -153,16 +162,16 @@ int main(int argc, char *argv[]) {
         }
 
         parse(line_buf);
-        struct timeval current_time;
+        /*struct timeval current_time;
         gettimeofday(&current_time, NULL);
         if (!last_print_flag || current_time.tv_usec - last_print_time.tv_usec >= 100) {
             last_print_flag = 1;
             last_print_time = current_time;
             output_stat();
-        }
+        }*/
     }
-    if (!last_print_flag)
-        output_stat();
+    // if (!last_print_flag)
+        // output_stat();
 
     free(exec_argv);
     return 0;
