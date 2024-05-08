@@ -59,6 +59,9 @@ void parse(const char *info) {
     syscall_name[name_len] = '\0';
 
     for (ptr_l = ptr_r; *ptr_l && *ptr_l != '<'; ++ptr_l);
+    if (*ptr_l != '<') {
+        printf("%s\n", info);
+    }
     assert(*ptr_l == '<');
     ++ptr_l;
     sscanf(ptr_l, "%f", &time);
