@@ -163,9 +163,6 @@ int main(int argc, char *argv[]) {
     }
     if (!last_print_flag)
         output_stat();
-    // int status;
-    // pid = wait(&status);
-    // assert(!WEXITSTATUS(status)); // strace exits normally
 
     free(exec_argv);
     return 0;
