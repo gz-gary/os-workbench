@@ -32,7 +32,9 @@ void parse(const char *info) {
     for (ptr_l = ptr_r; *ptr_l != '<'; ++ptr_l);
     sscanf(ptr_l, "%f", &time);
 
+    printf("%c\n", *ptr_l);
     printf("%s id=%ld cost=%.8f\n", syscall_name, syscall_id, time);
+    printf("\n");
 }
 
 int main(int argc, char *argv[]) {
