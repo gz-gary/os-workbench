@@ -11,27 +11,28 @@
 
 void parse(const char *info) {
     const char *ptr_l, *ptr_r;
-    int token_len;
-
     long syscall_id;
-    sscanf(info, "[%ld]", &syscall_id);
-
     char syscall_name[64];
+    int name_len;
+    float time;
 
-    ptr_l = info;
+    for (ptr_l = info; *ptr_l != '['; ++ptr_l);
+    ++ptr_l;
+    sscanf(ptr_l, "%ld", &syscall_id);
+
     while (*ptr_l != ']') ++ptr_l;
     ptr_l += 2;
 
     if (*ptr_l == '+') return;
 
-    ptr_r = info;
-    while (*ptr_r != '(') ++ptr_r;
+    for (ptr_r = ptr_l, name_len = 0; *ptr_r != '('; ++ptr_r, ++name_len);
+    strncpy(syscall_name, ptr_l, name_len);
+    syscall_name[name_len] = '\0';
 
-    token_len = ptr_r - ptr_l;
+    for (ptr_l = ptr_r; *ptr_l != '<'; ++ptr_l);
+    sscanf(ptr_l, "%f", &time);
 
-    strncpy(syscall_name, ptr_l, token_len);
-    syscall_name[token_len] = '\0';
-    printf("%s id=%ld\n", syscall_name, syscall_id);
+    printf("%s id=%ld cost=%.8f\n", syscall_name, syscall_id, time);
 }
 
 int main(int argc, char *argv[]) {
