@@ -86,6 +86,7 @@ void output_stat() {
     for (int i = 0; i < 5 && i < nr_syscalls; ++i) {
         printf("%s (%d%%)\n", syscall_stats[i].syscall_name, (int)(syscall_stats[i].time / total_time * 100.f));
     }
+    printf("--------------------\n");
 }
 
 void init() {
