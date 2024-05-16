@@ -160,17 +160,24 @@ int main(int argc, char *argv[]) {
 
     while (1) {
         static char line_buf[4096];
+        static char next_line[4096];
 
         if (!fgets(line_buf, sizeof(line_buf), stdin)) {
             break;
         }
 
-        // int line_len = strlen(line_buf);
-        // printf("%s\n", line_buf);
-        // printf("%d\n", line_len - 1);
-        // assert(line_buf[line_len - 1] == '>');
+        int line_len = strlen(line_buf);
+        if (line_buf[line_len - 1] == '+') break;
+        else if (line_buf[line_len - 1] == '?' || line_buf[line_len - 1] == '>') {
+            parse(line_buf);
+        } else {
+            fgets(next_line, sizeof(next_line), stdin);
+            line_buf[line_len - 1] = '\0';
+            strcat(line_buf, next_line);
+            parse(line_buf);
+        }
 
-        parse(line_buf);
+        // parse(line_buf);
         struct timeval current_time;
         gettimeofday(&current_time, NULL);
         if (!last_print_flag || current_time.tv_usec - last_print_time.tv_usec >= 100) {
