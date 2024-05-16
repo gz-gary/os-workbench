@@ -166,6 +166,8 @@ int main(int argc, char *argv[]) {
         }
 
         int line_len = strlen(line_buf);
+        printf("%s\n", line_buf);
+        printf("%d\n", line_len - 1);
         assert(line_buf[line_len - 1] == '>');
 
         parse(line_buf);
