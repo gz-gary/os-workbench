@@ -118,11 +118,6 @@ void init() {
 }
 
 int main(int argc, char *argv[], char *envp[]) {
-    while (*envp) {
-        printf("%s\n", *envp);
-        ++envp;
-    }
-    return 0;
     assert(argc >= 2);
 
     init();
@@ -135,7 +130,7 @@ int main(int argc, char *argv[], char *envp[]) {
     memcpy(exec_argv + 4, argv + 1, (argc - 1) * sizeof(char *));
     exec_argv[argc + 3] = NULL;
 
-    char *exec_envp[] = { "PATH=/bin", NULL, };
+    // char *exec_envp[] = { "PATH=/bin", NULL, };
     
     int pipefd[2];
     assert(syscall(SYS_pipe, pipefd) >= 0);
@@ -152,9 +147,9 @@ int main(int argc, char *argv[], char *envp[]) {
         syscall(SYS_close, 1);
         syscall(SYS_dup, dev_null);
 
-        execve("strace",          exec_argv, exec_envp);
-        execve("/bin/strace",     exec_argv, exec_envp);
-        execve("/usr/bin/strace", exec_argv, exec_envp);
+        execve("strace",          exec_argv, envp);
+        execve("/bin/strace",     exec_argv, envp);
+        execve("/usr/bin/strace", exec_argv, envp);
         perror(exec_argv[0]);
         exit(EXIT_FAILURE);
     }
