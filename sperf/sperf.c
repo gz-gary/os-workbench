@@ -33,11 +33,13 @@ int nr_syscalls;
 int last_print_flag;
 struct timeval last_print_time;
 
+FILE *strace_log;
+
 void parse(const char *info) {
     /* --- parse information from strace output --- */
 
-    // printf("parse %s\n", info);
-    // return;
+    // fprintf(strace_log, "%s", info);
+    // fflush(strace_log);
 
     const char *ptr_l, *ptr_r;
     long syscall_id;
@@ -46,7 +48,6 @@ void parse(const char *info) {
     float time;
 
     for (ptr_l = info; *ptr_l && *ptr_l != '['; ++ptr_l);
-    if (*ptr_l != '[') printf("%s\n", info);
     assert(*ptr_l == '[');
     ++ptr_l;
     sscanf(ptr_l, "%ld", &syscall_id);
@@ -111,6 +112,9 @@ void init() {
         syscall_stats[i].rank = i;
         rank_to_syscall_id[i] = i;
     }
+
+    strace_log = fopen("./log.txt", "w");
+    assert(strace_log);
 }
 
 int main(int argc, char *argv[]) {
@@ -156,12 +160,24 @@ int main(int argc, char *argv[]) {
 
     while (1) {
         static char line_buf[4096];
+        static char next_line[4096];
 
         if (!fgets(line_buf, sizeof(line_buf), stdin)) {
             break;
         }
 
-        parse(line_buf);
+        int line_len = strlen(line_buf);
+        if (line_buf[line_len - 1] == '+') break;
+        else if (line_buf[line_len - 1] == '?' || line_buf[line_len - 1] == '>') {
+            parse(line_buf);
+        } else {
+            fgets(next_line, sizeof(next_line), stdin);
+            line_buf[line_len - 1] = '\0';
+            strcat(line_buf, next_line);
+            parse(line_buf);
+        }
+
+        // parse(line_buf);
         struct timeval current_time;
         gettimeofday(&current_time, NULL);
         if (!last_print_flag || current_time.tv_usec - last_print_time.tv_usec >= 100) {
