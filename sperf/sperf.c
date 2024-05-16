@@ -33,13 +33,8 @@ int nr_syscalls;
 int last_print_flag;
 struct timeval last_print_time;
 
-FILE *strace_log;
-
 void parse(const char *info) {
     /* --- parse information from strace output --- */
-
-    // fprintf(strace_log, "%s", info);
-    // fflush(strace_log);
 
     const char *ptr_l, *ptr_r;
     long syscall_id;
@@ -112,12 +107,9 @@ void init() {
         syscall_stats[i].rank = i;
         rank_to_syscall_id[i] = i;
     }
-
-    strace_log = fopen("./log.txt", "w");
-    assert(strace_log);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[], char *envp[]) {
     assert(argc >= 2);
 
     init();
@@ -130,8 +122,6 @@ int main(int argc, char *argv[]) {
     memcpy(exec_argv + 4, argv + 1, (argc - 1) * sizeof(char *));
     exec_argv[argc + 3] = NULL;
 
-    char *exec_envp[] = { "PATH=/bin", NULL, };
-    
     int pipefd[2];
     assert(syscall(SYS_pipe, pipefd) >= 0);
 
@@ -147,9 +137,9 @@ int main(int argc, char *argv[]) {
         syscall(SYS_close, 1);
         syscall(SYS_dup, dev_null);
 
-        execve("strace",          exec_argv, exec_envp);
-        execve("/bin/strace",     exec_argv, exec_envp);
-        execve("/usr/bin/strace", exec_argv, exec_envp);
+        execve("strace",          exec_argv, envp);
+        execve("/bin/strace",     exec_argv, envp);
+        execve("/usr/bin/strace", exec_argv, envp);
         perror(exec_argv[0]);
         exit(EXIT_FAILURE);
     }
@@ -177,7 +167,6 @@ int main(int argc, char *argv[]) {
             parse(line_buf);
         }
 
-        // parse(line_buf);
         struct timeval current_time;
         gettimeofday(&current_time, NULL);
         if (!last_print_flag || current_time.tv_usec - last_print_time.tv_usec >= 100) {
