@@ -162,16 +162,16 @@ int main(int argc, char *argv[]) {
         }
 
         parse(line_buf);
-        /*struct timeval current_time;
+        struct timeval current_time;
         gettimeofday(&current_time, NULL);
         if (!last_print_flag || current_time.tv_usec - last_print_time.tv_usec >= 100) {
             last_print_flag = 1;
             last_print_time = current_time;
             output_stat();
-        }*/
+        }
     }
-    // if (!last_print_flag)
-        // output_stat();
+    if (!last_print_flag)
+        output_stat();
 
     free(exec_argv);
     return 0;
