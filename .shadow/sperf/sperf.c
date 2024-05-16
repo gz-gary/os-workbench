@@ -33,11 +33,13 @@ int nr_syscalls;
 int last_print_flag;
 struct timeval last_print_time;
 
+FILE *strace_log;
+
 void parse(const char *info) {
     /* --- parse information from strace output --- */
 
-    // printf("parse %s\n", info);
-    // return;
+    fprintf(strace_log, "%s", info);
+    fflush(strace_log);
 
     const char *ptr_l, *ptr_r;
     long syscall_id;
@@ -46,7 +48,6 @@ void parse(const char *info) {
     float time;
 
     for (ptr_l = info; *ptr_l && *ptr_l != '['; ++ptr_l);
-    if (*ptr_l != '[') printf("%s\n", info);
     assert(*ptr_l == '[');
     ++ptr_l;
     sscanf(ptr_l, "%ld", &syscall_id);
@@ -111,6 +112,9 @@ void init() {
         syscall_stats[i].rank = i;
         rank_to_syscall_id[i] = i;
     }
+
+    strace_log = fopen("./log.txt", "w");
+    assert(strace_log);
 }
 
 int main(int argc, char *argv[]) {
