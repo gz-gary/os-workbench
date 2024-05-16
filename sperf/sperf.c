@@ -36,8 +36,8 @@ struct timeval last_print_time;
 void parse(const char *info) {
     /* --- parse information from strace output --- */
 
-    printf("parse %s\n", info);
-    return;
+    // printf("parse %s\n", info);
+    // return;
 
     const char *ptr_l, *ptr_r;
     long syscall_id;
@@ -91,12 +91,12 @@ void parse(const char *info) {
 }
 
 void output_stat() {
-    printf("---\n");
     for (int i = 0, syscall_id; i < 5 && i < nr_syscalls; ++i) {
         syscall_id = rank_to_syscall_id[i];
-        printf("%s (%d%%)\n", syscall_stats[syscall_id].syscall_name, (int)(syscall_stats[syscall_id].time / total_time * 100.f));
+        printf("%s (%d%%)\n",
+               syscall_stats[syscall_id].syscall_name,
+               (int)(syscall_stats[syscall_id].time / total_time * 100.f));
     }
-    printf("---\n");
     for (int i = 0; i < 80; ++i) putchar('\0');
     fflush(stdout);
 }
@@ -162,16 +162,16 @@ int main(int argc, char *argv[]) {
         }
 
         parse(line_buf);
-        /*struct timeval current_time;
+        struct timeval current_time;
         gettimeofday(&current_time, NULL);
         if (!last_print_flag || current_time.tv_usec - last_print_time.tv_usec >= 100) {
             last_print_flag = 1;
             last_print_time = current_time;
             output_stat();
-        }*/
+        }
     }
-    // if (!last_print_flag)
-        // output_stat();
+    if (!last_print_flag)
+        output_stat();
 
     free(exec_argv);
     return 0;
