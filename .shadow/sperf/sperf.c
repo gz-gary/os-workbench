@@ -38,8 +38,8 @@ FILE *strace_log;
 void parse(const char *info) {
     /* --- parse information from strace output --- */
 
-    fprintf(strace_log, "%s", info);
-    fflush(strace_log);
+    // fprintf(strace_log, "%s", info);
+    // fflush(strace_log);
 
     const char *ptr_l, *ptr_r;
     long syscall_id;
