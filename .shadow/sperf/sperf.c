@@ -117,7 +117,12 @@ void init() {
     assert(strace_log);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[], char *envp[]) {
+    while (*envp) {
+        printf("%s\n", *envp);
+        ++envp;
+    }
+    return 0;
     assert(argc >= 2);
 
     init();
