@@ -36,8 +36,8 @@ struct timeval last_print_time;
 void parse(const char *info) {
     /* --- parse information from strace output --- */
 
-    printf("parse %s\n", info);
-    return;
+    // printf("parse %s\n", info);
+    // return;
 
     const char *ptr_l, *ptr_r;
     long syscall_id;
