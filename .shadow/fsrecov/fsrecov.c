@@ -148,7 +148,7 @@ void dump_bmp() {
 					for (int k = 12; k <= 13; ++k) buf[len++] = ldent[j].LDIR_Name3[k - 12];
 					buf[len++] = '\0';
 					if (ascii_printable(buf, len - 1)) {
-						printf("%s\n", buf);
+						printf("[Long file name]: %s\n", buf);
 					}
 				}
 				i += idx;
