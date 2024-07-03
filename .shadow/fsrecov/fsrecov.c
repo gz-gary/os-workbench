@@ -135,7 +135,7 @@ void dump_bmp() {
 				if ((void *)(dent + i + idx) > (void *)clus_end) continue; // cross cluster
 				printf("%d\n", idx);
 				int len = 0;
-				char buf[64];
+				char buf[128];
 				for (int j = idx - 1; j >= 0; --j) {
 					for (int k = 1; k <= 5; ++k) buf[len++] = ldent[j].LDIR_Name1[k - 1];
 					for (int k = 6; k <= 11; ++k) buf[len++] = ldent[j].LDIR_Name2[k - 6];
