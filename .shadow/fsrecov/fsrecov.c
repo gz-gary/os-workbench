@@ -145,7 +145,6 @@ void dump_bmp() {
 		if (clus_type[clus_id] != CLUS_DENT) { ++clus_id; continue; }
 		struct fat32dent *dent = (struct fat32dent *)clus;
 		char buf[128];
-		bzero(buf, 128);
 		u32 bmp_clus_id;
 		struct bmp_hdr_t *bmp_hdr;
 
@@ -156,6 +155,7 @@ void dump_bmp() {
 				int cnt_ldent = ldent->LDIR_Ord ^ LAST_LONG_ENTRY;
 				if (i + cnt_ldent >= dents_per_clus) continue; // cross cluster, abort
 
+				bzero(buf, 128);
 				bmp_clus_id = dump_long_file_name(ldent, buf);
 				i += cnt_ldent;
 			} else { // this entry is a 'short name directory entry'
@@ -165,6 +165,7 @@ void dump_bmp() {
 					continue;
 				}
 
+				bzero(buf, 128);
 				bmp_clus_id = dump_short_file_name(&dent[i], buf);
 			}
 
@@ -174,7 +175,7 @@ void dump_bmp() {
 
 			bmp_hdr = (struct bmp_hdr_t *)locate_clus(bmp_clus_id);
 			u32 bmp_cnt_clus = bmp_hdr->BMP_FileSz / bytes_per_clus;
-			if (bmp_hdr->BMP_FileSz % bytes_per_clus) ++bmp_cnt_clus;
+			if (bmp_hdr->BMP_FileSz % bytes_per_clus > 0) ++bmp_cnt_clus;
 
 			// printf("%u\t%u\t%s\tW=%u\tH=%u\n", tot_clus, bmp_clus_id, buf, bmp_hdr->BMP_Width, bmp_hdr->BMP_Height);
 			char tmp_file_name[256];
@@ -186,7 +187,6 @@ void dump_bmp() {
 					write(bmp_fd, locate_clus(bmp_clus_id + j), bytes_per_clus);
 				}
 			}
-
 			close(bmp_fd);
 
 			char sha1sum_cmd[300];
