@@ -187,7 +187,7 @@ void dump_bmp() {
 				  bmp_clus_id < tot_clus &&
 				  clus_type[bmp_clus_id] == CLUS_BMPDATA)) continue;
 
-			printf("%u ", bmp_clus_id);
+			printf("%u %u ", tot_clus, bmp_clus_id);
 			ascii_printable_print(buf);
 			printf("\n");
 		}
