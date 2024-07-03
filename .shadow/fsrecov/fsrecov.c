@@ -133,6 +133,7 @@ void dump_bmp() {
 				if ((ldent->LDIR_Ord & LAST_LONG_ENTRY) == 0) continue;
 				int idx = ldent->LDIR_Ord ^ LAST_LONG_ENTRY;
 				if ((void *)(dent + i + idx) > (void *)clus_end) continue; // cross cluster
+				printf("%d\n", idx);
 				int len = 0;
 				char buf[64];
 				for (int j = 0; j < idx; ++j) {
