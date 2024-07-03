@@ -24,7 +24,7 @@ struct fat32dent_long {
 
 struct fat32hdr *hdr;
 u32 bytes_per_clus;
-u8 before_data_sec;
+u32 before_data_sec;
 u8 *clus_begin;
 u8 *clus_end;
 
