@@ -173,7 +173,7 @@ void dump_bmp() {
 				printf("%u ", bmp_clus_id);
 				ascii_printable_print(buf);
 				printf("\n");
-				i += cnt_ldent + 1;
+				i += cnt_ldent;
 			} else { // this entry is a 'short name directory entry'
 				if (dent[i].DIR_Name[0] == 0x00 ||
 					dent[i].DIR_Name[0] == 0xE5 ||
