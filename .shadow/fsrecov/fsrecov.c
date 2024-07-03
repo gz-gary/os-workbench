@@ -182,14 +182,15 @@ void dump_bmp() {
 
 				bmp_clus_id = dump_short_file_name(&dent[i], buf);
 			}
+
+			printf("%u %u ", tot_clus, bmp_clus_id);
+			ascii_printable_print(buf);
+			printf("\n");
 			
 			if (!(bmp_clus_id >= 2 &&
 				  bmp_clus_id < tot_clus &&
 				  clus_type[bmp_clus_id] == CLUS_BMPDATA)) continue;
 
-			printf("%u %u ", tot_clus, bmp_clus_id);
-			ascii_printable_print(buf);
-			printf("\n");
 		}
 		// printf("%s ", idstr[clus_type[clus_id]]);
 		++clus_id;
