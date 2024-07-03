@@ -105,7 +105,7 @@ clus_type_t probe_clus_type(u8 *clus) {
 
 int ascii_printable(const char *str, int len) {
 	for (int i = 0; i < len; ++i) {
-		if (str[i] < ' ' || str[i] > '~') return 0;
+		if (str[i] != '\0' && (str[i] < ' ' || str[i] > '~')) return 0;
 	}
 	return 1;
 }
@@ -136,15 +136,15 @@ void dump_bmp() {
 				printf("%d\n", idx);
 				int len = 0;
 				char buf[64];
-				for (int j = 0; j < idx; ++j) {
+				for (int j = idx - 1; j >= 0; --j) {
 					len = 0;
 					for (int k = 1; k <= 5; ++k) buf[len++] = ldent[j].LDIR_Name1[k - 1];
 					for (int k = 6; k <= 11; ++k) buf[len++] = ldent[j].LDIR_Name2[k - 6];
 					for (int k = 12; k <= 13; ++k) buf[len++] = ldent[j].LDIR_Name3[k - 12];
 					buf[len++] = '\0';
-					// if (ascii_printable(buf, len - 1)) {
+					if (ascii_printable(buf, len - 1)) {
 						printf("[Long file name]: %s\n", buf);
-					// }
+					}
 				}
 				i += idx;
 			} else { // this entry is a 'short name directory entry'
