@@ -120,11 +120,11 @@ void dump_long_file_name(struct fat32ldent *ldent, char *buf, int cnt_ldent) {
 
 		for (int k = 6; k <= 11; ++k)
 			if (ldent->LDIR_Name2[k - 6] != '\0')
-				buf[len++] = ldent->LDIR_Name1[k - 6];
+				buf[len++] = ldent->LDIR_Name2[k - 6];
 
 		for (int k = 12; k <= 13; ++k)
 			if (ldent->LDIR_Name3[k - 12] != '\0')
-				buf[len++] = ldent->LDIR_Name1[k - 12];
+				buf[len++] = ldent->LDIR_Name3[k - 12];
 	}
 	buf[len++] = '\0';
 }
@@ -153,7 +153,7 @@ void dump_bmp() {
 				int cnt_ldent = ldent->LDIR_Ord ^ LAST_LONG_ENTRY;
 				if ((void *)(dent + i + cnt_ldent) > (void *)clus_end) continue; // cross cluster
 				printf("%d\n", cnt_ldent);
-				char buf[128];
+				char buf[256];
 				dump_long_file_name(ldent, buf, cnt_ldent);
 				printf("[Long file name]: %s\n", buf);
 				i += cnt_ldent;
