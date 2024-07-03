@@ -8,8 +8,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "fat32.h"
-#define MAX_CLUS 20000
-
 
 struct fat32hdr *hdr;
 u32 bytes_per_clus;
@@ -27,6 +25,7 @@ int main(int argc, char *argv[]) {
 	assert(sizeof(struct fat32hdr) == 512);
 	assert(sizeof(struct fat32dent) == 32);
 	assert(sizeof(struct fat32ldent) == 32);
+	assert(sizeof(struct bmp_hdr_t) == 0x36);
 	setbuf(stdout, NULL);
 
 	hdr = mmap_disk(argv[1]);
@@ -113,6 +112,10 @@ void ascii_printable_print(const char *str) {
 	}
 }
 
+u8 *locate_clus(u32 clus_id) {
+	return clus_begin + (clus_id - 2) * bytes_per_clus;
+}
+
 u32 dump_long_file_name(struct fat32ldent *ldent, char *buf) {
 	int len = 0;
 	int cnt_ldent = ldent->LDIR_Ord ^ LAST_LONG_ENTRY;
@@ -163,6 +166,7 @@ void dump_bmp() {
 		struct fat32dent *dent = (struct fat32dent *)clus;
 		char buf[128];
 		u32 bmp_clus_id;
+		struct bmp_hdr_t *bmp_hdr;
 
 		for (int i = 0; i < dents_per_clus; ++i) {
 			if ((dent[i].DIR_Attr & ATTR_LONG_NAME) == ATTR_LONG_NAME) { // this entry is a 'long name directory entry' 
@@ -187,8 +191,12 @@ void dump_bmp() {
 				  bmp_clus_id < tot_clus &&
 				  clus_type[bmp_clus_id] == CLUS_BMPHDR)) continue;
 
+			bmp_hdr = (struct bmp_hdr_t *)locate_clus(bmp_clus_id);
+
 			printf("%u %u ", tot_clus, bmp_clus_id);
 			ascii_printable_print(buf);
+			printf(" ");
+			printf("W=%u H=%u", bmp_hdr->BMP_Width, bmp_hdr->BMP_Height);
 			printf("\n");
 		}
 		// printf("%s ", idstr[clus_type[clus_id]]);

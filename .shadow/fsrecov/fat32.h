@@ -74,4 +74,29 @@ struct fat32ldent {
 #define ATTR_LONG_NAME (ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID)
 #define ATTR_LONG_NAME_MASK (ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID | ATTR_DIRECTORY | ATTR_ARCHIVE)
 
+#define MAX_CLUS 20000
+
+struct bmp_pixel {
+    u8 b, g, r;
+} __attribute__((packed));
+
+struct bmp_hdr_t {
+    u16   BMP_Magic;
+    u32   BMP_FileSz;
+    u16   BMP_Rsvd1;
+    u16   BMP_Rsvd2;
+    u32   BMP_DataOff;
+    u32   BMP_DIBHdrSz;
+    u32   BMP_Width;
+    u32   BMP_Height;
+    u16   BMP_Planes;
+    u16   BMP_BitsPerPixel;
+    u32   BMP_Compress;
+    u32   BMP_ImgSz;
+    u32   BMP_XResol;
+    u32   BMP_YResol;
+    u32   BMP_Cols;
+    u32   BMP_ImportantCols;
+    struct bmp_pixel pixels[0];
+} __attribute__((packed));
 #define LAST_LONG_ENTRY 0x40
