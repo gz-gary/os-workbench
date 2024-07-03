@@ -65,13 +65,6 @@ void *mmap_disk(const char *fname) {
     assert(hdr->Signature_word == 0xaa55); // this is an MBR
     assert(hdr->BPB_TotSec32 * hdr->BPB_BytsPerSec == size);
 
-    printf("%s: DOS/MBR boot sector, ", fname);
-    printf("OEM-ID \"%s\", ", hdr->BS_OEMName);
-    printf("sectors/cluster %d, ", hdr->BPB_SecPerClus);
-    printf("sectors %d, ", hdr->BPB_TotSec32);
-    printf("sectors %d, ", hdr->BPB_TotSec32);
-    printf("sectors/FAT %d, ", hdr->BPB_FATSz32);
-    printf("serial number 0x%x\n", hdr->BS_VolID);
     return hdr;
 
 release:
@@ -83,4 +76,9 @@ release:
 }
 
 void dump_bmp() {
+	u32 bytes_per_clus   = hdr->BPB_SecPerClus * hdr->BPB_BytsPerSec;
+	u8 before_data_sec   = hdr->BPB_RsvdSecCnt + (hdr->BPB_NumFATs * hdr->BPB_FATSz32);
+	u8 *clus_begin       = (u8 *)hdr + before_data_sec * hdr->BPB_BytsPerSec;
+	u8 *clus_end         = (u8 *)hdr + hdr->BPB_TotSec32 * hdr->BPB_BytsPerSec;
+	printf("%u\n", hdr->BPB_TotSec32 / hdr->BPB_SecPerClus);
 }
