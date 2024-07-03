@@ -170,6 +170,7 @@ void dump_bmp() {
 				if (i + cnt_ldent >= dents_per_clus) continue; // cross cluster, abort
 
 				bmp_clus_id = dump_long_file_name(ldent, buf);
+				printf("%u ", bmp_clus_id);
 				ascii_printable_print(buf);
 				printf("\n");
 				i += cnt_ldent;
@@ -181,6 +182,7 @@ void dump_bmp() {
 				}
 
 				bmp_clus_id = dump_short_file_name(&dent[i], buf);
+				printf("%u ", bmp_clus_id);
 				ascii_printable_print(buf);
 				printf("\n");
 			}
