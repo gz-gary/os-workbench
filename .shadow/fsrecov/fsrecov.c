@@ -122,6 +122,7 @@ void dump_bmp() {
 	printf("%u\n", hdr->BPB_RsvdSecCnt);
 	printf("%u\n", hdr->BPB_NumFATs);
 	printf("%u\n", hdr->BPB_FATSz32);
+	printf("%u\n", hdr->BPB_NumFATs * hdr->BPB_FATSz32);
 	printf("%d\n", (int)((void *)clus_begin - (void *)hdr));
 	u32 clus_id = 2;
 	for (u8 *clus = clus_begin; clus < clus_end; clus += bytes_per_clus) {
