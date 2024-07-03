@@ -202,7 +202,7 @@ void dump_bmp() {
 
 			char tmp_file_name[256];
 			sprintf(tmp_file_name, "/tmp/fsrecov/%s", buf);
-			int bmp_fd = open(tmp_file_name, O_RDWR | O_CREAT);
+			int bmp_fd = open(tmp_file_name, O_RDWR | O_CREAT, 0666);
 			for (int j = 0; j < bmp_cnt_clus; ++j) {
 				if (bmp_clus_id + j < tot_clus) {
 					write(bmp_fd, locate_clus(bmp_clus_id + j), bytes_per_clus);
