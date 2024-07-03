@@ -143,7 +143,7 @@ void dump_bmp() {
 					buf[len++] = dent[i].DIR_Name[j];
 				}
 				buf[len++] = '\0';
-				if (ascii_printable(buf, len)) {
+				if (ascii_printable(buf, len - 1)) {
 					printf("%s\n", buf);
 				}
 			}
