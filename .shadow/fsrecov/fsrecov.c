@@ -114,7 +114,7 @@ int ascii_printable(const char *str) {
 void dump_long_file_name(struct fat32ldent *ldent, char *buf, int cnt_ldent) {
 	int len = 0;
 	for (int j = cnt_ldent - 1; j >= 0; --j) {
-		for (int k = 1; k <= 5; ++k)
+		/*for (int k = 1; k <= 5; ++k)
 			if (ldent[j].LDIR_Name1[k - 1] != '\0')
 				buf[len++] = ldent[j].LDIR_Name1[k - 1];
 
@@ -124,7 +124,7 @@ void dump_long_file_name(struct fat32ldent *ldent, char *buf, int cnt_ldent) {
 
 		for (int k = 12; k <= 13; ++k)
 			if (ldent[j].LDIR_Name3[k - 12] != '\0')
-				buf[len++] = ldent[j].LDIR_Name3[k - 12];
+				buf[len++] = ldent[j].LDIR_Name3[k - 12];*/
 	}
 	buf[len++] = '\0';
 }
