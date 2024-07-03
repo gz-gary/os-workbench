@@ -192,8 +192,7 @@ void dump_bmp() {
 			u32 bmp_cnt_clus = bmp_hdr->BMP_FileSz / bytes_per_clus;
 			if (bmp_hdr->BMP_FileSz % bytes_per_clus) ++bmp_cnt_clus;
 
-			printf("%u\t%u\t%s\tW=%u\tH=%u", tot_clus, bmp_clus_id, buf, bmp_hdr->BMP_Width, bmp_hdr->BMP_Height);
-
+			// printf("%u\t%u\t%s\tW=%u\tH=%u\n", tot_clus, bmp_clus_id, buf, bmp_hdr->BMP_Width, bmp_hdr->BMP_Height);
 			char tmp_file_name[256];
 			bzero(tmp_file_name, 256);
 			sprintf(tmp_file_name, "/tmp/fsrecov/%s", buf);
@@ -205,7 +204,15 @@ void dump_bmp() {
 			}
 
 			close(bmp_fd);
-			printf("\n");
+
+			char sha1sum_cmd[300];
+			char sha1sum_str[50];
+			bzero(sha1sum_cmd, 300);
+			sprintf(sha1sum_cmd, "/usr/bin/sha1sum %s", tmp_file_name);
+			fprintf(stderr, "%s", sha1sum_cmd);
+			// FILE *sha1sum_fp = popen(sha1sum_cmd, "r");
+			// fscanf(sha1sum_fp, "%s", sha1sum_str);
+			// pclose(sha1sum_fp);
 		}
 		// printf("%s ", idstr[clus_type[clus_id]]);
 		++clus_id;
