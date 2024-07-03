@@ -112,8 +112,9 @@ void ascii_printable_print(const char *str) {
 	}
 }
 
-void dump_long_file_name(struct fat32ldent *ldent, char *buf, int cnt_ldent) {
+u32 dump_long_file_name(struct fat32ldent *ldent, char *buf) {
 	int len = 0;
+	int cnt_ldent = ldent->LDIR_Ord ^ LAST_LONG_ENTRY;
 	for (int j = cnt_ldent - 1; j >= 0; --j) {
 		if (len >= 64) break;
 		for (int k = 1; k <= 5; ++k)
@@ -125,6 +126,15 @@ void dump_long_file_name(struct fat32ldent *ldent, char *buf, int cnt_ldent) {
 		for (int k = 12; k <= 13; ++k)
 			if (ldent[j].LDIR_Name3[k - 12] != '\0')
 				buf[len++] = ldent[j].LDIR_Name3[k - 12];
+	}
+	buf[len++] = '\0';
+}
+
+u32 dump_short_file_name(struct fat32dent *dent, char *buf) {
+	int len = 0;
+	for (int j = 0; j < 11; ++j) {
+		if (j == 8) buf[len++] = '.';
+		buf[len++] = dent->DIR_Name[j];
 	}
 	buf[len++] = '\0';
 }
@@ -145,14 +155,17 @@ void dump_bmp() {
 	for (u8 *clus = clus_begin; clus < clus_end; clus += bytes_per_clus) {
 		if (clus_type[clus_id] != CLUS_DENT) { ++clus_id; continue; }
 		struct fat32dent *dent = (struct fat32dent *)clus;
+		char buf[128];
+		u32 bmp_clus_id;
+
 		for (int i = 0; i < dents_per_clus; ++i) {
 			if ((dent[i].DIR_Attr & ATTR_LONG_NAME) == ATTR_LONG_NAME) { // this entry is a 'long name directory entry' 
 				struct fat32ldent *ldent = (struct fat32ldent *)&dent[i];
 				if ((ldent->LDIR_Ord & LAST_LONG_ENTRY) == 0) continue;
 				int cnt_ldent = ldent->LDIR_Ord ^ LAST_LONG_ENTRY;
-				if ((void *)(ldent + cnt_ldent) >= (void *)clus_end) continue; // cross cluster
-				char buf[128];
-				dump_long_file_name(ldent, buf, cnt_ldent);
+				if (i + cnt_ldent >= dents_per_clus) continue; // cross cluster, abort
+
+				bmp_clus_id = dump_long_file_name(ldent, buf);
 				ascii_printable_print(buf);
 				printf("\n");
 				i += cnt_ldent;
@@ -162,13 +175,8 @@ void dump_bmp() {
 					dent[i].DIR_Attr & ATTR_HIDDEN) {
 					continue;
 				}
-				int len = 0;
-				char buf[64];
-				for (int j = 0; j < 11; ++j) {
-					if (j == 8) buf[len++] = '.';
-					buf[len++] = dent[i].DIR_Name[j];
-				}
-				buf[len++] = '\0';
+
+				bmp_clus_id = dump_short_file_name(&dent[i], buf);
 				ascii_printable_print(buf);
 				printf("\n");
 			}
