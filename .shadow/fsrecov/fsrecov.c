@@ -192,11 +192,24 @@ void dump_bmp() {
 				  clus_type[bmp_clus_id] == CLUS_BMPHDR)) continue;
 
 			bmp_hdr = (struct bmp_hdr_t *)locate_clus(bmp_clus_id);
+			u32 bmp_cnt_clus = bmp_hdr->BMP_FileSz / bytes_per_clus;
+			if (bmp_hdr->BMP_FileSz % bytes_per_clus) ++bmp_cnt_clus;
 
 			printf("%u %u ", tot_clus, bmp_clus_id);
 			ascii_printable_print(buf);
 			printf(" ");
 			printf("W=%u H=%u", bmp_hdr->BMP_Width, bmp_hdr->BMP_Height);
+
+			char tmp_file_name[128];
+			sprintf(tmp_file_name, "/tmp/fsrecov/%s", buf);
+			int bmp_fd = open(tmp_file_name, O_RDWR | O_CREAT);
+			for (int j = 0; j < bmp_cnt_clus; ++j) {
+				if (bmp_clus_id + j < tot_clus) {
+					write(bmp_fd, locate_clus(bmp_clus_id + j), bytes_per_clus);
+				}
+			}
+
+			close(bmp_fd);
 			printf("\n");
 		}
 		// printf("%s ", idstr[clus_type[clus_id]]);
