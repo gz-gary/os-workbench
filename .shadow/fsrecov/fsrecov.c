@@ -131,7 +131,7 @@ u32 dump_long_file_name(struct fat32ldent *ldent, char *buf) {
 			if (ldent[j].LDIR_Name3[k - 12] != '\0')
 				buf[len++] = ldent[j].LDIR_Name3[k - 12];
 	}
-	buf[len++] = '\0';
+	buf[len] = '\0';
 
 	struct fat32dent *dent = (struct fat32dent *)(ldent + cnt_ldent);
 	return (dent->DIR_FstClusHI << 16) | (dent->DIR_FstClusLO);
@@ -143,7 +143,7 @@ u32 dump_short_file_name(struct fat32dent *dent, char *buf) {
 		if (j == 8) buf[len++] = '.';
 		buf[len++] = dent->DIR_Name[j];
 	}
-	buf[len++] = '\0';
+	buf[len] = '\0';
 	return (dent->DIR_FstClusHI << 16) | (dent->DIR_FstClusLO);
 }
 
@@ -165,6 +165,7 @@ void dump_bmp() {
 		if (clus_type[clus_id] != CLUS_DENT) { ++clus_id; continue; }
 		struct fat32dent *dent = (struct fat32dent *)clus;
 		char buf[128];
+		bzero(buf, 128);
 		u32 bmp_clus_id;
 		struct bmp_hdr_t *bmp_hdr;
 
