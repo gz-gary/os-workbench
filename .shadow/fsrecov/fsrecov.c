@@ -118,7 +118,7 @@ void dump_bmp() {
 	before_data_sec  = hdr->BPB_RsvdSecCnt + (hdr->BPB_NumFATs * hdr->BPB_FATSz32);
 	clus_begin       = (u8 *)hdr + before_data_sec * hdr->BPB_BytsPerSec;
 	clus_end         = (u8 *)hdr + hdr->BPB_TotSec32 * hdr->BPB_BytsPerSec;
-	printf("%lu\n", (void *)clus_begin - (void *)hdr);
+	printf("%ld\n", (void *)clus_begin - (void *)hdr);
 	u32 clus_id = 2;
 	for (u8 *clus = clus_begin; clus < clus_end; clus += bytes_per_clus) {
 		clus_type[clus_id] = probe_clus_type(clus);
