@@ -51,7 +51,7 @@ struct fat32dent {
     u32 DIR_FileSize;
 } __attribute__((packed));
 
-struct fat32dent_long {
+struct fat32ldent {
 	u8 LDIR_Ord;
 	u16 LDIR_Name1[5];
 	u8 LDIR_Attr;
@@ -73,3 +73,5 @@ struct fat32dent_long {
 
 #define ATTR_LONG_NAME (ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID)
 #define ATTR_LONG_NAME_MASK (ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID | ATTR_DIRECTORY | ATTR_ARCHIVE)
+
+#define LAST_LONG_ENTRY 0x40

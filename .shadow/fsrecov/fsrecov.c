@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 	assert(argc == 2);
 	assert(sizeof(struct fat32hdr) == 512);
 	assert(sizeof(struct fat32dent) == 32);
-	assert(sizeof(struct fat32dent_long) == 32);
+	assert(sizeof(struct fat32ldent) == 32);
 	setbuf(stdout, NULL);
 
 	hdr = mmap_disk(argv[1]);
@@ -134,8 +134,25 @@ void dump_bmp() {
 				continue;
 			}
 
-			if ((dent[i].DIR_Attr & ATTR_LONG_NAME_MASK) == ATTR_LONG_NAME) { // this entry got a long name
-			} else { // this entry got a short name
+			if ((dent[i].DIR_Attr & ATTR_LONG_NAME_MASK) == ATTR_LONG_NAME) { // this entry is a 'long name directory entry' 
+				struct fat32ldent *ldent = (struct fat32ldent *)&dent[i];
+				if (!(ldent->LDIR_Ord & LAST_LONG_ENTRY)) continue;
+				int idx = ldent->LDIR_Ord ^ LAST_LONG_ENTRY;
+				if ((void *)(dent + i + idx) > (void *)clus_end) continue; // cross cluster
+				int len = 0;
+				char buf[64];
+				for (int j = 0; j < idx; ++j) {
+					len = 0;
+					for (int k = 1; k <= 5; ++k) buf[len++] = ldent[j].LDIR_Name1[k - 1];
+					for (int k = 6; k <= 11; ++k) buf[len++] = ldent[j].LDIR_Name2[k - 6];
+					for (int k = 12; k <= 13; ++k) buf[len++] = ldent[j].LDIR_Name3[k - 12];
+					buf[len++] = '\0';
+					if (ascii_printable(buf, len - 1)) {
+						printf("%s\n", buf);
+					}
+				}
+				i += idx;
+			} else { // this entry is a 'short name directory entry'
 				int len = 0;
 				char buf[64];
 				for (int j = 0; j < 11; ++j) {
