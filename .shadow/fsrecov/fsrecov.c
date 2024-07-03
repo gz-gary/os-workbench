@@ -151,10 +151,10 @@ void dump_bmp() {
 				if ((ldent->LDIR_Ord & LAST_LONG_ENTRY) == 0) continue;
 				int cnt_ldent = ldent->LDIR_Ord ^ LAST_LONG_ENTRY;
 				if ((void *)(ldent + cnt_ldent) >= (void *)clus_end) continue; // cross cluster
-				printf("%d\n", cnt_ldent);
 				char buf[128];
 				dump_long_file_name(ldent, buf, cnt_ldent);
 				ascii_printable_print(buf);
+				printf("\n");
 				i += cnt_ldent;
 			} else { // this entry is a 'short name directory entry'
 				if (dent[i].DIR_Name[0] == 0x00 ||
@@ -170,6 +170,7 @@ void dump_bmp() {
 				}
 				buf[len++] = '\0';
 				ascii_printable_print(buf);
+				printf("\n");
 			}
 		}
 		// printf("%s ", idstr[clus_type[clus_id]]);
