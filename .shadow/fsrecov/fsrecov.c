@@ -103,13 +103,8 @@ clus_type_t probe_clus_type(u8 *clus) {
 	return CLUS_BMPDATA;
 }
 
-void ascii_printable_print(const char *str) {
-	int len = strlen(str);
-	for (int i = 0; i < len; ++i) {
-		if (str[i] >= ' ' && str[i] <= '~') {
-			putchar(str[i]);
-		}
-	}
+int ascii_printable(char ch) {
+	return ch == '\0' || (ch >= ' ' && ch <= '~');
 }
 
 u8 *locate_clus(u32 clus_id) {
@@ -122,13 +117,13 @@ u32 dump_long_file_name(struct fat32ldent *ldent, char *buf) {
 	for (int j = cnt_ldent - 1; j >= 0; --j) {
 		if (len >= 64) break;
 		for (int k = 1; k <= 5; ++k)
-			if (ldent[j].LDIR_Name1[k - 1] != '\0')
+			if (ascii_printable(ldent[j].LDIR_Name1[k - 1]))
 				buf[len++] = ldent[j].LDIR_Name1[k - 1];
 		for (int k = 6; k <= 11; ++k)
-			if (ldent[j].LDIR_Name2[k - 6] != '\0')
+			if (ascii_printable(ldent[j].LDIR_Name2[k - 6]))
 				buf[len++] = ldent[j].LDIR_Name2[k - 6];
 		for (int k = 12; k <= 13; ++k)
-			if (ldent[j].LDIR_Name3[k - 12] != '\0')
+			if (ascii_printable(ldent[j].LDIR_Name3[k - 12]))
 				buf[len++] = ldent[j].LDIR_Name3[k - 12];
 	}
 	buf[len] = '\0';
@@ -141,7 +136,8 @@ u32 dump_short_file_name(struct fat32dent *dent, char *buf) {
 	int len = 0;
 	for (int j = 0; j < 11; ++j) {
 		if (j == 8) buf[len++] = '.';
-		buf[len++] = dent->DIR_Name[j];
+		if (ascii_printable(dent->DIR_Name[j]))
+			buf[len++] = dent->DIR_Name[j];
 	}
 	buf[len] = '\0';
 	return (dent->DIR_FstClusHI << 16) | (dent->DIR_FstClusLO);
@@ -197,7 +193,7 @@ void dump_bmp() {
 			if (bmp_hdr->BMP_FileSz % bytes_per_clus) ++bmp_cnt_clus;
 
 			printf("%u %u ", tot_clus, bmp_clus_id);
-			ascii_printable_print(buf);
+			printf("%s", buf);
 			printf(" ");
 			printf("W=%u H=%u", bmp_hdr->BMP_Width, bmp_hdr->BMP_Height);
 
