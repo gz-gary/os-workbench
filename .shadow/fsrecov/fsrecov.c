@@ -10,19 +10,6 @@
 #include "fat32.h"
 #define MAX_CLUS 20000
 
-#define ATTR_LONG_NAME (ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID)
-#define ATTR_LONG_NAME_MASK (ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID | ATTR_DIRECTORY | ATTR_ARCHIVE)
-
-struct fat32dent_long {
-	u8 LDIR_Ord;
-	u16 LDIR_Name1[5];
-	u8 LDIR_Attr;
-	u8 LDIR_Type;
-	u8 LDIR_Chksum;
-	u16 LDIR_Name2[6];
-	u16 LDIR_FstClusLO;
-	u16 LDIR_Name3[2];
-} __attribute__((packed));
 
 struct fat32hdr *hdr;
 u32 bytes_per_clus;
@@ -116,6 +103,13 @@ clus_type_t probe_clus_type(u8 *clus) {
 	return CLUS_BMPDATA;
 }
 
+int ascii_printable(const char *str, int len) {
+	for (int i = 0; i < len; ++i) {
+		if (str[i] < ' ' || str[i] > '~') return 0;
+	}
+	return 1;
+}
+
 void dump_bmp() {
 	bytes_per_clus   = hdr->BPB_SecPerClus * hdr->BPB_BytsPerSec;
 	before_data_sec  = hdr->BPB_RsvdSecCnt + ((hdr->BPB_NumFATs) * (hdr->BPB_FATSz32));
@@ -149,7 +143,9 @@ void dump_bmp() {
 					buf[len++] = dent[i].DIR_Name[j];
 				}
 				buf[len++] = '\0';
-				printf("%s\n", buf);
+				if (ascii_printable(buf, len)) {
+					printf("%s\n", buf);
+				}
 			}
 		}
 		// printf("%s ", idstr[clus_type[clus_id]]);
