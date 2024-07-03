@@ -201,6 +201,7 @@ void dump_bmp() {
 			printf("W=%u H=%u", bmp_hdr->BMP_Width, bmp_hdr->BMP_Height);
 
 			char tmp_file_name[256];
+			bzero(tmp_file_name, 256);
 			sprintf(tmp_file_name, "/tmp/fsrecov/%s", buf);
 			int bmp_fd = open(tmp_file_name, O_RDWR | O_CREAT, 0666);
 			for (int j = 0; j < bmp_cnt_clus; ++j) {
