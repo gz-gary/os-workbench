@@ -115,7 +115,7 @@ clus_type_t probe_clus_type(u8 *clus) {
 
 void dump_bmp() {
 	bytes_per_clus   = hdr->BPB_SecPerClus * hdr->BPB_BytsPerSec;
-	before_data_sec  = hdr->BPB_RsvdSecCnt + (hdr->BPB_NumFATs * hdr->BPB_FATSz32);
+	before_data_sec  = hdr->BPB_RsvdSecCnt + ((hdr->BPB_NumFATs) * (hdr->BPB_FATSz32));
 	clus_begin       = (u8 *)hdr + before_data_sec * hdr->BPB_BytsPerSec;
 	clus_end         = (u8 *)hdr + hdr->BPB_TotSec32 * hdr->BPB_BytsPerSec;
 	printf("%u\n", before_data_sec);
