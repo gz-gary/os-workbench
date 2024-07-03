@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <sys/mman.h>
@@ -10,6 +11,7 @@
 #define MAX_CLUS 20000
 
 #define ATTR_LONG_NAME (ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID)
+#define ATTR_LONG_NAME_MASK (ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID | ATTR_DIRECTORY | ATTR_ARCHIVE)
 
 struct fat32dent_long {
 	u8 LDIR_Ord;
@@ -27,6 +29,7 @@ u32 bytes_per_clus;
 u32 before_data_sec;
 u8 *clus_begin;
 u8 *clus_end;
+u32 dents_per_clus;
 
 void* mmap_disk(const char *filename);
 void dump_bmp();
@@ -118,11 +121,38 @@ void dump_bmp() {
 	before_data_sec  = hdr->BPB_RsvdSecCnt + ((hdr->BPB_NumFATs) * (hdr->BPB_FATSz32));
 	clus_begin       = (u8 *)hdr + before_data_sec * hdr->BPB_BytsPerSec;
 	clus_end         = (u8 *)hdr + hdr->BPB_TotSec32 * hdr->BPB_BytsPerSec;
-	u32 clus_id = 2;
+	dents_per_clus   = bytes_per_clus / sizeof(struct fat32dent);
+
+	u32 clus_id = 0;
 	for (u8 *clus = clus_begin; clus < clus_end; clus += bytes_per_clus) {
 		clus_type[clus_id] = probe_clus_type(clus);
-		printf("%s ", idstr[clus_type[clus_id]]);
+		// printf("%s ", idstr[clus_type[clus_id]]);
 		++clus_id;
 	}
-	// printf("%u\n", hdr->BPB_TotSec32 / hdr->BPB_SecPerClus);
+	clus_id = 0;
+	for (u8 *clus = clus_begin; clus < clus_end; clus += bytes_per_clus) {
+		if (clus_type[clus_id] != CLUS_DENT) { ++clus_id; continue; }
+		struct fat32dent *dent = (struct fat32dent *)clus;
+		for (int i = 0; i < dents_per_clus; ++i) {
+			if (dent[i].DIR_Name[0] == 0x00 ||
+				dent[i].DIR_Name[0] == 0xE5 ||
+				dent[i].DIR_Attr & ATTR_HIDDEN) {
+				continue;
+			}
+
+			if ((dent[i].DIR_Attr & ATTR_LONG_NAME_MASK) == ATTR_LONG_NAME) { // this entry got a long name
+			} else { // this entry got a short name
+				int len = 0;
+				char buf[64];
+				for (int j = 0; j < 11; ++j) {
+					if (j == 8) buf[len++] = '.';
+					buf[len++] = dent[i].DIR_Name[j];
+				}
+				buf[len++] = '\0';
+				printf("%s\n", buf);
+			}
+		}
+		// printf("%s ", idstr[clus_type[clus_id]]);
+		++clus_id;
+	}
 }
