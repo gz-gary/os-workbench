@@ -17,6 +17,7 @@ u32 before_data_sec;
 u8 *clus_begin;
 u8 *clus_end;
 u32 dents_per_clus;
+u32 tot_clus;
 
 void* mmap_disk(const char *filename);
 void dump_bmp();
@@ -149,13 +150,14 @@ void dump_bmp() {
 	clus_begin       = (u8 *)hdr + before_data_sec * hdr->BPB_BytsPerSec;
 	clus_end         = (u8 *)hdr + hdr->BPB_TotSec32 * hdr->BPB_BytsPerSec;
 	dents_per_clus   = bytes_per_clus / sizeof(struct fat32dent);
+	tot_clus         = (clus_end - clus_begin) / bytes_per_clus;
 
-	u32 clus_id = 0;
+	u32 clus_id = 2;
 	for (u8 *clus = clus_begin; clus < clus_end; clus += bytes_per_clus) {
 		clus_type[clus_id] = probe_clus_type(clus);
 		++clus_id;
 	}
-	clus_id = 0;
+	clus_id = 2;
 	for (u8 *clus = clus_begin; clus < clus_end; clus += bytes_per_clus) {
 		if (clus_type[clus_id] != CLUS_DENT) { ++clus_id; continue; }
 		struct fat32dent *dent = (struct fat32dent *)clus;
@@ -170,9 +172,6 @@ void dump_bmp() {
 				if (i + cnt_ldent >= dents_per_clus) continue; // cross cluster, abort
 
 				bmp_clus_id = dump_long_file_name(ldent, buf);
-				printf("%u ", bmp_clus_id);
-				ascii_printable_print(buf);
-				printf("\n");
 				i += cnt_ldent;
 			} else { // this entry is a 'short name directory entry'
 				if (dent[i].DIR_Name[0] == 0x00 ||
@@ -182,10 +181,15 @@ void dump_bmp() {
 				}
 
 				bmp_clus_id = dump_short_file_name(&dent[i], buf);
-				printf("%u ", bmp_clus_id);
-				ascii_printable_print(buf);
-				printf("\n");
 			}
+			
+			if (!(bmp_clus_id >= 2 &&
+				  bmp_clus_id < tot_clus &&
+				  clus_type[bmp_clus_id] == CLUS_BMPDATA)) continue;
+
+			printf("%u ", bmp_clus_id);
+			ascii_printable_print(buf);
+			printf("\n");
 		}
 		// printf("%s ", idstr[clus_type[clus_id]]);
 		++clus_id;
