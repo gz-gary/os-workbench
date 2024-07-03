@@ -137,14 +137,13 @@ void dump_bmp() {
 				int len = 0;
 				char buf[64];
 				for (int j = idx - 1; j >= 0; --j) {
-					len = 0;
 					for (int k = 1; k <= 5; ++k) buf[len++] = ldent[j].LDIR_Name1[k - 1];
 					for (int k = 6; k <= 11; ++k) buf[len++] = ldent[j].LDIR_Name2[k - 6];
 					for (int k = 12; k <= 13; ++k) buf[len++] = ldent[j].LDIR_Name3[k - 12];
-					buf[len++] = '\0';
-					if (ascii_printable(buf, len - 1)) {
-						printf("[Long file name]: %s\n", buf);
-					}
+				}
+				buf[len++] = '\0';
+				if (ascii_printable(buf, len - 1)) {
+					printf("[Long file name]: %s\n", buf);
 				}
 				i += idx;
 			} else { // this entry is a 'short name directory entry'
