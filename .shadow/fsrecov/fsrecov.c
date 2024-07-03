@@ -22,19 +22,15 @@ void* mmap_disk(const char *filename);
 void dump_bmp();
 
 int main(int argc, char *argv[]) {
-	assert(argc == 2);
-	assert(sizeof(struct fat32hdr) == 512);
-	assert(sizeof(struct fat32dent) == 32);
-	assert(sizeof(struct fat32ldent) == 32);
-	assert(sizeof(struct bmp_hdr_t) == 0x36);
+	assert(argc >= 2);
+	assert(sizeof(struct fat32hdr)     == 512);
+	assert(sizeof(struct fat32dent)    == 32);
+	assert(sizeof(struct fat32ldent)   == 32);
+	assert(sizeof(struct bmp_hdr_t)    == 0x36);
 	setbuf(stdout, NULL);
 
 	hdr = mmap_disk(argv[1]);
-	assert(hdr->BPB_BytsPerSec == 512);
-	assert(hdr->BPB_SecPerClus == 8);
-
 	dump_bmp();
-
 	munmap(hdr, hdr->BPB_TotSec32 * hdr->BPB_BytsPerSec);
 	return 0;
 }
@@ -71,19 +67,6 @@ release:
     exit(1);
 }
 
-typedef enum {
-	CLUS_DENT = 0,
-	CLUS_BMPHDR,
-	CLUS_BMPDATA,
-	CLUS_OTHERS
-} clus_type_t;
-char idstr[4][20] = {
-	"CLUS_DENT",
-	"CLUS_BMPHDR",
-	"CLUS_BMPDATA",
-	"CLUS_OTHERS"
-};
-
 clus_type_t clus_type[MAX_CLUS];
 
 clus_type_t probe_clus_type(u8 *clus) {
@@ -96,11 +79,11 @@ clus_type_t probe_clus_type(u8 *clus) {
 			++cnt_bmp;
 		}
 	}
+	if (cnt_bmp >= 3) return CLUS_DENT;
 
 	for (int i = 0; i < bytes_per_clus; ++i) if (clus[i] == 0) ++cnt_zero;
-
-	if (cnt_bmp >= 3) return CLUS_DENT;
 	if (cnt_zero == bytes_per_clus) return CLUS_OTHERS;
+
 	return CLUS_BMPDATA;
 }
 

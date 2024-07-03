@@ -52,15 +52,28 @@ struct fat32dent {
 } __attribute__((packed));
 
 struct fat32ldent {
-	u8 LDIR_Ord;
-	u16 LDIR_Name1[5];
-	u8 LDIR_Attr;
-	u8 LDIR_Type;
-	u8 LDIR_Chksum;
-	u16 LDIR_Name2[6];
-	u16 LDIR_FstClusLO;
-	u16 LDIR_Name3[2];
+    u8  LDIR_Ord;
+    u16 LDIR_Name1[5];
+    u8  LDIR_Attr;
+    u8  LDIR_Type;
+    u8  LDIR_Chksum;
+    u16 LDIR_Name2[6];
+    u16 LDIR_FstClusLO;
+    u16 LDIR_Name3[2];
 } __attribute__((packed));
+
+typedef enum {
+    CLUS_DENT = 0,
+    CLUS_BMPHDR,
+    CLUS_BMPDATA,
+    CLUS_OTHERS
+} clus_type_t;
+/*char idstr[4][20] = {
+    "CLUS_DENT",
+    "CLUS_BMPHDR",
+    "CLUS_BMPDATA",
+    "CLUS_OTHERS"
+};*/
 
 #define CLUS_INVALID   0xffffff7
 
@@ -75,6 +88,7 @@ struct fat32ldent {
 #define ATTR_LONG_NAME_MASK (ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID | ATTR_DIRECTORY | ATTR_ARCHIVE)
 
 #define MAX_CLUS 20000
+#define LAST_LONG_ENTRY 0x40
 
 struct bmp_pixel {
     u8 b, g, r;
@@ -99,4 +113,3 @@ struct bmp_hdr_t {
     u32   BMP_ImportantCols;
     struct bmp_pixel pixels[0];
 } __attribute__((packed));
-#define LAST_LONG_ENTRY 0x40
