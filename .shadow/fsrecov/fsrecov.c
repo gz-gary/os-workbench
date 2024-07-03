@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <strings.h>
 #include <sys/mman.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -208,11 +209,13 @@ void dump_bmp() {
 			char sha1sum_cmd[300];
 			char sha1sum_str[50];
 			bzero(sha1sum_cmd, 300);
+			bzero(sha1sum_str, 50);
 			sprintf(sha1sum_cmd, "/usr/bin/sha1sum %s", tmp_file_name);
-			fprintf(stderr, "%s", sha1sum_cmd);
-			// FILE *sha1sum_fp = popen(sha1sum_cmd, "r");
-			// fscanf(sha1sum_fp, "%s", sha1sum_str);
-			// pclose(sha1sum_fp);
+			FILE *sha1sum_fp = popen(sha1sum_cmd, "r");
+			fscanf(sha1sum_fp, "%s", sha1sum_str);
+			pclose(sha1sum_fp);
+
+			fprintf(stderr, "%s %s\n", sha1sum_str, buf);
 		}
 		// printf("%s ", idstr[clus_type[clus_id]]);
 		++clus_id;
