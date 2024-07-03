@@ -128,12 +128,6 @@ void dump_bmp() {
 		if (clus_type[clus_id] != CLUS_DENT) { ++clus_id; continue; }
 		struct fat32dent *dent = (struct fat32dent *)clus;
 		for (int i = 0; i < dents_per_clus; ++i) {
-			if (dent[i].DIR_Name[0] == 0x00 ||
-				dent[i].DIR_Name[0] == 0xE5 ||
-				dent[i].DIR_Attr & ATTR_HIDDEN) {
-				continue;
-			}
-
 			if ((dent[i].DIR_Attr & ATTR_LONG_NAME) == ATTR_LONG_NAME) { // this entry is a 'long name directory entry' 
 				struct fat32ldent *ldent = (struct fat32ldent *)&dent[i];
 				if ((ldent->LDIR_Ord & LAST_LONG_ENTRY) == 0) continue;
@@ -153,7 +147,11 @@ void dump_bmp() {
 				}
 				i += idx;
 			} else { // this entry is a 'short name directory entry'
-				printf("%02x\n", dent[i].DIR_Attr);
+				if (dent[i].DIR_Name[0] == 0x00 ||
+					dent[i].DIR_Name[0] == 0xE5 ||
+					dent[i].DIR_Attr & ATTR_HIDDEN) {
+					continue;
+				}
 				int len = 0;
 				char buf[64];
 				for (int j = 0; j < 11; ++j) {
