@@ -135,7 +135,6 @@ void dump_bmp() {
 			}
 
 			if ((dent[i].DIR_Attr & ATTR_LONG_NAME_MASK) == ATTR_LONG_NAME) { // this entry is a 'long name directory entry' 
-				printf("[Long file name]\n");
 				struct fat32ldent *ldent = (struct fat32ldent *)&dent[i];
 				if ((ldent->LDIR_Ord & LAST_LONG_ENTRY) == 0) continue;
 				int idx = ldent->LDIR_Ord ^ LAST_LONG_ENTRY;
@@ -154,6 +153,7 @@ void dump_bmp() {
 				}
 				i += idx;
 			} else { // this entry is a 'short name directory entry'
+				printf("[Short file name]\n");
 				int len = 0;
 				char buf[64];
 				for (int j = 0; j < 11; ++j) {
