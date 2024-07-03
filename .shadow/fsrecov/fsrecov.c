@@ -103,25 +103,25 @@ clus_type_t probe_clus_type(u8 *clus) {
 	return CLUS_BMPDATA;
 }
 
-int ascii_printable(const char *str) {
+void ascii_printable_print(const char *str) {
 	int len = strlen(str);
 	for (int i = 0; i < len; ++i) {
-		if (str[i] != '\0' && (str[i] < ' ' || str[i] > '~')) return 0;
+		if (str[i] >= ' ' && str[i] <= '~') {
+			putchar(str[i]);
+		}
 	}
-	return 1;
 }
 
 void dump_long_file_name(struct fat32ldent *ldent, char *buf, int cnt_ldent) {
 	int len = 0;
 	for (int j = cnt_ldent - 1; j >= 0; --j) {
+		if (len >= 64) break;
 		for (int k = 1; k <= 5; ++k)
 			if (ldent[j].LDIR_Name1[k - 1] != '\0')
 				buf[len++] = ldent[j].LDIR_Name1[k - 1];
-
 		for (int k = 6; k <= 11; ++k)
 			if (ldent[j].LDIR_Name2[k - 6] != '\0')
 				buf[len++] = ldent[j].LDIR_Name2[k - 6];
-
 		for (int k = 12; k <= 13; ++k)
 			if (ldent[j].LDIR_Name3[k - 12] != '\0')
 				buf[len++] = ldent[j].LDIR_Name3[k - 12];
@@ -139,7 +139,6 @@ void dump_bmp() {
 	u32 clus_id = 0;
 	for (u8 *clus = clus_begin; clus < clus_end; clus += bytes_per_clus) {
 		clus_type[clus_id] = probe_clus_type(clus);
-		// printf("%s ", idstr[clus_type[clus_id]]);
 		++clus_id;
 	}
 	clus_id = 0;
@@ -153,9 +152,9 @@ void dump_bmp() {
 				int cnt_ldent = ldent->LDIR_Ord ^ LAST_LONG_ENTRY;
 				if ((void *)(ldent + cnt_ldent) >= (void *)clus_end) continue; // cross cluster
 				printf("%d\n", cnt_ldent);
-				char buf[256];
+				char buf[128];
 				dump_long_file_name(ldent, buf, cnt_ldent);
-				printf("[Long file name]: %s\n", buf);
+				ascii_printable_print(buf);
 				i += cnt_ldent;
 			} else { // this entry is a 'short name directory entry'
 				if (dent[i].DIR_Name[0] == 0x00 ||
@@ -170,9 +169,7 @@ void dump_bmp() {
 					buf[len++] = dent[i].DIR_Name[j];
 				}
 				buf[len++] = '\0';
-				if (ascii_printable(buf)) {
-					printf("%s\n", buf);
-				}
+				ascii_printable_print(buf);
 			}
 		}
 		// printf("%s ", idstr[clus_type[clus_id]]);
