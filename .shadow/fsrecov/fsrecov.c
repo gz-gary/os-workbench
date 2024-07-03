@@ -192,10 +192,7 @@ void dump_bmp() {
 			u32 bmp_cnt_clus = bmp_hdr->BMP_FileSz / bytes_per_clus;
 			if (bmp_hdr->BMP_FileSz % bytes_per_clus) ++bmp_cnt_clus;
 
-			printf("%u %u ", tot_clus, bmp_clus_id);
-			printf("%s", buf);
-			printf(" ");
-			printf("W=%u H=%u", bmp_hdr->BMP_Width, bmp_hdr->BMP_Height);
+			printf("%u\t%u\t%s\tW=%u\tH=%u", tot_clus, bmp_clus_id, buf, bmp_hdr->BMP_Width, bmp_hdr->BMP_Height);
 
 			char tmp_file_name[256];
 			bzero(tmp_file_name, 256);
