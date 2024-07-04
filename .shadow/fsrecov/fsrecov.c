@@ -178,8 +178,6 @@ void dump_bmp() {
         continue;
 
       bmp_hdr = (struct bmp_hdr_t *)locate_clus(bmp_clus_id);
-      u32 bmp_cnt_clus = bmp_hdr->BMP_FileSz / bytes_per_clus;
-      if (bmp_hdr->BMP_FileSz % bytes_per_clus > 0) ++bmp_cnt_clus;
       u32 bmp_bytes_left = bmp_hdr->BMP_FileSz;
 
       // printf("%u\t%u\t%s\tW=%u\tH=%u\n", tot_clus, bmp_clus_id, buf,
@@ -201,21 +199,11 @@ void dump_bmp() {
         }
         ++j;
       }
-      /*for (int j = 0; j < bmp_cnt_clus; ++j) {
-        if (bmp_clus_id + j < tot_clus) {
-          if (bmp_bytes_left < bytes_per_clus) {
-            write(bmp_fd, locate_clus(bmp_clus_id + j), bmp_bytes_left);
-          } else {
-            write(bmp_fd, locate_clus(bmp_clus_id + j), bytes_per_clus);
-            bmp_bytes_left -= bytes_per_clus;
-          }
-        }
-      }*/
       close(bmp_fd);
 
-      char sha1sum_cmd[300];
+      char sha1sum_cmd[512];
       char sha1sum_str[50];
-      bzero(sha1sum_cmd, 300);
+      bzero(sha1sum_cmd, 512);
       bzero(sha1sum_str, 50);
       sprintf(sha1sum_cmd, "/usr/bin/sha1sum %s", tmp_file_name);
       FILE *sha1sum_fp = popen(sha1sum_cmd, "r");
