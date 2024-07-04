@@ -1,4 +1,5 @@
 // spin lock
+#include <common.h>
 #include <am.h>
 #include <spinlock.h>
 

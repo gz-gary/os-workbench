@@ -3,14 +3,6 @@
 #include <buddy.h>
 #include <chunklist.h>
 
-#ifdef TEST
-
-struct heap_t {
-    void *start, *end;
-} heap;
-
-#endif
-
 static void *kalloc(size_t size) {
     if (size > REJECT_THRESHOLD) return NULL;
 
@@ -84,8 +76,6 @@ static void setup_heap_layout() {
     }
 }
 
-#ifndef TEST
-
 static void pmm_init() {
     uintptr_t pmsize = (
         (uintptr_t)heap.end
@@ -101,34 +91,6 @@ static void pmm_init() {
     buddy_init();
     slab_init();
 }
-
-#else
-
-#define TEST_HEAP_SIZE 16 * 1024 * 1024 //32MiB
-
-static void pmm_init() {
-    char *ptr = malloc(TEST_HEAP_SIZE);
-    heap.start = ptr;
-    heap.end = ptr + TEST_HEAP_SIZE;
-    
-    uintptr_t pmsize = (
-        (uintptr_t)heap.end
-        - (uintptr_t)heap.start
-    );
-
-    printf(
-        "Got %ld MiB heap: [%p, %p)\n",
-        pmsize >> 20, heap.start, heap.end
-    );
-
-    /* ---------- */
-
-    setup_heap_layout();
-    buddy_init();
-    slab_init();
-}
-
-#endif
 
 MODULE_DEF(pmm) = {
     .init  = pmm_init,

@@ -1,10 +1,10 @@
 #ifndef SPINLOCK_H
 #define SPINLOCK_H
 
-typedef struct spinlock_t {
+struct spinlock {
     int flag;
     int owner;
-} spinlock_t;
+};
 
 void spinlock_init(spinlock_t *spinlock);
 
