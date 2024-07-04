@@ -189,7 +189,19 @@ void dump_bmp() {
       sprintf(tmp_file_name, "/tmp/fsrecov/%s", buf);
       int bmp_fd = open(tmp_file_name, O_RDWR | O_CREAT, 0666);
       // if (bmp_fd == -1) perror("Fail to open file");
-      for (int j = 0; j < bmp_cnt_clus; ++j) {
+      int j = 0;
+      while (1) {
+        if (bmp_clus_id + j >= tot_clus) break;
+        if (bmp_bytes_left <= bytes_per_clus) {
+          write(bmp_fd, locate_clus(bmp_clus_id + j), bmp_bytes_left);
+          break;
+        } else {
+          write(bmp_fd, locate_clus(bmp_clus_id + j), bytes_per_clus);
+          bmp_bytes_left -= bytes_per_clus;
+        }
+        ++j;
+      }
+      /*for (int j = 0; j < bmp_cnt_clus; ++j) {
         if (bmp_clus_id + j < tot_clus) {
           if (bmp_bytes_left < bytes_per_clus) {
             write(bmp_fd, locate_clus(bmp_clus_id + j), bmp_bytes_left);
@@ -198,7 +210,7 @@ void dump_bmp() {
             bmp_bytes_left -= bytes_per_clus;
           }
         }
-      }
+      }*/
       close(bmp_fd);
 
       char sha1sum_cmd[300];
