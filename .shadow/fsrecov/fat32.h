@@ -63,10 +63,10 @@ struct fat32ldent {
 } __attribute__((packed));
 
 typedef enum {
-    CLUS_DENT = 0,
-    CLUS_BMPHDR,
-    CLUS_BMPDATA,
-    CLUS_OTHERS
+    CLUS_DENT = 1,
+    CLUS_BMPHDR = 2,
+    CLUS_BMPDATA = 4,
+    CLUS_OTHERS = 8
 } clus_type_t;
 /*char idstr[4][20] = {
     "CLUS_DENT",
