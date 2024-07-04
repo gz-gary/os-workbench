@@ -210,7 +210,7 @@ void dump_bmp() {
       fscanf(sha1sum_fp, "%s", sha1sum_str);
       pclose(sha1sum_fp);
 
-      printf("%s %s\n", sha1sum_str, buf);
+      printf("%s  %s\n", sha1sum_str, buf);
     }
     // printf("%s ", idstr[clus_type[clus_id]]);
     ++clus_id;
