@@ -184,7 +184,7 @@ void dump_bmp() {
       // bmp_hdr->BMP_Width, bmp_hdr->BMP_Height);
       char tmp_file_name[256];
       bzero(tmp_file_name, 256);
-      sprintf(tmp_file_name, "/tmp/fsrecov/%s", buf);
+      sprintf(tmp_file_name, "/tmp/fsrecov-%s", buf);
       int bmp_fd = open(tmp_file_name, O_RDWR | O_CREAT, 0666);
       // if (bmp_fd == -1) perror("Fail to open file");
       int j = 0;
@@ -205,7 +205,7 @@ void dump_bmp() {
       char sha1sum_str[50];
       bzero(sha1sum_cmd, 512);
       bzero(sha1sum_str, 50);
-      sprintf(sha1sum_cmd, "/usr/bin/sha1sum %s", tmp_file_name);
+      sprintf(sha1sum_cmd, "sha1sum %s", tmp_file_name);
       FILE *sha1sum_fp = popen(sha1sum_cmd, "r");
       fscanf(sha1sum_fp, "%s", sha1sum_str);
       pclose(sha1sum_fp);
