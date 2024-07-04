@@ -180,6 +180,7 @@ void dump_bmp() {
       bmp_hdr = (struct bmp_hdr_t *)locate_clus(bmp_clus_id);
       u32 bmp_cnt_clus = bmp_hdr->BMP_FileSz / bytes_per_clus;
       if (bmp_hdr->BMP_FileSz % bytes_per_clus > 0) ++bmp_cnt_clus;
+      u32 bmp_bytes_left = bmp_hdr->BMP_FileSz;
 
       // printf("%u\t%u\t%s\tW=%u\tH=%u\n", tot_clus, bmp_clus_id, buf,
       // bmp_hdr->BMP_Width, bmp_hdr->BMP_Height);
@@ -187,11 +188,15 @@ void dump_bmp() {
       bzero(tmp_file_name, 256);
       sprintf(tmp_file_name, "/tmp/fsrecov/%s", buf);
       int bmp_fd = open(tmp_file_name, O_RDWR | O_CREAT, 0666);
-      printf("[Name]: %s\n", tmp_file_name);
-      if (bmp_fd == -1) perror("Fail to open file");
+      // if (bmp_fd == -1) perror("Fail to open file");
       for (int j = 0; j < bmp_cnt_clus; ++j) {
         if (bmp_clus_id + j < tot_clus) {
-          write(bmp_fd, locate_clus(bmp_clus_id + j), bytes_per_clus);
+          if (bmp_bytes_left < bytes_per_clus) {
+            write(bmp_fd, locate_clus(bmp_clus_id + j), bmp_bytes_left);
+          } else {
+            write(bmp_fd, locate_clus(bmp_clus_id + j), bytes_per_clus);
+            bmp_bytes_left -= bytes_per_clus;
+          }
         }
       }
       close(bmp_fd);
@@ -205,7 +210,6 @@ void dump_bmp() {
       fscanf(sha1sum_fp, "%s", sha1sum_str);
       pclose(sha1sum_fp);
 
-      // fprintf(stderr, "%s %s\n", sha1sum_str, buf);
       printf("%s %s\n", sha1sum_str, buf);
     }
     // printf("%s ", idstr[clus_type[clus_id]]);
