@@ -70,6 +70,7 @@ release:
 }
 
 clus_type_t clus_type[MAX_CLUS];
+u8 clus_used[MAX_CLUS];
 
 clus_type_t probe_clus_type(u8 *clus) {
   if (clus[0] == 'B' && clus[1] == 'M') return CLUS_BMPHDR;
@@ -94,6 +95,19 @@ int ascii_printable(char ch) { return ch == '\0' || (ch >= ' ' && ch <= '~'); }
 
 u8 *locate_clus(u32 clus_id) {
   return clus_begin + (clus_id - 2) * bytes_per_clus;
+}
+
+int bmp_pics_len;
+struct bmp_pic_t {
+  char *file_name;
+  struct bmp_hdr_t *bmp_hdr;
+  u32 bmp_clus_id;
+} bmp_pics[MAX_CLUS];
+
+int cmp_bmp_pic(const void *left, const void *right) {
+  struct bmp_pic_t *l = (struct bmp_pic_t *)left;
+  struct bmp_pic_t *r = (struct bmp_pic_t *)right;
+  return l->bmp_clus_id < r->bmp_clus_id;
 }
 
 u32 dump_long_file_name(struct fat32ldent *ldent, char *buf) {
@@ -128,6 +142,8 @@ u32 dump_short_file_name(struct fat32dent *dent, char *buf) {
 }
 
 void dump_bmp() {
+  memset(clus_used, 0, sizeof(clus_used));
+
   bytes_per_clus = hdr->BPB_SecPerClus * hdr->BPB_BytsPerSec;
   before_data_sec =
       hdr->BPB_RsvdSecCnt + ((hdr->BPB_NumFATs) * (hdr->BPB_FATSz32));
@@ -177,31 +193,63 @@ void dump_bmp() {
             clus_type[bmp_clus_id] == CLUS_BMPHDR))
         continue;
 
+      bmp_pics[bmp_pics_len] = (struct bmp_pic_t) {
+        .bmp_clus_id = bmp_clus_id,
+        .bmp_hdr = (struct bmp_hdr_t *)locate_clus(bmp_clus_id),
+        .file_name = (char *)malloc(128),
+      };
+      strncpy(bmp_pics[bmp_pics_len].file_name, buf, 128);
+      ++bmp_pics_len;
+
       bmp_hdr = (struct bmp_hdr_t *)locate_clus(bmp_clus_id);
       u32 bmp_bytes_left = bmp_hdr->BMP_FileSz;
 
       // printf("%u\t%u\t%s\tW=%u\tH=%u\n", tot_clus, bmp_clus_id, buf,
       // bmp_hdr->BMP_Width, bmp_hdr->BMP_Height);
+    }
+    // printf("%s ", idstr[clus_type[clus_id]]);
+    ++clus_id;
+  }
+
+  qsort(bmp_pics, bmp_pics_len, sizeof(struct bmp_pic_t), cmp_bmp_pic);
+  for (int i = 0; i < bmp_pics_len; ++i) {
+
+      struct bmp_hdr_t *bmp_hdr = bmp_pics[i].bmp_hdr;
+      u32 bmp_clus_id = bmp_pics[i].bmp_clus_id;
+      clus_used[bmp_clus_id] = 1;
+      u32 bmp_bytes_left = bmp_hdr->BMP_FileSz;
+
       char tmp_file_name[256];
       bzero(tmp_file_name, 256);
-      sprintf(tmp_file_name, "/tmp/fsrecov-%s", buf);
+      sprintf(tmp_file_name, "/tmp/fsrecov-%s", bmp_pics[i].file_name);
       int bmp_fd = open(tmp_file_name, O_RDWR | O_CREAT, 0666);
       // if (bmp_fd == -1) perror("Fail to open file");
-      int j = 0;
-      while (1) {
-        if (bmp_clus_id + j >= tot_clus) break;
-        if (!(clus_type[bmp_clus_id + j] & (CLUS_BMPHDR | CLUS_BMPDATA))) {
-          ++j;
-          continue;
-        }
-        if (bmp_bytes_left <= bytes_per_clus) {
-          write(bmp_fd, locate_clus(bmp_clus_id + j), bmp_bytes_left);
-          break;
-        } else {
-          write(bmp_fd, locate_clus(bmp_clus_id + j), bytes_per_clus);
+      if (bmp_bytes_left <= bytes_per_clus) {
+          write(bmp_fd, locate_clus(bmp_clus_id), bmp_bytes_left);
+      } else {
+          write(bmp_fd, locate_clus(bmp_clus_id), bytes_per_clus);
           bmp_bytes_left -= bytes_per_clus;
+          int j = 1;
+          while (1) {
+            if (bmp_clus_id + j >= tot_clus) break;
+            if (!(clus_type[bmp_clus_id + j] & CLUS_BMPDATA)) {
+              ++j;
+              continue;
+            }
+            if (clus_used[bmp_clus_id + j]) {
+              ++j;
+              continue;
+            }
+            clus_used[bmp_clus_id + j] = 1;
+            if (bmp_bytes_left <= bytes_per_clus) {
+              write(bmp_fd, locate_clus(bmp_clus_id + j), bmp_bytes_left);
+              break;
+            } else {
+              write(bmp_fd, locate_clus(bmp_clus_id + j), bytes_per_clus);
+              bmp_bytes_left -= bytes_per_clus;
+            }
+            ++j;
         }
-        ++j;
       }
       close(bmp_fd);
 
@@ -214,9 +262,8 @@ void dump_bmp() {
       fscanf(sha1sum_fp, "%s", sha1sum_str);
       pclose(sha1sum_fp);
 
-      printf("%s  %s\n", sha1sum_str, buf);
-    }
-    // printf("%s ", idstr[clus_type[clus_id]]);
-    ++clus_id;
+      printf("%s  %s\n", sha1sum_str, bmp_pics[i].file_name);
+
+      free(bmp_pics[i].file_name);
   }
 }
