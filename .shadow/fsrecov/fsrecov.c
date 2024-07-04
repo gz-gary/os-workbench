@@ -190,7 +190,10 @@ void dump_bmp() {
       int j = 0;
       while (1) {
         if (bmp_clus_id + j >= tot_clus) break;
-        if (!(clus_type[bmp_clus_id + j] & (CLUS_BMPHDR | CLUS_BMPDATA))) continue;
+        if (!(clus_type[bmp_clus_id + j] & (CLUS_BMPHDR | CLUS_BMPDATA))) {
+          ++j;
+          continue;
+        }
         if (bmp_bytes_left <= bytes_per_clus) {
           write(bmp_fd, locate_clus(bmp_clus_id + j), bmp_bytes_left);
           break;
