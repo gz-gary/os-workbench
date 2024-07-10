@@ -1,4 +1,5 @@
 #include <common.h>
+#include <os.h>
 #include <slab.h>
 #include <buddy.h>
 

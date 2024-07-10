@@ -1,4 +1,5 @@
 // free space list
+#include <os.h>
 #include <common.h>
 #include <chunklist.h>
 

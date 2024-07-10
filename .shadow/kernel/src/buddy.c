@@ -1,8 +1,9 @@
 #include <common.h>
+#include <os.h>
 #include <buddy.h>
 #include <chunklist.h>
 
-spinlock_t big_kernel_lock;
+struct spinlock big_kernel_lock;
 
 void *buddy_alloc(size_t size) {
     size = (size - 1) / PAGE_SIZE + 1;
