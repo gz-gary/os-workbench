@@ -4,12 +4,15 @@
 struct spinlock {
     int flag;
     int owner;
+    const char *name;
 };
 
-void spinlock_init(spinlock_t *spinlock);
+void spinlock_init(struct spinlock *spinlock);
 
-void spinlock_lock(spinlock_t *spinlock);
+void spinlock_lock(struct spinlock *spinlock);
 
-void spinlock_unlock(spinlock_t *spinlock);
+void spinlock_unlock(struct spinlock *spinlock);
+
+bool holding(struct spinlock *spinlock);
 
 #endif

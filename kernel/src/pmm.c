@@ -2,6 +2,7 @@
 #include <slab.h>
 #include <buddy.h>
 #include <chunklist.h>
+#include <os.h>
 
 static void *kalloc(size_t size) {
     if (size > REJECT_THRESHOLD) return NULL;

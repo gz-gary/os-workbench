@@ -1,5 +1,4 @@
-#include <common.h>
-#include <spinlock.h>
+#include <os.h>
 
 static void os_init() {
     pmm->init();
@@ -13,7 +12,16 @@ static void os_run() {
     while (1) ;
 }
 
+static Context* os_trap(Event ev, Context *context) {
+    return NULL;
+}
+
+static void os_on_irq(int seq, int event, handler_t handler) {
+}
+
 MODULE_DEF(os) = {
-    .init = os_init,
-    .run  = os_run,
+    .init    = os_init,
+    .run     = os_run,
+    .trap    = os_trap,
+    .on_irq  = os_on_irq,
 };

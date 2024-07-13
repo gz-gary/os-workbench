@@ -15,7 +15,7 @@ struct piece_t {
 };
 
 struct slab_t {
-    spinlock_t lock;
+    struct spinlock lock;
     piece_t *head;
 };
 

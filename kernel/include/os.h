@@ -7,3 +7,11 @@
 // not present in kernel.h. 
 
 // Include these definitions in os.h.
+
+#define CPUS_LIMIT 16
+#include <kernel.h>
+#include <klib.h>
+#include <klib-macros.h>
+#include <spinlock.h>
+#include <semaphore.h>
+#include <task.h>
