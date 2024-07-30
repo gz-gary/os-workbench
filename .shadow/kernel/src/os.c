@@ -75,17 +75,16 @@ static void os_run() {
 }
 
 static Context* os_trap(Event ev, Context *context) {
-    // Context *new_context = NULL;
+    Context *new_context = NULL;
     for (int i = 0; i < cnt_handlers; ++i) {
         if (handlers[i].event == EVENT_NULL
             || handlers[i].event == ev.event) {
-            printf("%d ", i);
-            // Context *c = handlers[i].handler(ev, context);
-            // panic_on(c && new_context, "Multiple context returned");
-            // if (c) new_context = c;
+            Context *c = handlers[i].handler(ev, context);
+            panic_on(c && new_context, "Multiple context returned");
+            if (c) new_context = c;
         }
     }
-    // panic_on(!new_context, "No context retunred");
+    panic_on(!new_context, "No context retunred");
     // return new_context;
     return context;
 }
