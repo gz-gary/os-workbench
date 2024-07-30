@@ -32,19 +32,20 @@ static void os_init_handlers() {
     }
 }
 
-sem_t empty, fill;
-#define P kmt->sem_wait
-#define V kmt->sem_signal
-
 static inline task_t *task_alloc() {
     return pmm->alloc(sizeof(task_t));
 }
+
+#ifdef LOCAL_TEST
+
+sem_t empty, fill;
+#define P kmt->sem_wait
+#define V kmt->sem_signal
 
 void T_produce(void *arg) { while (1) { P(&empty); putch('('); V(&fill); } }
 void T_consume(void *arg) { while (1) { P(&fill); putch(')'); V(&empty); } }
 
 static void run_test1() {
-    return;
     int N = 100;
     int NPROD = 1;
     int NCONS = 1;
@@ -57,6 +58,8 @@ static void run_test1() {
         kmt->create(task_alloc(), "consumer", T_consume, NULL);
     }
 }
+
+#endif
 
 void T_idle(void *arg) { while (1); }
 
@@ -73,7 +76,9 @@ static void os_init() {
         current[i] = t;
     }
 
+#ifdef LOCAL_TEST
     run_test1();
+#endif
 
 }
 
