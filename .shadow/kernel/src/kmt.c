@@ -11,6 +11,7 @@ struct cpu_info_t cpu_info[CPUS_LIMIT];
 static Context *kmt_context_save(Event ev, Context *context) {
     int c = cpu_current();
     assert(current[c] != NULL);
+    assert(&(current[c]->context) != NULL);
     // kmt->spin_lock(&lock_tasks_list);
     current[c]->context = *context;
     current[c]->status = TASK_RUNABLE;
@@ -34,6 +35,7 @@ static int kmt_get_next_task(int tid) {
 static Context *kmt_schedule(Event ev, Context *context) {
     int c = cpu_current();
     assert(current[c] != NULL);
+    assert(&(current[c]->context) != NULL);
     // kmt->spin_lock(&lock_tasks_list);
     int next_tid = kmt_get_next_task(current[c]->tid);
     printf("\ncpu %d switch %d to %d\n", c, current[c]->tid, next_tid);
