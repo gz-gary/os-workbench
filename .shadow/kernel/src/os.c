@@ -43,11 +43,12 @@ static void os_run() {
     for (const char *s = "Hello World from CPU #*\n"; *s; s++) {
         putch(*s == '*' ? '0' + cpu_current() : *s);
     }
-    iset(false);
+    iset(true);
     while (1) ;
 }
 
 static Context* os_trap(Event ev, Context *context) {
+    /*
     Context *new_context = NULL;
     for (int i = 0; i < cnt_handlers; ++i) {
         if (handlers[i].event == EVENT_NULL
@@ -58,7 +59,9 @@ static Context* os_trap(Event ev, Context *context) {
         }
     }
     panic_on(!new_context, "No context retunred");
-    return new_context;
+    return new_context;*/
+    putch('i');
+    return context;
 }
 
 static void os_on_irq(int seq, int event, handler_t handler) {
