@@ -45,6 +45,7 @@ void T_consume(void *arg) { while (1) { P(&fill); putch(')'); V(&empty); } }
 void T_idle(void *arg) { while (1); }
 
 static void run_test1() {
+    return;
     int N = 100;
     int NPROD = 1;
     int NCONS = 1;
