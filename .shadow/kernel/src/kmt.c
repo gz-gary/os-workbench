@@ -20,7 +20,7 @@ static Context *kmt_context_save(Event ev, Context *context) {
 static int kmt_get_next_task(int tid) {
     int nxt_tid = tid < cnt_tasks - 1 ? tid + 1 : 0;
     while (1) {
-        if (tasks[nxt_tid]
+        if (tasks[nxt_tid] != NULL
             && tasks[nxt_tid]->status == TASK_RUNABLE) {
             break;
         }

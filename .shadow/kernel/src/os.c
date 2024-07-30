@@ -62,15 +62,15 @@ void T_consume(void *arg) {
 static void run_test1() {
     int N = 5;
     int NPROD = 1;
-    int NCONS = 1;
+    // int NCONS = 1;
     kmt->sem_init(&empty, "empty", N);
     kmt->sem_init(&fill, "fill", 0);
     for (int i = 0; i < NPROD; ++i) {
         kmt->create(task_alloc(), "producer", T_produce, NULL);
     }
-    for (int i = 0; i < NCONS; ++i) {
+    /*for (int i = 0; i < NCONS; ++i) {
         kmt->create(task_alloc(), "consumer", T_consume, NULL);
-    }
+    }*/
 }
 
 static void tty_reader(void *arg) {
