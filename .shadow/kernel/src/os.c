@@ -92,8 +92,8 @@ static Context* os_trap(Event ev, Context *context) {
         }
     }
     panic_on(!new_context, "No context retunred");
-    printf("%d %d\n", new_context->rax, context->rax);
-    assert(!memcmp(new_context, context, sizeof(Context)));
+    // printf("%d %d\n", new_context->rax, context->rax);
+    // assert(!memcmp(new_context, context, sizeof(Context)));
     // assert(*new_context == *context);
     return new_context;
     // return context;
