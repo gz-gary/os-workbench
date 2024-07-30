@@ -12,7 +12,7 @@ static Context *kmt_context_save(Event ev, Context *context) {
     int c = cpu_current();
     current[c]->context = *context;
     current[c]->status = TASK_RUNABLE;
-    putch('0');
+    // putch('0');
     return NULL;
 }
 
@@ -32,10 +32,10 @@ static int kmt_get_next_task(int tid) {
 }
 
 static Context *kmt_schedule(Event ev, Context *context) {
-    putch('1');
+    // putch('1');
     int c = cpu_current();
     int next_tid = kmt_get_next_task(current[c]->tid);
-    printf("\nswitch %d to %d\n", current[c]->tid, next_tid);
+    // printf("\nswitch %d to %d\n", current[c]->tid, next_tid);
     current[c] = tasks[next_tid];
     current[c]->status = TASK_RUNNING;
     return &(current[c]->context);
