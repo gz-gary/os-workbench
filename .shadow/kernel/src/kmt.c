@@ -10,13 +10,14 @@ struct cpu_info_t cpu_info[CPUS_LIMIT];
 
 static Context *kmt_context_save(Event ev, Context *context) {
     int c = cpu_current();
+    kmt->spin_lock(&lock_tasks_list);
     current[c]->context = *context;
     current[c]->status = TASK_RUNABLE;
+    kmt->spin_unlock(&lock_tasks_list);
     return NULL;
 }
 
 static int kmt_get_next_task(int tid) {
-    kmt->spin_lock(&lock_tasks_list);
     int nxt_tid = tid < cnt_tasks - 1 ? tid + 1 : 0;
     while (1) {
         if (tasks[nxt_tid]
@@ -26,16 +27,17 @@ static int kmt_get_next_task(int tid) {
         ++nxt_tid;
         if (nxt_tid == cnt_tasks) nxt_tid = 0;
     }
-    kmt->spin_unlock(&lock_tasks_list);
     return nxt_tid;
 }
 
 static Context *kmt_schedule(Event ev, Context *context) {
     int c = cpu_current();
+    kmt->spin_lock(&lock_tasks_list);
     int next_tid = kmt_get_next_task(current[c]->tid);
     // printf("\nswitch %d to %d\n", current[c]->tid, next_tid);
     current[c] = tasks[next_tid];
     current[c]->status = TASK_RUNNING;
+    kmt->spin_unlock(&lock_tasks_list);
     return &(current[c]->context);
 }
 
