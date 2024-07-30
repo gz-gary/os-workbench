@@ -31,11 +31,38 @@ static void os_init_handlers() {
     }
 }
 
+sem_t empty, fill;
+#define P kmt->sem_wait
+#define V kmt->sem_signal
+
+static inline task_t *task_alloc() {
+    return pmm->alloc(sizeof(task_t));
+}
+
+void T_produce(void *arg) { while (1) { P(&empty); putch('('); V(&fill); } }
+void T_consume(void *arg) { while (1) { P(&fill); putch(')'); V(&empty); } }
+
+static void run_test1() {
+    int N = 5;
+    int NPROD = 1;
+    int NCONS = 1;
+    kmt->sem_init(&empty, "empty", N);
+    kmt->sem_init(&fill, "fill", 0);
+    for (int i = 0; i < NPROD; ++i) {
+        kmt->create(task_alloc(), "producer", T_produce, NULL);
+    }
+    for (int i = 0; i < NCONS; ++i) {
+        kmt->create(task_alloc(), "consumer", T_consume, NULL);
+    }
+}
+
 static void os_init() {
     os_init_handlers();
 
     pmm->init();
     kmt->init();
+
+    run_test1();
 
 }
 
@@ -48,20 +75,18 @@ static void os_run() {
 }
 
 static Context* os_trap(Event ev, Context *context) {
-    /*
-    Context *new_context = NULL;
+    // Context *new_context = NULL;
     for (int i = 0; i < cnt_handlers; ++i) {
         if (handlers[i].event == EVENT_NULL
             || handlers[i].event == ev.event) {
-            Context *c = handlers[i].handler(ev, context);
-            panic_on(c && new_context, "Multiple context returned");
-            if (c) new_context = c;
+            printf("%d ", i);
+            // Context *c = handlers[i].handler(ev, context);
+            // panic_on(c && new_context, "Multiple context returned");
+            // if (c) new_context = c;
         }
     }
-    panic_on(!new_context, "No context retunred");
-    return new_context;*/
-    assert(ev.event == EVENT_IRQ_TIMER);
-    putch('i');
+    // panic_on(!new_context, "No context retunred");
+    // return new_context;
     return context;
 }
 

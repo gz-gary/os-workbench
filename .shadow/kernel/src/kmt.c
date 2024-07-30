@@ -1,7 +1,7 @@
 #include <common.h>
 #include <os.h>
 
-int cnt_tasks = 0;
+int cnt_tasks;
 task_t *tasks[TASKS_LIMIT];
 task_t *current[CPUS_LIMIT];
 spinlock_t lock_tasks_list;
@@ -49,6 +49,7 @@ static void kmt_init() {
         };
         current[i] = NULL;
     }
+    cnt_tasks = 0;
     for (int i = 0; i < TASKS_LIMIT; ++i) {
         tasks[i] = NULL;
     }
