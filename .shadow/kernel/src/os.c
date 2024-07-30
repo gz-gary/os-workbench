@@ -103,7 +103,7 @@ static void os_run() {
     }*/
 #endif
     // while (1) { yield(); }
-    while (1) { putch('A' + cpu_current()); }
+    while (1) { yield(); /*putch('A' + cpu_current());*/ }
 }
 
 static void os_init() {
