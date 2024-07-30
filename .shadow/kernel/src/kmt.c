@@ -18,7 +18,6 @@ static int kmt_get_next_task(int tid) {
     kmt->spin_lock(&lock_tasks_list);
     int nxt_tid = tid < cnt_tasks - 1 ? tid + 1 : 0;
     while (1) {
-        assert(nxt_tid != tid);
         if (tasks[nxt_tid]
             && tasks[nxt_tid]->status == TASK_RUNABLE) {
             break;
