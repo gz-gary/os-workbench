@@ -1,8 +1,24 @@
 #ifndef TASK_H
 #define TASK_H
 
+#include <am.h>
+#include <klib.h>
+#include <klib-macros.h>
+
+#define TASKS_LIMIT 128
+#define KSTACK_LIMIT 4 * 1024 // 4 KiB
+
 struct task {
-    // nothing now
+    const char     *name;
+    void           (*entry)(void*);
+    Context        context;
+    int            tid;
+    enum {
+        TASK_RUNABLE,
+        TASK_RUNNING,
+        TASK_BLOCKED,
+    }              status;
+    uint8_t        kstack[KSTACK_LIMIT];
 };
 
 #endif

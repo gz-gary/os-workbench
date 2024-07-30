@@ -77,6 +77,6 @@ void slab_init() {
         for (int j = 0; j < SLAB_LEVEL; ++j) {
             slab_t *slab = locate_slab(i, j);
             slab->head = NULL;
-            spinlock_init(&slab->lock);
+            spinlock_init(&slab->lock, NULL);
         }
 }
