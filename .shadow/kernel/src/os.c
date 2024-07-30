@@ -68,7 +68,9 @@ static void os_init() {
 
     pmm->init();
     kmt->init();
+#ifdef LOCAL_TEST
     printf("CPU count = %d\n", cpu_count());
+#endif
     for (int i = 0; i < cpu_count(); ++i) {
         task_t *t = task_alloc();
         kmt->create(t, "idle", T_idle, NULL);
@@ -83,9 +85,11 @@ static void os_init() {
 }
 
 static void os_run() {
+#ifdef LOCAL_TEST
     for (const char *s = "Hello World from CPU #*\n"; *s; s++) {
         putch(*s == '*' ? '0' + cpu_current() : *s);
     }
+#endif
     iset(true);
     while (1) ;
 }

@@ -83,10 +83,12 @@ static void pmm_init() {
         - (uintptr_t)heap.start
     );
 
+#ifdef LOCAL_TEST
     printf(
         "Got %d MiB heap: [%p, %p)\n",
         pmsize >> 20, heap.start, heap.end
     );
+#endif
 
     setup_heap_layout();
     buddy_init();
