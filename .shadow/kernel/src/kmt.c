@@ -36,7 +36,7 @@ static int kmt_get_next_task(int tid) {
 static Context *kmt_schedule(Event ev, Context *context) {
     // putch('1');
     int next_tid = kmt_get_next_task(current[cpu_current()]->tid);
-    //printf("switch %d to %d\n", current[cpu_current()]->tid, next_tid);
+    printf("switch %d to %d\n", current[cpu_current()]->tid, next_tid);
     int c = cpu_current();
     // printf("%p ", &(current[c]->context));
     current[c] = tasks[next_tid];
