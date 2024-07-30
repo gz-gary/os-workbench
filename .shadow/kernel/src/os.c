@@ -85,6 +85,8 @@ static void run_test2() {
 
 #endif
 
+void T_idle(void *arg) { while (1) { yield(); } }
+
 static void os_run() {
 #ifdef LOCAL_TEST
     /*for (const char *s = "Hello World from CPU #*\n"; *s; s++) {
@@ -105,7 +107,7 @@ static void os_init() {
 #endif
     for (int i = 0; i < cpu_count(); ++i) {
         task_t *t = task_alloc();
-        kmt->create(t, "idle", os_run, NULL);
+        kmt->create(t, "idle", T_idle, NULL);
         t->status = TASK_RUNNING;
         current[i] = t;
     }
