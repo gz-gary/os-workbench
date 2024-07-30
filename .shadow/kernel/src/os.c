@@ -48,7 +48,7 @@ sem_t empty, fill;
 
 void T_produce(void *arg) {
     while (1) {
-        putch('C');
+        // putch('C');
         // yield();
         // P(&empty); /*putch('(');*/ V(&fill);
     }
