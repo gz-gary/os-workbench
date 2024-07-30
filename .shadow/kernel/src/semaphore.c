@@ -10,6 +10,7 @@ void semaphore_wait(struct semaphore *sem) {
     spinlock_lock(&sem->lock);
     while (sem->value < 1) {
         spinlock_unlock(&sem->lock);
+        for (int i = 1; i <= 100; ++i);
         spinlock_lock(&sem->lock);
     }
     --sem->value;
