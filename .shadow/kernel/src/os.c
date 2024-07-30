@@ -60,6 +60,7 @@ static Context* os_trap(Event ev, Context *context) {
     }
     panic_on(!new_context, "No context retunred");
     return new_context;*/
+    assert(ev.event == EVENT_IRQ_TIMER);
     putch('i');
     return context;
 }
