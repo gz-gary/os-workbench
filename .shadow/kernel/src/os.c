@@ -48,13 +48,14 @@ sem_t empty, fill;
 
 void T_produce(void *arg) {
     while (1) {
-        yield();
+        putch('C');
+        // yield();
         // P(&empty); /*putch('(');*/ V(&fill);
     }
 }
 void T_consume(void *arg) {
     while (1) {
-        yield();
+        // yield();
         // P(&fill); /*putch(')');*/ V(&empty);
     }
 }
@@ -101,7 +102,8 @@ static void os_run() {
         putch(*s == '*' ? '0' + cpu_current() : *s);
     }*/
 #endif
-    while (1) { yield(); }
+    // while (1) { yield(); }
+    while (1) { putch('A' + cpu_current()); }
 }
 
 static void os_init() {
