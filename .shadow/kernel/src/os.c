@@ -63,10 +63,9 @@ static void os_init() {
 
     pmm->init();
     kmt->init();
-    printf("%d\n", cpu_count());
+    printf("CPU count = %d\n", cpu_count());
     for (int i = 0; i < cpu_count(); ++i) {
         task_t *t = task_alloc();
-        printf("%p\n", t);
         kmt->create(t, "idle", NULL, NULL);
         t->status = TASK_RUNNING;
         current[i] = t;
@@ -95,11 +94,7 @@ static Context* os_trap(Event ev, Context *context) {
         }
     }
     panic_on(!new_context, "No context retunred");
-    // printf("%d %d\n", new_context->rax, context->rax);
-    // assert(!memcmp(new_context, context, sizeof(Context)));
-    // assert(*new_context == *context);
     return new_context;
-    // return context;
 }
 
 static void os_on_irq(int seq, int event, handler_t handler) {
