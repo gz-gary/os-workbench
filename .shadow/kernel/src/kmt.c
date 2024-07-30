@@ -37,7 +37,7 @@ static Context *kmt_schedule(Event ev, Context *context) {
     // printf("switch %d to %d\n", current[cpu_current()]->tid, next_tid);
     // current[cpu_current()] = tasks[next_tid];
     // current[cpu_current()]->status = TASK_RUNNING;
-    return NULL;
+    // return NULL;
     return &current[cpu_current()]->context;
 }
 

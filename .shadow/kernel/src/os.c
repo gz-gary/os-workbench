@@ -91,9 +91,9 @@ static Context* os_trap(Event ev, Context *context) {
             if (c) new_context = c;
         }
     }
-    // panic_on(!new_context, "No context retunred");
-    // return new_context;
-    return context;
+    panic_on(!new_context, "No context retunred");
+    return new_context;
+    // return context;
 }
 
 static void os_on_irq(int seq, int event, handler_t handler) {
