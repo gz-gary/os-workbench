@@ -62,6 +62,7 @@ static void os_init() {
 
     pmm->init();
     kmt->init();
+    printf("%d\n", cpu_count());
     for (int i = 0; i < cpu_count(); ++i) {
         task_t *t = task_alloc();
         printf("%p\n", t);
