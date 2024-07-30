@@ -10,7 +10,7 @@
 
 struct task {
     const char     *name;
-    void           (*entry)(void);
+    void           (*entry)(void*);
     Context        context;
     int            tid;
     enum {
