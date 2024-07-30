@@ -64,6 +64,7 @@ static void os_init() {
     kmt->init();
     for (int i = 0; i < cpu_count(); ++i) {
         task_t *t = task_alloc();
+        printf("%p\n", t);
         kmt->create(t, "idle", NULL, NULL);
         t->status = TASK_RUNNING;
         current[i] = t;

@@ -34,10 +34,11 @@ static int kmt_get_next_task(int tid) {
 
 static Context *kmt_schedule(Event ev, Context *context) {
     // putch('1');
-    int next_tid = kmt_get_next_task(current[cpu_current()]->tid);
-    printf("switch %d to %d\n", current[cpu_current()]->tid, next_tid);
     int c = cpu_current();
-    assert(current[c] == tasks[next_tid]);
+    int next_tid = kmt_get_next_task(current[c]->tid);
+    // printf("switch %d to %d\n", current[c]->tid, next_tid);
+    printf("%p %p\n", current[c], tasks[next_tid]);
+    // assert(current[c] == tasks[next_tid]);
     current[c] = tasks[next_tid];
     current[c]->status = TASK_RUNNING;
     return &(current[c]->context);
