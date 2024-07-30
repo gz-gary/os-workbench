@@ -35,9 +35,7 @@ static void os_init_handlers() {
 }
 
 static inline task_t *task_alloc() {
-    task_t *t = pmm->alloc(sizeof(task_t));
-    t->status = TASK_RUNABLE;
-    return t;
+    return pmm->alloc(sizeof(task_t));
 }
 
 #ifdef LOCAL_TEST

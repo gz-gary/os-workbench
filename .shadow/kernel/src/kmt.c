@@ -12,6 +12,7 @@ static Context *kmt_context_save(Event ev, Context *context) {
     int c = cpu_current();
     assert(current[c] != NULL);
     assert(&(current[c]->context) != NULL);
+    printf("\n cpu %d switch out %d\n", c, current[c]->tid);
     // kmt->spin_lock(&lock_tasks_list);
     current[c]->context = *context;
     current[c]->status = TASK_RUNABLE;
