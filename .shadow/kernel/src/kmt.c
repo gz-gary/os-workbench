@@ -11,6 +11,7 @@ struct cpu_info_t cpu_info[CPUS_LIMIT];
 static Context *kmt_context_save(Event ev, Context *context) {
     current[cpu_current()]->context = *context;
     current[cpu_current()]->status = TASK_RUNABLE;
+    putch('0');
     return NULL;
 }
 
@@ -30,8 +31,9 @@ static int kmt_get_next_task(int tid) {
 }
 
 static Context *kmt_schedule(Event ev, Context *context) {
+    putch('1');
     int next_tid = kmt_get_next_task(current[cpu_current()]->tid);
-    printf("switch %d to %d\n", current[cpu_current()]->tid, next_tid);
+    //printf("switch %d to %d\n", current[cpu_current()]->tid, next_tid);
     current[cpu_current()] = tasks[next_tid];
     current[cpu_current()]->status = TASK_RUNNING;
     return &current[cpu_current()]->context;
