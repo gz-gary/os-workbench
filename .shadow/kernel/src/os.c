@@ -60,7 +60,6 @@ void T_consume(void *arg) {
 }
 
 static void run_test1() {
-    return;
     int N = 5;
     int NPROD = 1;
     int NCONS = 1;
