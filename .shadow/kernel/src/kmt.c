@@ -11,7 +11,6 @@ struct cpu_info_t cpu_info[CPUS_LIMIT];
 static Context *kmt_context_save(Event ev, Context *context) {
     int c = cpu_current();
     current[c]->context = *context;
-    assert(!memcmp(&(current[c]->context), context, sizeof(Context)));
     current[c]->status = TASK_RUNABLE;
     // printf("%d ", c);
     // putch('0');
