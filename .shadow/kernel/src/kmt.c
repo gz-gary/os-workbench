@@ -34,7 +34,7 @@ static Context *kmt_schedule(Event ev, Context *context) {
     int c = cpu_current();
     kmt->spin_lock(&lock_tasks_list);
     int next_tid = kmt_get_next_task(current[c]->tid);
-    // printf("\nswitch %d to %d\n", current[c]->tid, next_tid);
+    printf("\ncpu %d switch %d to %d\n", c, current[c]->tid, next_tid);
     current[c] = tasks[next_tid];
     current[c]->status = TASK_RUNNING;
     kmt->spin_unlock(&lock_tasks_list);

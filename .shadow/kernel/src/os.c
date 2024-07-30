@@ -46,8 +46,8 @@ sem_t empty, fill;
 #define P kmt->sem_wait
 #define V kmt->sem_signal
 
-void T_produce(void *arg) { while (1) { P(&empty); putch('('); V(&fill); } }
-void T_consume(void *arg) { while (1) { P(&fill); putch(')'); V(&empty); } }
+void T_produce(void *arg) { while (1) { P(&empty); /*putch('(');*/ V(&fill); } }
+void T_consume(void *arg) { while (1) { P(&fill); /*putch(')');*/ V(&empty); } }
 
 static void run_test1() {
     int N = 5;
