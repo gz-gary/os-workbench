@@ -87,9 +87,9 @@ static void run_test2() {
 
 static void os_run() {
 #ifdef LOCAL_TEST
-    for (const char *s = "Hello World from CPU #*\n"; *s; s++) {
+    /*for (const char *s = "Hello World from CPU #*\n"; *s; s++) {
         putch(*s == '*' ? '0' + cpu_current() : *s);
-    }
+    }*/
 #endif
     while (1) { yield(); }
 }
