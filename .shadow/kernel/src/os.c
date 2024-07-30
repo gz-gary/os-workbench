@@ -46,7 +46,7 @@ void T_produce(void *arg) { while (1) { P(&empty); putch('('); V(&fill); } }
 void T_consume(void *arg) { while (1) { P(&fill); putch(')'); V(&empty); } }
 
 static void run_test1() {
-    int N = 100;
+    int N = 5;
     int NPROD = 1;
     int NCONS = 1;
     kmt->sem_init(&empty, "empty", N);
