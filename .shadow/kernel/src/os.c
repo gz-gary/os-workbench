@@ -42,6 +42,7 @@ static inline task_t *task_alloc() {
 
 void T_produce(void *arg) { while (1) { P(&empty); putch('('); V(&fill); } }
 void T_consume(void *arg) { while (1) { P(&fill); putch(')'); V(&empty); } }
+void T_idle(void *arg) { while (1); }
 
 static void run_test1() {
     int N = 100;
@@ -65,7 +66,7 @@ static void os_init() {
     printf("CPU count = %d\n", cpu_count());
     for (int i = 0; i < cpu_count(); ++i) {
         task_t *t = task_alloc();
-        kmt->create(t, "idle", NULL, NULL);
+        kmt->create(t, "idle", T_idle, NULL);
         t->status = TASK_RUNNING;
         current[i] = t;
     }
