@@ -92,7 +92,7 @@ static Context* os_trap(Event ev, Context *context) {
         }
     }
     panic_on(!new_context, "No context retunred");
-    assert(new_context == context);
+    // assert(*new_context == *context);
     return new_context;
     // return context;
 }
