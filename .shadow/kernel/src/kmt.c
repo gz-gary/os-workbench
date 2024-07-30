@@ -75,7 +75,6 @@ static int kmt_create(task_t *task, const char *name, void (*entry)(void *arg), 
     if (first_unused_tid == -1) {
         first_unused_tid = cnt_tasks++;
     }
-    printf("%d %d %p\n", cnt_tasks, first_unused_tid, task);
     tasks[first_unused_tid] = task;
     task->tid = first_unused_tid;
 
