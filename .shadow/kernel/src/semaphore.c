@@ -2,6 +2,7 @@
 
 void semaphore_init(struct semaphore *sem, const char *name, int value) {
     spinlock_init(&sem->lock, name);
+    // queue_init(&sem->queue);
     sem->name = name;
     sem->value = value;
 }
@@ -10,6 +11,7 @@ void semaphore_wait(struct semaphore *sem) {
     spinlock_lock(&sem->lock);
     while (sem->value < 1) {
         spinlock_unlock(&sem->lock);
+        yield();
         spinlock_lock(&sem->lock);
     }
     --sem->value;
