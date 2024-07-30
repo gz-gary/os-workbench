@@ -11,6 +11,7 @@ typedef struct handler_alt_t {
 handler_alt_t handlers[HANDLERS_LIMIT];
 int cnt_handlers;
 extern task_t *current[CPUS_LIMIT];
+spinlock_t lock_trap;
 
 static void os_sort_handlers() {
     for (int i = 0; i < cnt_handlers; ++i) {
@@ -49,7 +50,6 @@ void T_produce(void *arg) { while (1) { P(&empty); putch('('); V(&fill); } }
 void T_consume(void *arg) { while (1) { P(&fill); putch(')'); V(&empty); } }
 
 static void run_test1() {
-    return;
     int N = 5;
     int NPROD = 1;
     int NCONS = 1;
@@ -77,6 +77,7 @@ static void tty_reader(void *arg) {
 }
 
 static void run_test2() {
+    return;
     dev->init();
     kmt->create(task_alloc(), "tty_reader", tty_reader, "tty1");
     kmt->create(task_alloc(), "tty_reader", tty_reader, "tty2");
@@ -98,6 +99,7 @@ static void os_init() {
 
     pmm->init();
     kmt->init();
+    kmt->spin_init(&lock_trap, "trap lock");
 #ifdef LOCAL_TEST
     printf("CPU count = %d\n", cpu_count());
 #endif
@@ -116,6 +118,8 @@ static void os_init() {
 }
 
 static Context* os_trap(Event ev, Context *context) {
+    kmt->spin_lock(&lock_trap);
+
     Context *new_context = NULL;
     for (int i = 0; i < cnt_handlers; ++i) {
         if (handlers[i].event == EVENT_NULL
@@ -126,6 +130,8 @@ static Context* os_trap(Event ev, Context *context) {
         }
     }
     panic_on(!new_context, "No context retunred");
+
+    kmt->spin_unlock(&lock_trap);
     return new_context;
 }
 
