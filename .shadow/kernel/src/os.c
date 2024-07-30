@@ -9,6 +9,7 @@ typedef struct handler_alt_t {
 
 handler_alt_t handlers[HANDLERS_LIMIT];
 int cnt_handlers;
+extern task_t *current[CPUS_LIMIT];
 
 static void os_sort_handlers() {
     for (int i = 0; i < cnt_handlers; ++i) {
@@ -61,6 +62,12 @@ static void os_init() {
 
     pmm->init();
     kmt->init();
+    for (int i = 0; i < CPUS_LIMIT; ++i) {
+        task_t *t = task_alloc();
+        kmt->create(t, "idle", NULL, NULL);
+        t->status = TASK_RUNNING;
+        current[i] = t;
+    }
 
     run_test1();
 
