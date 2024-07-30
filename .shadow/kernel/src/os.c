@@ -118,8 +118,6 @@ static void os_init() {
 }
 
 static Context* os_trap(Event ev, Context *context) {
-    kmt->spin_lock(&lock_trap);
-
     Context *new_context = NULL;
     for (int i = 0; i < cnt_handlers; ++i) {
         if (handlers[i].event == EVENT_NULL
@@ -130,8 +128,6 @@ static Context* os_trap(Event ev, Context *context) {
         }
     }
     panic_on(!new_context, "No context retunred");
-
-    kmt->spin_unlock(&lock_trap);
 
     return new_context;
 }
