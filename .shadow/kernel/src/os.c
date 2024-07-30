@@ -1,5 +1,6 @@
 #include <common.h>
 #include <os.h>
+#include <devices.h>
 
 typedef struct handler_alt_t {
     int seq;
@@ -33,7 +34,9 @@ static void os_init_handlers() {
 }
 
 static inline task_t *task_alloc() {
-    return pmm->alloc(sizeof(task_t));
+    task_t *t = pmm->alloc(sizeof(task_t));
+    t->status = TASK_RUNABLE;
+    return t;
 }
 
 #ifdef LOCAL_TEST
@@ -46,6 +49,7 @@ void T_produce(void *arg) { while (1) { P(&empty); putch('('); V(&fill); } }
 void T_consume(void *arg) { while (1) { P(&fill); putch(')'); V(&empty); } }
 
 static void run_test1() {
+    return;
     int N = 5;
     int NPROD = 1;
     int NCONS = 1;
@@ -57,6 +61,25 @@ static void run_test1() {
     for (int i = 0; i < NCONS; ++i) {
         kmt->create(task_alloc(), "consumer", T_consume, NULL);
     }
+}
+
+static void tty_reader(void *arg) {
+    device_t *tty = dev->lookup(arg);
+    char cmd[128], resp[128], ps[16];
+    snprintf(ps, 16, "(%s) $ ", arg);
+    while (1) {
+        tty->ops->write(tty, 0, ps, strlen(ps));
+        int nread = tty->ops->read(tty, 0, cmd, sizeof(cmd) - 1);
+        cmd[nread] = '\0';
+        sprintf(resp, "tty reader task: got %d character(s).\n", strlen(cmd));
+        tty->ops->write(tty, 0, resp, strlen(resp));
+    }
+}
+
+static void run_test2() {
+    dev->init();
+    kmt->create(task_alloc(), "tty_reader", tty_reader, "tty1");
+    kmt->create(task_alloc(), "tty_reader", tty_reader, "tty2");
 }
 
 #endif
@@ -87,6 +110,7 @@ static void os_init() {
 
 #ifdef LOCAL_TEST
     run_test1();
+    run_test2();
 #endif
 
 }
