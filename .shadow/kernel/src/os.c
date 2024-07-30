@@ -61,7 +61,7 @@ static void run_test1() {
 
 #endif
 
-void T_idle(void *arg) { while (1); }
+void T_idle(void *arg) { while (1) { yield(); } }
 
 static void os_init() {
     os_init_handlers();
@@ -90,8 +90,7 @@ static void os_run() {
         putch(*s == '*' ? '0' + cpu_current() : *s);
     }
 #endif
-    iset(true);
-    while (1) ;
+    while (1) { yield(); }
 }
 
 static Context* os_trap(Event ev, Context *context) {
