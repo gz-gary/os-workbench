@@ -46,30 +46,27 @@ sem_t empty, fill;
 
 void T_produce(void *arg) {
     while (1) {
-        putch('C');
-        // yield();
-        // P(&empty); /*putch('(');*/ V(&fill);
+        P(&empty); putch('('); V(&fill);
     }
 }
 void T_consume(void *arg) {
     while (1) {
-        // yield();
-        // P(&fill); /*putch(')');*/ V(&empty);
+        P(&fill); putch(')'); V(&empty);
     }
 }
 
 static void run_test1() {
     int N = 5;
     int NPROD = 1;
-    // int NCONS = 1;
+    int NCONS = 1;
     kmt->sem_init(&empty, "empty", N);
     kmt->sem_init(&fill, "fill", 0);
     for (int i = 0; i < NPROD; ++i) {
         kmt->create(task_alloc(), "producer", T_produce, NULL);
     }
-    /*for (int i = 0; i < NCONS; ++i) {
+    for (int i = 0; i < NCONS; ++i) {
         kmt->create(task_alloc(), "consumer", T_consume, NULL);
-    }*/
+    }
 }
 
 static void tty_reader(void *arg) {
@@ -100,8 +97,7 @@ static void os_run() {
         putch(*s == '*' ? '0' + cpu_current() : *s);
     }*/
 #endif
-    // while (1) { yield(); }
-    while (1) { yield(); /*putch('A' + cpu_current());*/ }
+    while (1) { yield(); }
 }
 
 static void os_init() {
