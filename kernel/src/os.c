@@ -11,7 +11,7 @@ typedef struct handler_alt_t {
 handler_alt_t handlers[HANDLERS_LIMIT];
 int cnt_handlers;
 extern task_t *current[CPUS_LIMIT];
-spinlock_t lock_trap;
+extern task_t *task_buf[CPUS_LIMIT];
 
 static void os_sort_handlers() {
     for (int i = 0; i < cnt_handlers; ++i) {
@@ -35,9 +35,7 @@ static void os_init_handlers() {
 }
 
 static inline task_t *task_alloc() {
-    task_t *t = pmm->alloc(sizeof(task_t));
-    t->status = TASK_RUNABLE;
-    return t;
+    return pmm->alloc(sizeof(task_t));
 }
 
 #ifdef LOCAL_TEST
@@ -46,8 +44,16 @@ sem_t empty, fill;
 #define P kmt->sem_wait
 #define V kmt->sem_signal
 
-void T_produce(void *arg) { while (1) { P(&empty); putch('('); V(&fill); } }
-void T_consume(void *arg) { while (1) { P(&fill); putch(')'); V(&empty); } }
+void T_produce(void *arg) {
+    while (1) {
+        P(&empty); putch('('); V(&fill);
+    }
+}
+void T_consume(void *arg) {
+    while (1) {
+        P(&fill); putch(')'); V(&empty);
+    }
+}
 
 static void run_test1() {
     int N = 5;
@@ -87,9 +93,9 @@ static void run_test2() {
 
 static void os_run() {
 #ifdef LOCAL_TEST
-    for (const char *s = "Hello World from CPU #*\n"; *s; s++) {
+    /*for (const char *s = "Hello World from CPU #*\n"; *s; s++) {
         putch(*s == '*' ? '0' + cpu_current() : *s);
-    }
+    }*/
 #endif
     while (1) { yield(); }
 }
@@ -99,7 +105,6 @@ static void os_init() {
 
     pmm->init();
     kmt->init();
-    kmt->spin_init(&lock_trap, "trap lock");
 #ifdef LOCAL_TEST
     printf("CPU count = %d\n", cpu_count());
 #endif
@@ -118,8 +123,11 @@ static void os_init() {
 }
 
 static Context* os_trap(Event ev, Context *context) {
-    kmt->spin_lock(&lock_trap);
-
+    int cur = cpu_current();
+    if (task_buf[cur]) {
+        task_buf[cur]->status = TASK_RUNABLE;
+        task_buf[cur] = NULL;
+    }
     Context *new_context = NULL;
     for (int i = 0; i < cnt_handlers; ++i) {
         if (handlers[i].event == EVENT_NULL
@@ -131,7 +139,6 @@ static Context* os_trap(Event ev, Context *context) {
     }
     panic_on(!new_context, "No context retunred");
 
-    kmt->spin_unlock(&lock_trap);
     return new_context;
 }
 

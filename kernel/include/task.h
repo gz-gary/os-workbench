@@ -6,7 +6,7 @@
 #include <klib-macros.h>
 
 #define TASKS_LIMIT 128
-#define KSTACK_LIMIT 4 * 1024 // 4 KiB
+#define KSTACK_LIMIT 8 * 1024 // 8 KiB
 
 struct task {
     const char     *name;
