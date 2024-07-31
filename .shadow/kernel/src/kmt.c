@@ -4,18 +4,21 @@
 int cnt_tasks;
 task_t *tasks[TASKS_LIMIT];
 task_t *current[CPUS_LIMIT];
+task_t *task_buf[CPUS_LIMIT];
 spinlock_t lock_tasks_list;
 
 struct cpu_info_t cpu_info[CPUS_LIMIT];
 
 static Context *kmt_context_save(Event ev, Context *context) {
     int c = cpu_current();
-    assert(current[c] != NULL);
-    assert(&(current[c]->context) != NULL);
-    // kmt->spin_lock(&lock_tasks_list);
+    kmt->spin_lock(&lock_tasks_list);
+
     current[c]->context = *context;
-    current[c]->status = TASK_RUNABLE;
-    // kmt->spin_unlock(&lock_tasks_list);
+    assert(task_buf[c] == NULL);
+    task_buf[c] = current[c];
+    // current[c]->status = TASK_RUNABLE;
+
+    kmt->spin_unlock(&lock_tasks_list);
     return NULL;
 }
 
@@ -34,17 +37,14 @@ static int kmt_get_next_task(int tid) {
 
 static Context *kmt_schedule(Event ev, Context *context) {
     int c = cpu_current();
-    assert(current[c] != NULL);
-    assert(&(current[c]->context) != NULL);
-    // kmt->spin_lock(&lock_tasks_list);
+    kmt->spin_lock(&lock_tasks_list);
+
     int next_tid = kmt_get_next_task(current[c]->tid);
-    if (next_tid == 2) {
-        printf("thread goto %d\n", c);
-    }
     // printf("\ncpu %d switch %d to %d\n", c, current[c]->tid, next_tid);
     current[c] = tasks[next_tid];
     current[c]->status = TASK_RUNNING;
-    // kmt->spin_unlock(&lock_tasks_list);
+
+    kmt->spin_unlock(&lock_tasks_list);
     return &(current[c]->context);
 }
 
@@ -59,6 +59,7 @@ static void kmt_init() {
             .intena = true
         };
         current[i] = NULL;
+        task_buf[i] = NULL;
     }
     cnt_tasks = 0;
     for (int i = 0; i < TASKS_LIMIT; ++i) {

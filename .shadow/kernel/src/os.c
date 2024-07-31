@@ -11,7 +11,7 @@ typedef struct handler_alt_t {
 handler_alt_t handlers[HANDLERS_LIMIT];
 int cnt_handlers;
 extern task_t *current[CPUS_LIMIT];
-spinlock_t lock_trap;
+extern task_t *task_buf[CPUS_LIMIT];
 
 static void os_sort_handlers() {
     for (int i = 0; i < cnt_handlers; ++i) {
@@ -46,7 +46,7 @@ sem_t empty, fill;
 
 void T_produce(void *arg) {
     while (1) {
-        // putch('C');
+        putch('C');
         // yield();
         // P(&empty); /*putch('(');*/ V(&fill);
     }
@@ -109,7 +109,6 @@ static void os_init() {
 
     pmm->init();
     kmt->init();
-    kmt->spin_init(&lock_trap, "trap lock");
 #ifdef LOCAL_TEST
     printf("CPU count = %d\n", cpu_count());
 #endif
@@ -128,8 +127,11 @@ static void os_init() {
 }
 
 static Context* os_trap(Event ev, Context *context) {
-    kmt->spin_lock(&lock_trap);
-
+    int cur = cpu_current();
+    if (task_buf[cur]) {
+        task_buf[cur]->status = TASK_RUNABLE;
+        task_buf[cur] = NULL;
+    }
     Context *new_context = NULL;
     for (int i = 0; i < cnt_handlers; ++i) {
         if (handlers[i].event == EVENT_NULL
@@ -140,8 +142,6 @@ static Context* os_trap(Event ev, Context *context) {
         }
     }
     panic_on(!new_context, "No context retunred");
-
-    kmt->spin_unlock(&lock_trap);
 
     return new_context;
 }
